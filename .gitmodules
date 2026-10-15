@@ -15,7 +15,7 @@
 	url = ../fparser.git
 [submodule "hyp2mat"]
 	path = hyp2mat
-	url = https://github.com/koendv/hyp2mat.git
+	url = https://github.com/mberkanbicer/hyp2mat.git
 [submodule "CTB"]
 	path = CTB
 	url = ../CTB.git
