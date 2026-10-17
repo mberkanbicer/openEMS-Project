@@ -1,0 +1,1059 @@
+# Scientific and Compatibility Validation
+
+## Current evidence
+
+An original-stack baseline was built and exercised in Ubuntu 26.04.1 under
+WSL on 2026-10-16. The root build succeeded with the GUI, Python bindings,
+and CTB enabled; the optional hyp2mat build also succeeded. The native,
+Python, Octave, smoke, and documentation test results are recorded below.
+This is a headless single-platform baseline, not a completed migration
+acceptance baseline: GUI interaction, cross-platform runs, optional fparser
+backends, comprehensive immutable solver datasets, and performance/memory
+characterization across representative workloads remain open.
+
+### Original-stack WSL baseline
+
+The isolated Linux checkout used the exact source revisions listed in
+`MIGRATION_STATUS.md`. Toolchain: GCC/G++ 15.2.0, CMake 4.2.3, Python 3.14.4,
+Octave 11.1.0, HDF5 1.14.6, TinyXML 2.6.2, Boost 1.90, CGAL 6.1.1, VTK
+9.5.2, and Qt 6.10.2. The WSL host exposed a 13th Gen Intel Core i9-13900H
+with 20 logical CPUs. The install prefix was
+`/home/mberkanbicer/opt/openEMS`.
+
+The initial offline `--python-venv-mode=site` build failed in Python metadata
+preparation: `scripts/build_python.sh` appends `--system-site-packages` to
+`pip_opt` instead of `pip_opts`, so the generated venv could not import the
+system-installed `setuptools`. No source was changed. A manually created
+system-site venv and `--python-venv-mode=disable --python-use-network=disable`
+allowed the documented root build to complete without build isolation or
+network access:
+
+```sh
+./update_openEMS.sh /home/mberkanbicer/opt/openEMS \
+  --python --python-venv-mode=disable --python-use-network=disable \
+  --with-CTB --njobs=4
+./update_openEMS.sh /home/mberkanbicer/opt/openEMS \
+  --with-hyp2mat --njobs=4
+```
+
+| Validation | Result |
+| --- | --- |
+| Root build with GUI, Python, and CTB | Passed |
+| Optional hyp2mat root build and `hyp2mat --help` | Passed |
+| CSXCAD C++ tests (`CSXCAD_BUILD_TESTS=ON`) | 2 passed |
+| CSXCAD Python `unittest` suite | 150 passed, 1 skipped; targeted wrapper-cache tests 7/7 passed |
+| openEMS Python unit suite | 10 passed |
+| openEMS Python unit + simulation suite | 31 passed |
+| openEMS Octave/Matlab suite | 10 passed |
+| Octave and Python `MSL_NotchFilter` smoke tests | Passed |
+| Sphinx HTML documentation build | Passed, 0 warnings |
+
+Two cleanup-disabled Python MSL smoke runs produced immutable time-domain
+field/port traces and HDF5 E/H spatial snapshots in
+`reference-data/msl-notchfilter-wsl/`; the pinned input script hash, toolchain,
+dataset hashes, and exact dump configuration are recorded there. All 12
+numeric output arrays and all E/H HDF5 dataset arrays/attributes matched
+exactly across repeated runs. Five solver-time measurements for the
+269,780-cell, 1,000-step case ranged from 1.97494 s to 2.02864 s (median
+1.99594 s, coefficient of variation 1.11%). The simulation reached its
+1,000-step cap before the -60 dB termination criterion, so these outputs and
+timings are repeatability evidence for a smoke case, not a converged physical
+reference or cross-machine performance threshold.
+
+The analytic references were run from the pinned repository root in the
+configured WSL Python environment:
+
+```sh
+python3 openEMS/python/Tests/FieldProbes.py
+python3 openEMS/python/Tests/Conducting_Sheet.py
+```
+
+For the retained raw captures, each script was executed without source edits
+using a unique simulation output path and an in-memory `cleanup=False` override.
+The compact artifacts, pinned input hashes, test assertions, comparison
+results, and output checksums are documented in the following sections and
+their reference-directory READMEs.
+
+The pinned `openEMS/python/Tests/FieldProbes.py` analytic dipole case passed
+eight runs in the same WSL environment. All runs passed the script's
+probe/dump consistency, free-space D/E and B/H, frequency-domain, symmetry,
+Hertzian-dipole, and VTK assertions. The first output set is checksummed under
+`reference-data/fieldprobes-wsl/`; it retains the complete E/H time-domain
+plane dumps, E/H frequency-domain dumps, and numeric probe traces. A compact
+lossless keyframe file retains the quarter-run E/D/H/B fields and mesh/time
+coordinates. The complete first output set contained 54 files (119 MiB); the
+selected archive is 18,378,309 bytes. Repeat runs matched all 9 HDF5 files and
+22 numeric text files bitwise, although only the compact subset and the first
+run's full output checksums are retained.
+
+The case used a 41x41x41 mesh (68,921 cells), 10,000 maximum timesteps, a
+500 MHz frequency-domain probe, and 23 VTK slices. It did not reach its
+-60 dB end criterion before the timestep cap, so it is an analytic
+consistency/repeatability case, not a converged scientific acceptance case.
+Observed relative differences were `D - eps0*E = 6.29e-9`,
+`B - mue0*H = 5.30e-8`, and non-interpolated `B - mue0*H = 3.05e-8`;
+the analytic E and H dipole-ratio errors were 5.07% and 4.18%, respectively.
+The script's pass limits and its source SHA-256 are recorded with the
+artifacts. Three cleanup-enabled repeats reported solver times of
+9.61, 8.60, and 8.63 s (median 8.63 s, mean 8.94667 s, sample standard
+deviation 0.5747 s, coefficient of variation 6.42%). These timings are
+preliminary, exclude post-processing and cleanup, and do not satisfy the
+planned converged-case performance or memory study.
+Three additional process-isolated runs also passed; `/usr/bin/time` measured
+peak resident memory at 121,788, 122,248, and 122,920 KiB (median 122,248
+KiB), with end-to-end elapsed times of 11.73, 11.50, and 11.25 s. These
+include Python startup, post-processing, and cleanup. They characterize only
+this capped analytic case and do not supply a converged-case memory baseline.
+
+The pinned `openEMS/python/Tests/Conducting_Sheet.py` analytic transmission
+test supplies a converged scientific reference. The four 1D channel runs
+(5,409 cells at 0.25 mm axial spacing) all reached the configured -50 dB
+end-criteria at 1,460 steps for the empty reference and 1,314 steps for each
+sheet case. Five separate full test runs passed; all 20 solver calls reached
+the same scheduled stopping steps. The first run's four numeric probe traces
+and per-frequency complex transmission results are preserved under
+`reference-data/conducting-sheet-wsl/`; two cleanup-disabled captures matched
+bitwise in all numeric trace rows and derived complex responses.
+
+Across the 91 points from 1 to 10 GHz, the resistive-film case had maximum
+analytic errors of 0.017 dB and 6.54 degrees, thin copper 0.099 dB and
+3.84 degrees, and thick copper 1.982 dB; the measured thick-copper slope was
+8.8 dB/decade against 10 analytically. Five process-isolated runs produced 20
+solver-time observations from 0.027302 to 0.042648 s (median 0.029648 s, mean
+0.031390 s, sample standard deviation 0.004501 s, coefficient of variation
+14.34%). Per-process peak RSS ranged from 86,608 to 86,928 KiB (median 86,696
+KiB); end-to-end wall time ranged from 0.38 to 0.72 s. The small workload and
+timing variability make these platform-specific characterization data, not a
+performance threshold.
+
+For Rust acceptance, candidate analytic bounds are the source test's existing
+limits: cases 1 and 2 require maximum magnitude error below 0.25 dB and phase
+error below 10 degrees; case 3 requires magnitude error below 2.5 dB and a
+10 +/- 2 dB/decade magnitude slope. At 0.20 mm axial spacing, the maximum
+response change from the 0.25 mm reference was 0.0153 dB and 1.614 degrees
+across these cases, and all source assertions passed. A 0.50 mm aligned grid
+converged but exceeded the resistive-film phase limit at 12.39 degrees. A
+0.30 mm grid did not align source/sheet/probe planes, produced an unused-source
+warning and failed to converge; that run is invalid as a sensitivity sample.
+These criteria are provisional analytic acceptance bounds, not approved
+same-grid raw-field tolerances; the final comparison policy remains subject
+to Task 15 review.
+
+The pinned `openEMS/python/Tests/Coax.py` case adds a converged 3D reference.
+It models a 150 mm air-filled coaxial line with a 97x97x76 mesh (715,084
+cells), 0.25 mm transverse spacing, 2 mm axial spacing, and a 1-3 GHz,
+201-point port sweep. Two runs reached the configured `EndCriteria=1e-4`
+after 2,264 timesteps at -51.31 dB. Both passed the source assertions for
+return loss, transmission, and analytic characteristic impedance; the maximum
+impedance error was 1.20% against 49.939974651068 ohms. The maximum S11 was
+-50.8824 dB and S21 ranged from -0.0081 to +0.0034 dB. All saved frequency,
+port, and S-parameter arrays matched bitwise; all ten numeric rows in each
+port text file matched after ignoring timestamp headers, and the E/H HDF5
+files had matching hashes. Solver times were 11.33 and 12.03 seconds; these
+two observations characterize this WSL run only and are not a performance
+threshold. Compact arrays, solver outputs, and reproduction metadata are in
+`reference-data/coax-3d-wsl/`.
+The source assertions can be rerun from the repository root with:
+
+```bash
+source /home/mberkanbicer/python-venv-verified/bin/activate
+python3 openEMS/python/Tests/Coax.py
+```
+
+The retained runs executed the same pinned source without editing it, redirecting
+each output path and disabling cleanup in memory so solver outputs and port
+arrays could be captured.
+
+The original fparser CMake target built on Windows with Visual Studio
+2022/MSVC 19.44. Its example evaluated `x^2` at -1, 0, and 1 as 1, 0, and 1.
+A separate build enabling float, long double, and long integer ran the second
+example: double and float produced visibly different precision, Windows long
+double matched double, and integer `x*x` produced 0, 1, 4 for inputs 0, 1, 2.
+Two more default-double probes returned `sin(0) = 0`, `sin(1.5) = 0.997495`,
+`sin(3) = 0.14112`, and true (`1`) for a constant sum of ten `0.1` terms
+compared with 1. A temporary C++ probe linked against the original parser
+sources and observed error codes 1-4, stale error state after an invalid parse,
+inline-variable result 27 for `a:=x*x; a+2*a` at `x=3`, correct skipping of an
+erroring unselected `if` branch, and child-parser error propagation.
+Optimization also removed an observable callback from `0*count(x)` and
+`0&count(x)`. A separate complex-double build returned approximately
+`6.12323e-17 - i` for `sqrt(-1)` and `sqrt(0-1)`; for `sqrt(x)`, the imaginary
+sign followed the sign of zero in the input (`x=(-1,+0)` returned `+i`,
+`x=(-1,-0)` returned `-i`). Optimizing `sqrt(-1)` preserved that result.
+A separate build enabled all three complex scalar types and evaluated
+`sqrt(-1)`: double and long double returned approximately
+`6.12323e-17 - i`, while float returned approximately `-4.37114e-08 - i`.
+Further default-double probes returned `7` for `1+2*3`, `-4` for `-2^2`,
+`1`/`0` for equality at/just beyond the `1e-12` absolute epsilon,
+`0`/`1` for corresponding less-than boundary checks, and `0`/`1` for logical
+truth inputs `0.4999`/`0.5`. With `cm=0.01`, `5/2cm` returned `250` while
+`(5/2)cm` returned `0.025`; `sin(90)` parsed in degree mode returned `1`.
+The optimized/unoptimized expression sample matched values and errors for
+trigonometric identity, conditional square roots, `log(exp(x))`, a quadratic,
+and `x^0` at `x=-2,0,2`. It did not preserve the error from `0*log(-2)`:
+unoptimized evaluation reported error 3, while optimized evaluation returned
+zero with no error. `x/x` at zero already evaluated to 1 before explicit
+optimization, indicating a compile-time rewrite.
+These are component behavior probes only, not comprehensive parser or
+numerical-boundary validation. The build under `%TEMP%` emitted MSBuild path
+warnings; compiling the example emitted narrowing-conversion warnings from
+generated optimizer code. MPFR and GMP variants and other platform builds were
+not exercised in that initial baseline. Their headers were unavailable at the
+checked MSYS2 and vcpkg locations, and no dependency was installed. A later WSL
+check found MPFR 4.2.2 and GMP 6.3.0 already installed. Separate C++98 builds
+of `fparser.cc`, `fpoptimizer.cc`, and the corresponding wrapper sources
+succeeded; arithmetic probes returned `1.01` for MPFR `x*x+1` at `x=0.1` and
+the exact GMP integer `15241578750190522` for `x*x+1` at `x=123456789`. The
+MPFR build emitted a deprecation warning for `mpfr_root`. No dependency was
+installed. Broader backend compatibility and installation packaging remain
+unverified. Temporary probe source and build outputs were removed after
+recording their results. A separate focused probe exercised every source-listed
+built-in in the default double parser: all real-valued functions evaluated
+without errors, while the five complex-only names failed with
+`UNKNOWN_IDENTIFIER`. A complex-double build then evaluated all five
+complex-only functions without errors. Exact outputs are in
+`audits/fparser.md`. These probes do not cover all domains, variants, or
+optimizer transformations.
+
+## Additional component evidence
+
+- **CTB:** MATLAB R2025b exercised representative transform singularities,
+  zero/negative reference impedances, matrix shape errors, malformed and
+  truncated Touchstone records, zero/negative frequencies, and network
+  operation edge cases. Hz/kHz/MHz/GHz scaling and RI/MA/DB decoding also
+  matched their sample expectations. An invalid-unit exception left the input
+  file open, confirmed with `openedFiles`. The complete observed outputs and
+  unresolved cross-product gaps are in `audits/ctb.md`.
+
+  A separate three-frequency, two-port transform probe used asymmetric
+  reference impedances `[50;75]`; `s2y`/`y2s`, `s2z`/`y2z`, `s2z`/`z2y`, and
+  `s2a`/`a2s` round trips all passed with maximum absolute error below
+  `4.3e-14`:
+
+  ```powershell
+  matlab -batch "addpath('CTB'); S=zeros(2,2,3); for k=1:3, S(:,:,k)=[0.1+0.01i*k,0.2-0.02i*k;0.7+0.03i*k,-0.1+0.01i*k]; end; Z=s2z(S,[50;75]); Y=s2y(S,[50;75]); S2=y2s(Y,[50;75]); Z2=y2z(Y); Y2=z2y(Z); A=s2a(S,50); S3=a2s(A,50); e1=max(abs(S(:)-S2(:))); e2=max(abs(Z(:)-Z2(:))); e3=max(abs(Y(:)-Y2(:))); e4=max(abs(S(:)-S3(:))); assert(max([e1,e2,e3,e4])<1e-12); fprintf('CTB transform round-trips passed; max errors %.3g %.3g %.3g %.3g\n',e1,e2,e3,e4);"
+  ```
+
+  A 3-port S/Z/Y round trip with distinct references also passed at all three
+  frequency slices; maximum absolute errors were `1.25e-16` (S/Z) and
+  `7.08e-17` (S/Y):
+
+  ```powershell
+  matlab -batch "addpath('CTB'); S=zeros(3,3,3); for k=1:3, S(:,:,k)=[0.10+0.01i*k,0.02-0.01i*k,0.03;0.04,0.08+0.01i*k,0.02;0.01,0.05,0.12-0.02i*k]; end; ref=[50;75;60]; Z=s2z(S,ref); Y=s2y(S,ref); Sz=z2s(Z,ref); Sy=y2s(Y,ref); ez=max(abs(S(:)-Sz(:))); ey=max(abs(S(:)-Sy(:))); assert(max(ez,ey)<1e-12); fprintf('CTB 3-port transform round-trips passed; max errors %.3g %.3g\n',ez,ey);"
+  ```
+
+  Two-frequency, two-port Touchstone S/Z/Y files also round-tripped through
+  the writer and reader exactly; omitted references were `50` for S and `1`
+  for Z/Y:
+
+  ```powershell
+  matlab -batch "addpath('CTB'); freq=[1e6 2e6]; D=zeros(2,2,2); D(:,:,1)=[0.1+0.02i,0.3-0.01i;0.7+0.05i,-0.2+0.03i]; D(:,:,2)=[-0.1+0.01i,0.2+0.02i;0.6-0.04i,0.15+0.03i]; types={'s','z','y'}; errs=zeros(1,3); for k=1:3, f=[tempname,'.s2p']; try, write_touchstone(types{k},freq,D,f); [t,fr,R,ref]=read_touchstone(f); errs(k)=max(abs(D(:)-R(:))); wantref=1; if types{k}=='s', wantref=50; end; assert(t==types{k} && max(abs(fr-freq))<1e-9 && ref==wantref && errs(k)<1e-5); delete(f); catch e, if exist(f,'file'), delete(f); end; rethrow(e); end; end; fprintf('CTB 2-port Touchstone S/Z/Y round trips passed; max errors %.3g %.3g %.3g\n',errs);"
+  ```
+
+  Renormalization between distinct per-port reference vectors and back passed
+  for a three-port, two-frequency S matrix:
+
+  ```powershell
+  matlab -batch "addpath('CTB'); S=zeros(3,3,2); for k=1:2, S(:,:,k)=[0.1+0.01i*k,0.02,0.03;0.04,0.08-0.01i*k,0.02;0.01,0.05,0.12+0.02i*k]; end; old=[50;75;60]; new=[75;60;50]; Snew=s_renorm(S,old,new); Sback=s_renorm(Snew,new,old); err=max(abs(S(:)-Sback(:))); assert(err<1e-12); fprintf('CTB unequal-reference 3-port renormalization round trip passed; max error %.3g\n',err);"
+  ```
+
+  `s2z` and `s2y` were also compared with independently assembled direct
+  equations for a three-port S matrix and `[50;75;60]` ohm references:
+
+  ```powershell
+  matlab -batch "addpath('CTB'); S=zeros(3,3,3); for k=1:3, S(:,:,k)=[0.10+0.01i*k,0.02-0.01i*k,0.03;0.04,0.08+0.01i*k,0.02;0.01,0.05,0.12-0.02i*k]; end; ref=[50;75;60]; Rroot=diag(sqrt(ref)); Rinv=diag(1./sqrt(ref)); Ze=zeros(size(S)); Ye=zeros(size(S)); I=eye(3); for k=1:3, Ze(:,:,k)=Rroot*((I-S(:,:,k))\(I+S(:,:,k)))*Rroot; Ye(:,:,k)=Rinv*((I+S(:,:,k))\(I-S(:,:,k)))*Rinv; end; Z=s2z(S,ref); Y=s2y(S,ref); ez=max(abs(Z(:)-Ze(:))); ey=max(abs(Y(:)-Ye(:))); assert(max(ez,ey)<1e-12); fprintf('CTB 3-port S-to-Z/Y analytic equations passed; max errors %.3g %.3g\n',ez,ey);"
+  ```
+  The renormalized 3-port S matrix also preserved its Z matrix across
+  `[50;75;60]` to `[75;60;50]` reference conversion:
+
+  ```powershell
+  matlab -batch "addpath('CTB'); S=zeros(3,3,2); for k=1:2, S(:,:,k)=[0.1+0.01i*k,0.02,0.03;0.04,0.08-0.01i*k,0.02;0.01,0.05,0.12+0.02i*k]; end; old=[50;75;60]; new=[75;60;50]; Snew=s_renorm(S,old,new); Zold=s2z(S,old); Znew=s2z(Snew,new); err=max(abs(Zold(:)-Znew(:))); assert(err<1e-12); fprintf('CTB renormalization impedance invariant passed; max Z error %.3g\n',err);"
+  ```
+
+  The 2-port S/ABCD conversion also passed for a single-frequency array:
+
+  ```powershell
+  matlab -batch "addpath('CTB'); S=reshape([0.1+0.02i,0.3-0.01i;0.7+0.05i,-0.2+0.03i],2,2,1); A=s2a(S,50); S2=a2s(A,50); err=max(abs(S(:)-S2(:))); assert(err<1e-12); fprintf('CTB single-frequency S/ABCD round trip passed; max error %.3g\n',err);"
+  ```
+- **QCSXCAD/AppCSXCAD:** `cmake -S QCSXCAD -B <temporary-build-dir>` ran with
+  MSVC 19.44 and failed during configure because the CSXCAD library/include
+  paths and TinyXML library/include files were missing. Later, the complete
+  WSL root build compiled QCSXCAD and AppCSXCAD and linked the Qt6/VTK runtime
+  libraries. No interactive GUI test was possible in the headless session;
+  exact source findings are in `audits/gui.md`.
+- **CSXCAD Matlab/Octave:** MATLAB R2025b `struct_2_xml` probe with an `A&B`
+  attribute, `A&B` text value, and empty numeric field passed assertions that
+  the DOM output escaped ampersands and omitted the empty field. The temporary
+  XML file was removed. Octave is now available; the separate writer was
+  tested with the same input shape and confirmed to emit raw ampersands and an
+  explicit empty element. A missing output directory caused `fprintf` to fail
+  with `invalid stream number = -1` after `fopen` returned its unchecked error
+  value. The probe assertions were:
+
+  ```octave
+  addpath('CSXCAD/matlab');
+  f = [tempname(), '.xml'];
+  s.ATTRIBUTE.Attr = 'A&B'; s.Text = 'A&B'; s.Empty = [];
+  struct_2_xml(f, s, 'root'); out = fileread(f);
+  assert(!isempty(strfind(out, 'Attr="A&B"')));
+  assert(!isempty(strfind(out, '<Text>A&B</Text>')));
+  assert(!isempty(strfind(out, '<Empty></Empty>'))); unlink(f);
+  ```
+
+  A second probe confirmed the unchecked `fopen` path reports the downstream
+  Octave stream error:
+
+  ```octave
+  p = [tempname(), '/missing/subdir.xml']; failed = false;
+  try
+    struct_2_xml(p, struct(), 'root');
+  catch err
+    failed = true;
+    assert(!isempty(strfind(err.message, 'invalid stream number = -1')));
+  end
+  assert(failed);
+  ```
+  A second MATLAB probe passed an unknown `AddProbe` option with numeric value
+  `42`; the emitted warning used `"*"` rather than the option key because the
+  warning formats the value argument. The call completed and `lastwarn`
+  returned identifier `CSXCAD:AddProbe`.
+  A `CheckMesh([0 2],0,1,1.3,...)` probe returned no error data with
+  `be_quiet=1`, but returned one max-resolution error (position 1, type 1)
+  with `be_quiet=0`; quiet mode suppresses results as well as warnings.
+  Calling `Convert_VF_DiscMaterial` with an unknown option and nonexistent
+  input paths failed immediately with `Undefined variable 'varagin'.`, before
+  file access. The converter's full workflow remains unrun because the
+  required Virtual Family/database inputs are unavailable.
+- **openEMS and scripting interfaces:** The MATLAB pure-M-file unit groups
+  passed 17 checks, as recorded in `audits/openems-core.md`. The later WSL
+  baseline built the native solver and Python extensions. The Python full
+  suite passed all 31 unit and simulation tests; the Octave suite passed all
+  10 tests and compared all four engines' field dumps. Both language smoke
+  tests passed. GUI interaction and cross-platform behavior remain untested.
+  An earlier Python unit-runner attempt, before installing the documented
+  dependencies, was:
+
+  ```powershell
+  python openEMS\python\Tests\run_testsuite.py --only-unittests --timeout=30
+  ```
+
+  It ran 10 tests: `test_sim_scripts.py` passed, while nine errored at import
+  (eight missing NumPy, one missing `openEMS`). This was an initial
+  environment-readiness failure and is superseded by the passing WSL baseline
+  above.
+
+  The MATLAB `transforms` group was also run directly. Its five Gaussian,
+  DFT/FFT agreement, truncated-record, and periodic-sine checks passed; maximum
+  relative deviations were `1.7e-15`, `3.57e-15`, `2.07e-15`, `3.2e-12`, and
+  `1.23e-16`, respectively.
+  The `harminv` executable was not on `PATH` and was absent from its expected
+  Windows location, so that helper was not invoked end-to-end.
+
+  ```powershell
+  matlab -batch "addpath('CSXCAD\matlab'); addpath('openEMS\matlab'); addpath('openEMS\TESTSUITE\unittests'); assert(transforms());"
+  ```
+
+  MATLAB R2025b HDF5 round-trip probes used `WriteHDF5` with temporary files.
+  An FD-only field plus Cartesian mesh round-tripped values successfully
+  through `ReadHDF5Dump`; frequency and mesh vectors were returned as columns,
+  so the assertions compared normalized vector orientation. Adding TD samples
+  failed in `ReadHDF5FieldData` with `Invalid field name: '1/time'.` The
+  reader's `hdf5info` attribute name includes the dataset name, which its
+  regular expression retains as part of the dynamic struct field name. Both
+  temporary files were removed. These focused MATLAB probes do not replace
+  the missing solver-backed HDF5 reference comparison.
+
+  The TD failure was reproduced with:
+
+  ```powershell
+  matlab -batch "addpath('CSXCAD\matlab'); addpath('openEMS\matlab'); f=[tempname,'.h5']; try, h.TD.time=[0 1]; h.TD.values={reshape(1:8,[2 2 2]),reshape(9:16,[2 2 2])}; h.FD.frequency=[1e6 2e6]; h.FD.values={complex(ones(2,2,2),2*ones(2,2,2)),complex(3*ones(2,2,2),4*ones(2,2,2))}; m.type=0; m.names={'/Mesh/x','/Mesh/y','/Mesh/z'}; m.lines={[0 1],[0 2],[0 3]}; WriteHDF5(f,h,m); [r,rm]=ReadHDF5Dump(f); delete(f); catch e, if exist(f,'file'), delete(f); end; rethrow(e); end"
+  ```
+
+  The FD/mesh value round-trip was reproduced with:
+
+  ```powershell
+  matlab -batch "addpath('CSXCAD\matlab'); addpath('openEMS\matlab'); f=[tempname,'.h5']; try, h.FD.frequency=[1e6 2e6]; h.FD.values={complex(ones(2,2,2),2*ones(2,2,2)),complex(3*ones(2,2,2),4*ones(2,2,2))}; m.type=0; m.names={'/Mesh/x','/Mesh/y','/Mesh/z'}; m.lines={[0 1],[0 2],[0 3]}; WriteHDF5(f,h,m); [r,rm]=ReadHDF5Dump(f); assert(isequal(r.FD.frequency(:)',h.FD.frequency)); assert(isequal(r.FD.values{1},h.FD.values{1}) && isequal(r.FD.values{2},h.FD.values{2})); assert(all(cellfun(@(a,b) isequal(a(:)',b(:)'),rm.lines,m.lines))); delete(f); disp('MATLAB HDF5 FD/mesh value round-trip passed (vector orientation normalized)'); catch e, if exist(f,'file'), delete(f); end; rethrow(e); end"
+  ```
+
+  Spherical vector conversion was checked against the analytic radial unit
+  vector at theta=phi=90 degrees:
+
+  ```powershell
+  matlab -batch "addpath('openEMS\matlab'); f=[tempname,'.vtk']; try, m.type=2; m.lines={[1],[pi/2],[pi/2]}; q=reshape([1 0 0],[1 1 1 3]); Dump2VTK(f,q,m,'E'); out=fileread(f); disp(out); delete(f); catch e, if exist(f,'file'), delete(f); end; rethrow(e); end"
+  ```
+
+  The source emitted approximately `(0,0,0)`; the expected Cartesian vector is
+  `(0,1,0)`. No M-file was changed; this is recorded as a compatibility finding
+  pending migration behavior decisions.
+
+  Pure field-processing helpers were exercised with a scalar field
+  `x + 2*y + 3*z + t` on a 3x2x2 Cartesian mesh and three uniformly spaced
+  time samples. Range selection, `[2 1 2]` subsampling, interpolation onto five
+  X coordinates, and the zero-frequency TD-to-FD sum all passed assertions.
+  A separate probe requested scalar X range `2` on mesh `[0 1]`; MATLAB
+  reproduced `Index exceeds the number of array elements` from the one-value
+  fallback. The analytic field test was run as:
+
+  ```powershell
+  matlab -batch "addpath('openEMS\matlab'); m.type=0; m.lines={[0 1 2],[0 1],[0 1]}; [X,Y,Z]=ndgrid(m.lines{1},m.lines{2},m.lines{3}); f.TD.time=[0 .5 1]; for k=1:3, f.TD.values{k}=X+2*Y+3*Z+f.TD.time(k); end; f.TD.names={'1','2','3'}; [r,mr]=GetField_Range(f,m,{[1 2],[0],[]}); assert(isequal(mr.lines{1},[1 2]) && isequal(mr.lines{2},0) && isequal(size(r.TD.values{1}),[2 1 2])); [s,ms]=GetField_SubSampling(f,m,[2 1 2]); assert(isequal(ms.lines{1},[0 2]) && isequal(ms.lines{3},0) && isequal(s.TD.values{2},f.TD.values{2}([1 3],:,1,:))); li={linspace(0,2,5),[],[]}; [i,mi]=GetField_Interpolation(f,m,li); [Xi,Yi,Zi]=ndgrid(mi.lines{1},mi.lines{2},mi.lines{3}); expected=Xi+2*Yi+3*Zi+f.TD.time(2); assert(max(abs(i.TD.values{2}(:)-expected(:)))<1e-12); g=GetField_TD2FD(f,0); expectedFD=2*.5*(f.TD.values{1}+f.TD.values{2}+f.TD.values{3}); assert(isequal(g.FD.frequency,0) && max(abs(g.FD.values{1}(:)-expectedFD(:)))<1e-12); disp('MATLAB field range/subsampling/interpolation/TD2FD probes passed');"
+  ```
+
+  The scalar out-of-range failure was reproduced with:
+
+  ```powershell
+  matlab -batch "addpath('openEMS\matlab'); m.lines={[0 1],[0],[0]}; caught=false; try, GetField_Range([],m,{2,[],[]}); catch e, caught=contains(e.message,'Index exceeds'); disp(e.message); end; assert(caught); disp('MATLAB scalar out-of-range probe reproduced the range-index error');"
+  ```
+
+  `calcWGPort` reference-plane handling was exercised with minimal U/I probe
+  text files. The branch failed at `real(beta)` because MATLAB resolved bare
+  `beta` to its built-in function:
+
+  ```powershell
+  matlab -batch "addpath('openEMS\matlab'); d=tempname; mkdir(d); try, U=[0 1;1e-12 .5;2e-12 0;3e-12 -.5]; I=U; dlmwrite(fullfile(d,'U.txt'),U,'delimiter',' '); dlmwrite(fullfile(d,'I.txt'),I,'delimiter',' '); p.type='WaveGuide'; p.U_filename='U.txt'; p.I_filename='I.txt'; p.kc=1; p.drawingunit=1; p.measplanepos=0; try, calcWGPort(p,d,[1e9 2e9],'RefPlaneShift',1); catch e, disp(getReport(e,'extended')); end; delete(fullfile(d,'U.txt')); delete(fullfile(d,'I.txt')); rmdir(d); catch e, if exist(fullfile(d,'U.txt'),'file'), delete(fullfile(d,'U.txt')); end; if exist(fullfile(d,'I.txt'),'file'), delete(fullfile(d,'I.txt')); end; if exist(d,'dir'), rmdir(d); end; rethrow(e); end"
+  ```
+
+  The legacy MSL excitation option was probed with an initialized Cartesian
+  mesh and metal. Although the supplied string was empty, `port.excite` was 1:
+
+  ```powershell
+  matlab -batch "addpath('CSXCAD\matlab'); addpath('openEMS\matlab'); c=InitCSX(); m.x=[0 1 2 3 4]; m.y=[-1 -.5 0 .5 1]; m.z=[-3 -2 -1 0 1 2]; c=DefineRectGrid(c,1,m); c=AddMetal(c,'metal'); [c,p]=AddMSLPort(c,1,1,'metal',[0 -.5 0],[4 .5 -1],'x',[0 0 -1],'ExcitePort',''); disp(p.excite); assert(p.excite==1); disp('MATLAB empty legacy ExcitePort string enabled the MSL excitation');"
+  ```
+
+  The deprecated NF2FF function's documented optional radius was checked by
+  calling it with the five non-radius arguments; the implementation failed at
+  its exact-six-argument check:
+
+  ```powershell
+  matlab -batch "addpath('openEMS\matlab'); caught=false; try, AnalyzeNF2FF('unused',struct(),1,[0],[0]); catch e, caught=contains(e.message,'Not enough input'); disp(e.message); end; assert(caught); disp('MATLAB AnalyzeNF2FF radius documented optional but required');"
+  ```
+
+  The CSXCAD MATLAB writer edge probe was run as:
+
+  ```powershell
+  matlab -batch "addpath('CSXCAD\matlab'); q=struct(); q.ATTRIBUTE.note='A&B'; q.text='A&B'; q.empty=[]; f=[tempname,'.xml']; struct_2_xml(f,q,'Root'); out=fileread(f); assert(contains(out,'A&amp;B')); assert(~contains(out,'<empty')); delete(f)"
+  ```
+
+  ```powershell
+  matlab -batch "addpath('CSXCAD\matlab'); c=InitCSX(); lastwarn(''); c=AddProbe(c,'p',0,'Bogus',42); [msg,id]=lastwarn; assert(strcmp(id,'CSXCAD:AddProbe')); assert(contains(msg,'*')); disp(msg)"
+  ```
+
+  ```powershell
+  matlab -batch "addpath('CSXCAD\matlab'); [eQuiet,pQuiet,tQuiet]=CheckMesh([0 2],0,1,1.3,1); [eReport,pReport,tReport]=CheckMesh([0 2],0,1,1.3,0); assert(eQuiet==0 && isempty(pQuiet) && isempty(tQuiet)); assert(eReport==1 && isequal(pReport,1) && isequal(tReport,1))"
+  ```
+
+  ```powershell
+  matlab -batch "addpath('CSXCAD\matlab'); caught=false; try, Convert_VF_DiscMaterial('missing','missing.h5','unused.h5','Bogus',1); catch e, caught=contains(e.message,'varagin'); disp(e.message); end; assert(caught)"
+  ```
+
+  MATLAB R2025b also resolved a bundled phantom through
+  `openEMS_resource_path` after changing the working directory to `tempdir`;
+  a missing resource raised `openEMS:resource_not_found`. This confirms the
+  helper's function-relative behavior but does not validate installed layouts.
+
+  ```powershell
+  matlab -batch "orig=pwd; addpath(fullfile(orig,'openEMS','matlab')); cd(tempdir); p=openEMS_resource_path('phantoms','phantom_head_298MHz.h5'); assert(isfile(p)); try, openEMS_resource_path('__missing_resource__'); error('probe:expectedFailure'); catch e, assert(strcmp(e.identifier,'openEMS:resource_not_found')); end; disp('MATLAB resource lookup found packaged phantom from a changed working directory and raised the documented error identifier for a missing resource');"
+  ```
+
+  MATLAB R2025b also exercised `AR_estimate` on a constant signal and its
+  error-code paths for mismatched lengths, `mu <= 2*nu`, `expand_factor <= 1`,
+  and too-short input; constant extrapolation and codes `1`, `2`, `3`, and
+  `10` passed:
+
+  ```powershell
+  matlab -batch "addpath('openEMS\matlab'); t=0:9; v=ones(1,10); [va,ta,fa,e0]=AR_estimate(t,v,0,1,4,2); assert(e0==0 && numel(va)==20 && numel(ta)==20 && numel(fa)==1); [~,~,~,e1]=AR_estimate(t,v(1:9),0,1,4,2); [~,~,~,e2]=AR_estimate(t,v,0,1,2,2); [~,~,~,e3]=AR_estimate(t,v,0,1,4,1); [~,~,~,e10]=AR_estimate(0:4,ones(1,5),0,1,10,2); assert(isequal([e1 e2 e3 e10],[1 2 3 10])); disp('MATLAB AR_estimate valid extrapolation and error-code probes passed');"
+  ```
+
+  A synthetic MATLAB mesh verified `AddPML`'s per-face cell extension and that
+  zero counts leave the mesh unchanged:
+
+  ```powershell
+  matlab -batch "addpath('openEMS\matlab'); m.x=[0 1 3]; m.y=[0 2 5]; m.z=[0 4]; q=AddPML(m,[1 2 0 1 1 1]); assert(isequal(q.x,[-1 0 1 3 5 7]) && isequal(q.y,[0 2 5 8]) && isequal(q.z,[-4 0 4 8])); q2=AddPML(m,0); assert(isequal(q2,m)); disp('MATLAB AddPML directional padding and zero-padding probes passed');"
+  ```
+
+  A MATLAB R2025b probe of the exact `vectorEqual` comparison expression
+  reproduced an incorrect equality for distinct vectors: `[1;1]` and `[2;0]`
+  yield per-column mismatch flags `[true false]`, which do not enter the
+  helper's vector `if` branch.
+
+  ```powershell
+  matlab -batch "v1=[1;1]; v2=[2;0]; acc=1e-6; mismatch=sum(abs((v1(:)-v2(:))/v1(:))>acc)>0; if mismatch, equal=0; else, equal=1; end; assert(equal==1 && any(v1~=v2)); disp('MATLAB right-division expression accepted distinct comparison vectors');"
+  ```
+
+  Source inspection mapped `invoke_openEMS`, `setup`, and the Octave-only
+  `ensure_oct_file` recovery path. The Octave suite later passed in WSL, but
+  the solver-launcher error paths and forced oct-file rebuild/recovery path
+  were not directly exercised; directory-restoration and platform-specific
+  logging behaviors remain source observations, not runtime results.
+  Further source review mapped `DumpFF2VTK`, MATLAB/Octave HDF5 field and mesh
+  readers, attribute access, and waveguide mode-file serialization. No direct
+  helper tests were found for most paths; a focused Octave mesh fixture probe
+  is recorded below, while the Octave field reader and mode-file writer remain
+  without direct fixture coverage.
+  A MATLAB R2025b focused mode-file probe passed for coordinates, component
+  matrices as exposed by `h5read`, and the root `Version` attribute:
+
+  ```powershell
+  matlab -batch "addpath('CSXCAD\matlab'); addpath('openEMS\matlab'); f=[tempname '.h5']; c=onCleanup(@() delete(f)); x=[1 2]; y=[10 20 30]; Vx=reshape(1:6,2,3); Vy=10*Vx; h5writemode(f,x,y,Vx,Vy); xf=h5read(f,'/x'); yf=h5read(f,'/y'); vxf=h5read(f,'/Vx'); vyf=h5read(f,'/Vy'); assert(isequal(xf(:)',x)); assert(isequal(yf(:)',y)); assert(isequal(vxf,Vx.')); assert(isequal(vyf,Vy.')); assert(h5readatt(f,'/','Version')==1); disp('MATLAB h5writemode coordinates, transposed components, and Version attribute passed');"
+  ```
+  Source-only contracts were also added for optimizer callbacks and cache
+  naming, the four-run directional-coupler example and its local Y-to-S
+  conversion, CRLH geometry hints, and patch-array setup. The solver-backed
+  examples and direct tests were not run.
+
+- **openEMS Python port post-processing:** A synthetic WSL probe using the
+  verified system-site Python environment exercised `_load_ui_file` header
+  parsing and invalid-header rejection, `Port.ReadUIData` time-series
+  summation, `Port.CalcPort` incident/reflected wave identities, and incident
+  power calculation. All assertions passed. This checks the Python-level
+  contract only; no solver-produced files, mismatched probe time axes, or
+  reference-plane shifts were involved.
+
+  Reproduce from the repository root in the WSL baseline:
+
+  ```bash
+  source /home/mberkanbicer/python-venv-verified/bin/activate
+  python3 - <<'PY'
+  import os
+  import tempfile
+  import numpy as np
+  from openEMS.ports import Port, _load_ui_file
+
+  with tempfile.TemporaryDirectory() as directory:
+      header = os.path.join(directory, "header.txt")
+      with open(header, "w", encoding="utf-8") as stream:
+          stream.write("% t/s voltage mode_purity\n0 2 0.25\n1e-9 4 0.5\n")
+      data, columns = _load_ui_file(header)
+      assert data.shape == (2, 3) and columns == ["t/s", "voltage", "mode_purity"]
+      assert np.array_equal(data[:, 1], [2.0, 4.0])
+
+      invalid = os.path.join(directory, "invalid-header.txt")
+      with open(invalid, "w", encoding="utf-8") as stream:
+          stream.write("% time voltage\n0 2\n")
+      try:
+          _load_ui_file(invalid)
+      except ValueError:
+          pass
+      else:
+          raise AssertionError("invalid first column was accepted")
+
+      times = [0, 1e-9, 2e-9, 3e-9]
+      for name, values in (("u.txt", [2, 2, 2, 2]), ("i.txt", [1, 1, 1, 1])):
+          with open(os.path.join(directory, name), "w", encoding="utf-8") as stream:
+              stream.write("% t/s value\n")
+              stream.writelines(f"{t} {v}\n" for t, v in zip(times, values))
+      port = Port(None, 1, [0, 0, 0], [1, 1, 1], 0,
+                  U_filenames=["u.txt"], I_filenames=["i.txt"])
+      port.CalcPort(directory, [0.0], ref_impedance=2)
+      assert np.array_equal(port.ut_tot, [2, 2, 2, 2])
+      assert np.array_equal(port.it_tot, [1, 1, 1, 1])
+      assert np.allclose(port.uf_inc + port.uf_ref, port.uf_tot)
+      assert np.allclose(port.if_inc - port.if_ref, port.if_tot)
+      assert np.allclose(port.P_inc, 0.5 * np.real(port.uf_inc * np.conj(port.if_inc)))
+      assert port.u_mode_purity == [None]
+  PY
+  ```
+
+- **openEMS simulation-path cleanup:** A WSL Octave probe created a temporary
+  directory containing whitelisted solver outputs, an unrelated text file,
+  and an unreadable `.h5` file. `CleanupSimPath` removed the known outputs,
+  preserved both unrelated files, and created a requested missing directory;
+  all assertions passed. The probe did not create a genuine openEMS HDF5 dump,
+  so fingerprint-based HDF5 deletion remains untested.
+
+  ```bash
+  octave --no-gui --quiet --eval "addpath('openEMS/matlab'); root=tempname(); mkdir(root); unwind_protect; names={'et','ht','port_ut1','port_it1','mesh.vtk','notes.txt','unrelated.h5'}; for k=1:numel(names), fid=fopen(fullfile(root,names{k}),'w'); assert(fid>=0); fprintf(fid,'keep or delete'); fclose(fid); end; CleanupSimPath(root,0); assert(~exist(fullfile(root,'et'),'file')); assert(~exist(fullfile(root,'ht'),'file')); assert(~exist(fullfile(root,'port_ut1'),'file')); assert(~exist(fullfile(root,'port_it1'),'file')); assert(~exist(fullfile(root,'mesh.vtk'),'file')); assert(exist(fullfile(root,'notes.txt'),'file')==2); assert(exist(fullfile(root,'unrelated.h5'),'file')==2); missing=fullfile(root,'created'); CleanupSimPath(missing,0); assert(exist(missing,'dir')==7); unwind_protect_cleanup; if exist(root,'dir'), rmdir(root,'s'); end; end_unwind_protect; disp('CleanupSimPath whitelist, unrelated-file preservation, and directory creation passed');"
+  ```
+
+- **openEMS Octave HDF5 mesh reader:** Synthetic Cartesian, cylindrical, and
+  spherical HDF5 fixtures passed the type and line-array ordering checks. The
+  cylindrical result exposes a confirmed label/value mismatch: `lines` are
+  returned in rho/alpha/z order, while `names` remain alpha/rho/z; Cartesian
+  and spherical names match their line arrays. The cause is the Octave
+  `fieldnames` column vector being passed through `fliplr` (no-op), while the
+  line cell array is row-shaped and does reverse. No submodule source was
+  changed.
+
+  Reproduce in the WSL baseline from the repository root:
+
+  ```bash
+  source /home/mberkanbicer/python-venv-verified/bin/activate
+  python3 - <<'PY'
+  import os
+  import subprocess
+  import tempfile
+  import h5py
+  import numpy as np
+
+  cases = {
+      "cartesian": [("x", [0, 1]), ("y", [2, 3, 4]), ("z", [5, 6, 7, 8])],
+      "cylindrical": [("alpha", [0, 1]), ("rho", [2, 3, 4]), ("z", [5, 6, 7, 8])],
+      "spherical": [("phi", [0, 1]), ("r", [2, 3, 4]), ("theta", [5, 6, 7, 8])],
+  }
+  expected = {
+      "cartesian": (0, ["x", "y", "z"], [2, 3, 4]),
+      "cylindrical": (1, ["alpha", "rho", "z"], [3, 2, 4]),
+      "spherical": (2, ["r", "theta", "phi"], [3, 4, 2]),
+  }
+  with tempfile.TemporaryDirectory() as directory:
+      code = ["addpath('openEMS/matlab');"]
+      for name, axes in cases.items():
+          path = os.path.join(directory, name + ".h5")
+          with h5py.File(path, "w") as output:
+              mesh = output.create_group("Mesh")
+              for axis, values in axes:
+                  mesh.create_dataset(axis, data=np.asarray(values, dtype=np.float64))
+          path = path.replace("'", "''")
+          mesh_type, labels, lengths = expected[name]
+          code.extend([
+              f"m=ReadHDF5Mesh('{path}');",
+              f"assert(m.type=={mesh_type});",
+              *[f"assert(strcmp(m.names{{{index}}},'/Mesh/{label}'));" for index, label in enumerate(labels, 1)],
+              f"assert(isequal(cellfun(@numel,m.lines),[{ ' '.join(map(str, lengths)) }]));",
+              f"fprintf('{name} type=%d names=',m.type); disp(m.names');",
+              "fprintf('line counts='); disp(cellfun(@numel,m.lines));",
+          ])
+      subprocess.run(["octave", "--no-gui", "--quiet", "--eval", " ".join(code)], check=True)
+  PY
+  ```
+
+## Reference environment readiness
+
+The initial Windows audit environment lacked Octave and the native runtime.
+The baseline was therefore captured in an isolated Ubuntu 26.04.1 WSL clone
+created from local Git bundles because the Windows worktree's `.git` metadata
+points to a drive unavailable inside WSL. Its root and seven submodule
+checkouts match the pinned commits recorded in `MIGRATION_STATUS.md`. The
+installed native libraries, Python bindings, and Octave interfaces imported
+or executed from `/home/mberkanbicer/opt/openEMS`; no baseline source changes
+were made. Build and test dependencies were installed in WSL only.
+
+## Reference capture
+
+For each Rust unit:
+
+1. Record the exact root and submodule commits, operating system, compiler,
+   build options, dependency versions, and runtime configuration.
+2. Build the original component stack using the repository's documented build
+   flow and retain build logs.
+3. Run representative existing unit, integration, smoke, and end-to-end tests.
+   Preserve their inputs and outputs as immutable reference artifacts.
+4. For scientific cases, capture intermediate values at meaningful boundaries
+   (input parsing, mesh/material setup, operator coefficients, time-step
+   fields, and post-processing) where the original interfaces permit.
+5. Add analytical or manufactured-solution references and physical invariants
+   appropriate to each algorithm. Record the derivation and units.
+6. Measure runtime and memory on declared hardware using repeatable workloads.
+
+Do not edit or regenerate reference results to make a migrated implementation
+pass.
+
+## Comparison rules
+
+- Compare identical input files, meshes, parameters, boundary conditions,
+  precision, and solver settings.
+- Use bitwise comparison only when operation order and runtime are intended to
+  remain identical. Otherwise define case-specific absolute, relative, and
+  norm-based tolerances from analytical error, original repeatability, and
+  sensitivity evidence before evaluating the Rust result.
+- Compare intermediate state as well as final output. Investigate every
+  discrepancy beyond the predeclared criteria; do not mask it with broader
+  tolerances.
+- Check units, dimensions, coordinate conventions, conservation/physical
+  constraints, convergence behavior, and deterministic behavior where
+  applicable.
+- Verify XML and other file-format round trips, existing-project loading,
+  Python/Matlab APIs, GUI workflows, and cross-platform builds independently
+  from numerical equivalence.
+- Record command, environment, input/reference identifiers, comparison method,
+  tolerances, result, and unresolved differences for every validation run.
+
+## Existing validation entry points
+
+These commands are documented by the project instructions and must be run in
+an environment with the required toolchains and installed dependencies:
+
+```sh
+# Root integration smoke tests
+cd openEMS/.github/smoketests/octave && octave MSL_NotchFilter.m
+cd openEMS/.github/smoketests/python && python3 MSL_NotchFilter.py
+
+# CSXCAD
+cd CSXCAD/build && ctest --output-on-failure
+cd CSXCAD/python/tests && python3 -m unittest
+
+# openEMS
+cd openEMS/TESTSUITE && octave --no-gui run_testsuite.m
+python3 -m unittest discover -s openEMS/python/Tests -p "test_*.py" -v
+cd openEMS/python/Tests && python3 run_testsuite.py
+```
+
+The root build, CSXCAD tests, Python suites, Octave suite, smoke tests, and
+documentation build above were run in the WSL baseline. The Windows/MSVC and
+other CI platform commands, interactive GUI workflows, broader fparser
+MPFR/GMP backend tests, and fixture-driven hyp2mat conversion tests remain
+unrun.
+
+## Initial fparser Rust implementation
+
+On 2026-10-16, the new dependency-free `fparser-rs` crate was tested with
+Rust 1.99 on Windows. Its 20 unit tests passed; `cargo fmt --check` and
+`cargo clippy --all-targets -- -D warnings` passed. A separate CMake oracle
+compiled the pinned C++ `fparser.cc` and `fpoptimizer.cc` with MSVC 19.44 and
+ran focused compatibility cases:
+
+| Case | Original C++ result |
+| --- | --- |
+| `-2^2`, `2^3^2`, `2^-2` | `-4`, `512`, `0.25` |
+| `sin(30)` and `asin(0.5)` in degree mode | `0.49999999999999994`, `30.000000000000004` |
+| `2cm`, with `cm=0.01` | `0.02` |
+| `x=y` for values within the default epsilon | `1` |
+| `!0.49`, `!!0.5` | `1`, `1` |
+| Division by zero, negative square root, zero logarithm, invalid `asin` | Eval errors `1`, `2`, `3`, `4` |
+| Constant zero-to-negative power; dynamic zero-to-negative power | Eval errors `1`; `3` |
+| `if(0,count(x),7)`, `0&count(x)`, `1|count(x)` | Results `7`, `0`, `1`; callback called twice for the eager logical operators |
+| `a:=count(x); b:=a+1; b+b` at `x=2` | Result `6`; callback called once |
+
+The C++ oracle and Rust unit corpus also cover the same 33 default real
+built-ins. All Rust cases pass within `1e-12` of their asserted values; the
+oracle's `cot(pi/4)` is `1.0000000000000002` and `log2(8)` is
+`2.9999999999999996`, demonstrating why exact decimal equality is not used.
+The Rust tests assert the corresponding behavior, including the compile-time
+versus dynamic power distinction. An automated differential runner now builds
+the original C++ parser and evaluates the shared
+`fparser/rust/tests/differential_cases.tsv` corpus against both
+implementations. `python fparser/rust/tests/run_differential.py` passed 36,717
+expression cases and 36,692 callback-count checks with matching parse
+offsets/error categories and evaluation errors; successful numeric results use a
+relative/absolute `1e-12` comparison. The corpus covers all 33 default real
+built-ins plus representative precedence, units, every default-real angle
+input/output flag in degree mode, epsilon, numeric literals, parse errors,
+evaluator errors, callback laziness/eagerness, inline callback execution,
+variable deduction, parser-to-parser evaluation/error propagation,
+representative UTF-8 identifiers (including Greek, emoji, and combining marks)
+and the full legacy Unicode whitespace set, plus observed optimizer effects
+on callback counts and error behavior, including elimination, sharing,
+evaluation order, and lazy conditional branches.
+The runner adds 7,712 deterministic cases spanning all binary operators and
+the `pow` built-in and unary logical-not across a 16-value operand grid
+including NaN and both infinities, plus 1,434 cases covering the other unary
+and binary built-ins at domain boundaries, signed zero, non-finite values, and
+extreme magnitudes and 448 duplicate-callback operator cases, in both optimized
+and unoptimized modes. It also adds all 4,374 pairwise
+compositions of the 27 unary built-ins over six
+inputs including signed zero and domain boundaries in unoptimized mode, plus
+the same 4,374 compositions in optimized mode. A further 8,748 compositions in
+each mode use a 12-value stress grid including large magnitudes. All these
+generated nested cases pass against the C++ oracle, including focused overflow
+behavior for `atan(tan(x))`, `abs(tanh(x))`, and `tanh(abs(x))`.
+The runner additionally checks 393 targeted three-function optimizer
+compositions across signed zero, domain boundaries, and near-zero inputs.
+Nested callback variants of these rewrites also preserve the C++ callback
+counts. GCC 15.2 and MSVC 19.44 produced identical C++ results in the complete
+118,098-case optimized triple sweep. Reproduce it with
+`python fparser/rust/tests/run_differential.py --triple-audit`. After adding
+measured rewrites for `sec/tan(asin(cosh(x)))` and
+`tanh(acosh(cot(x)))`, nested-log lowerings, and measured `cot(atan(x)) -> 1/x`
+and `sqrt(exp2(x))` lowerings, the 118,098-case optimized triple audit passes
+with zero mismatches on both Windows/MSVC 19.44 and Ubuntu WSL/GCC 15.2. The
+last two fixes were driven by C++ bytecode: GCC emits the `sqrt(exp2(x))`
+factor `0.34657359027997259`, while MSVC emits
+`0.34657359027997264`; the Rust lowering uses the GCC value, which produces
+matching `floor`/`trunc` results at `x=2` on both tested systems. Passing the
+triple sweep is not proof of full generated optimizer-rule equivalence.
+The corpus includes the original compile-time
+`x/x` rewrite (which returns 1 even when `x` is zero), but confirms that the
+same rewrite does not apply to identical compound expressions or callback
+calls. This is still focused coverage, not full parser or optimizer
+equivalence. Optional numeric variants and malformed UTF-8 byte behavior are
+formally out of scope for `fparser-rs`; see `MIGRATION_PLAN.md`. The supported
+platform matrix remains only partially validated.
+
+The latest Windows and Ubuntu WSL checks pass `cargo fmt --check`, all 52 Rust
+tests, Clippy with warnings denied, and the 36,717-expression/36,692
+callback-count C++ differential suite and the complete 118,098-case triple
+audit. The extended 236,196-case 12-value triple stress audit also passes on
+both systems; full generated optimizer equivalence is not claimed. Context-sensitive `tan(atan(x))`, `abs(tanh(...))`, and
+`cosh(asinh(sinh(x)))` rewrites, along with rejecting NaN as a logarithm-domain
+error, reduced the mismatch count from 302.
+Cross-target `cargo check --all-targets` passes for `aarch64-apple-darwin`
+and `x86_64-unknown-freebsd`; runtime validation on macOS and FreeBSD remains
+outstanding. Ubuntu WSL initially lacked Cargo, so a user-local Rust toolchain
+was installed to run these checks. The
+Octave and Python
+smoke-test commands initially lacked installation paths. The Octave smoke test
+passed after adding the installed openEMS and CSXCAD M-file paths and binary
+directory; the Python smoke test remains blocked because the installed stack
+does not contain the Python `CSXCAD` module.
+
+Rust parser links use owned, immutable `Arc<Parser>` children
+rather than preserving the C++ non-owning pointer lifetime contract.
+
+From the repository root, rerun with PowerShell:
+
+```powershell
+cargo test --manifest-path fparser\rust\Cargo.toml
+cargo fmt --manifest-path fparser\rust\Cargo.toml -- --check
+cargo clippy --manifest-path fparser\rust\Cargo.toml --all-targets -- -D warnings
+cmake -S fparser\rust\tests -B fparser\rust\target\reference -DCMAKE_BUILD_TYPE=Release
+cmake --build fparser\rust\target\reference --config Release --parallel 2
+fparser\rust\target\reference\Release\fparser-reference.exe
+```
+
+## Initial CSXCAD Rust foundations
+
+The standalone `CSXCAD/rust` crate currently covers parameter sets and
+expression-backed scalars, rectilinear-grid operations, 4x4 transforms, base
+structure/property/primitive ownership, parameterized points, boxes and
+multi-box unions, spheres, spherical shells, finite cylinders, cylindrical
+shells, curves, wires, polygons, linear- and rotational-extrusion polygons,
+polyhedra,
+User-Defined Cartesian/cylindrical/spherical coordinate-function geometry,
+Cartesian/cylindrical geometry, and isotropic/anisotropic material terms and
+coordinate weights. The tests cover ordering and sweep
+snapping, parser errors and current parameter values, line
+sorting/deduplication/removal/snapping/refinement, coordinate defaults and
+conversion, transform composition order, rotations, inverse behavior,
+parameterized operation arguments, singular matrices, property replacement
+and primitive transfer, native-style property copies with and without
+primitives, copied material settings, and fresh structure-owned handles,
+point/box/multi-box/sphere/cylinder bounds and
+containment, cylindrical-shell bounds and inclusive containment, curve/wire
+and polygon bounds/containment, positive and negative linear-polygon extrusions,
+rotational-polygon angular-sector containment,
+polyhedron bounds and closed-solid containment. This does not reproduce the
+native CGAL incremental builder: native `BuildTree()` retries reversed face
+winding, rejects topologically invalid facets, and derives the polyhedron
+dimension from the accepted closed surface and invalid-face count. A native
+CGAL probes confirmed repeated vertex indices, a third facet on a shared
+two-sided edge, a facet attached only to a closed vertex, and a facet joining
+disconnected vertex fans invalidate a facet. A non-orientable six-vertex
+projective-plane triangulation also causes CGAL to reject three of ten facets;
+Rust now matches the seven accepted facets by trying each face's original and
+reversed winding. Rust matches native dimensions for these cases and excludes
+rejected facets from containment; broader topology is still approximated with
+face-index, edge, vertex-link, and orientation checks.
+A seeded native CGAL cube probe classified points on a face, edge, and vertex,
+as well as a point just inside the surface, as inside; a point just outside and
+a point beyond the bounding box were outside. The Rust cube regression asserts
+the same boundary and near-boundary classifications.
+Native C++ probes of zero-height cylinders and cylindrical shells confirmed
+point-sized bounds at the axis endpoint and containment only at that endpoint;
+Rust regressions now match these degenerate results.
+material weighting, dependency-free XML parsing/writing,
+subset model round trips, and parsing of native-shaped parameterized material
+XML. The XML reader also accepts the native legacy `ChargeBox` and
+`Discrete-Material` aliases, while serialization writes canonical names. XML
+support is limited to parameters, grids, background material,
+Unknown/Material/Metal/ConductingSheet/AbsorbingBC/LumpedElement/ProbeBox/
+DumpBox/Excitation/ResBox/DispersiveMaterial/DebyeMaterial/LorentzMaterial/
+DiscMaterial properties, and
+Point/Box/MultiBox/Sphere/SphericalShell/Cylinder/CylindricalShell/Curve/Wire/
+Polygon/LinPoly/RotPoly/Polyhedron/PolyhedronReader/User-Defined primitives,
+with RGBA property
+colors preserved when present and IDs normalized to native list indices.
+Structure query tests cover property-category counts and combined type masks,
+primitive counts, stable traversal order, descending priority sorting, and
+primitive-owner lookup across transfer and deletion. The Rust
+`primitives_by_type()` method matches native `GetPrimitivesByType`: it emits
+the same stderr diagnostic and returns an empty vector. Single- and
+multi-coordinate selection tests
+cover filters, priority ties, used marking, misses, and unregistered
+primitives; unused-primitive filtering verifies the used-state query.
+Structure-bound tests cover filtered unions and exclusion of unbounded
+User-Defined geometry. Bounding-box queries cover overlap, disjoint bounds,
+property-type filtering, and conservative inclusion of transformed and
+unbounded primitives. Grid-edge insertion checks axis-specific endpoints,
+sorting/deduplication, unbounded-geometry exclusion, and invalid directions.
+Structure-clearing tests cover reset state and non-reuse of prior handles.
+Simulation-setup prerequisite tests cover missing properties, primitives,
+required grid lines in each direction, and an excitation property with
+primitives. These checks cover the native structural gates; the separate
+expression and bounds checks below cover only a subset of native `Update()`
+validation.
+Property-expression validation exercises base-material values and weights,
+Debye and Lorentz terms, and excitation terms, reports the owning property ID,
+and returns parameter-evaluation errors. Conducting-sheet, absorbing-boundary,
+and lumped-element expressions are also evaluated through the same validator;
+primitive-bound validation reports the owning primitive ID for parameter or
+transform failures, including unresolved wire-radius, spherical/cylindrical
+shell-width, linear-extrusion, and rotational-polygon angle expressions. For
+User-Defined geometry, it parses the function and
+evaluates coordinate shifts but does not sample the function because the
+native-style bound is unbounded. A new `validate_updates()` path checks all
+properties before all primitives and returns source-carrying diagnostics,
+matching native `ContinuousStructure::Update()` traversal order without
+stopping at the first invalid item. Base-material scalar errors are reported
+individually in native component order; Debye, Lorentz, conducting-sheet,
+absorbing-boundary, lumped-element, and excitation expressions are also
+reported individually. Primitive scalar failures are collected in native
+shape-specific order, including coordinate-level short-circuit behavior;
+other primitive failures contribute their first source-carrying error. Exact
+native diagnostic text and full `Update()` parity remain open. The combined
+`validate_geometry()` path checks structural counts first,
+then primitive bounds, then property expressions, and finally the excitation
+requirement, matching the native guard order while preserving the corresponding
+error category and owner identity.
+Additional native edge behavior, captured-writer XML differential tests,
+scripting bindings, and full-stack integration remain unimplemented.
+
+On Windows, Rust 1.99 passed the following checks:
+
+```powershell
+$env:CARGO_TARGET_DIR = Join-Path $env:TEMP 'csxcad-rust-target'
+cargo fmt --manifest-path CSXCAD\rust\Cargo.toml -- --check
+cargo test --manifest-path CSXCAD\rust\Cargo.toml
+cargo clippy --manifest-path CSXCAD\rust\Cargo.toml --all-targets -- -D warnings
+```
+
+Result: 145 unit tests passed; formatting and Clippy passed with warnings
+denied. Background-material tests also cover the native acceptance of
+non-finite values through its comparison-only validation. Absorbing-boundary
+tests cover native defaults, negative numeric phase
+velocity coercion, expression evaluation, unknown enum values, and native XML
+attributes. Lumped-element tests cover defaults, setter bounds, parameterized
+R/C/L values, series/parallel types, and native XML attributes. The
+ProbeBox and DumpBox fixtures cover sampling and mode data,
+hidden-by-default behavior, legacy mode-function attributes, dump modes,
+subsampling, and single-value resolution expansion. Excitation fixtures cover
+expression-backed vectors/scalars, weighting, propagation direction, enabled
+state, and weight origin; ResBox tests cover its hidden default and refinement
+factor; Debye and Lorentz fixtures cover dispersion order, parameterized terms,
+and coordinate-dependent weighting; DiscreteMaterial fixtures cover canonical
+and legacy file metadata plus property-level transforms, and in-memory
+voxel-index/value lookup covers native coordinate conversion, transform/scale
+order, x-fastest indexing, mesh boundaries, background/out-of-range fallback,
+optional database attributes, and index/value-count validation. HDF5 loading is feature-gated and validated
+separately below. PolyhedronReader tests cover standard ASCII and binary STL
+plus ASCII, little-endian binary, and big-endian binary PLY imports, with XML
+metadata round-trips. A targeted WSL differential probe against VTK
+9.5.2 compared native `vtkSTLReader` output with merging enabled and
+`vtkPLYReader` output for shared-vertex ASCII STL, binary STL, ASCII PLY, and
+both binary PLY endiannesses. The Rust tests now assert the same point order
+and face indices for these fixtures. The binary STL regression checks that
+shared facets produce four unique points and faces `[0, 1, 2]` and `[0, 2, 3]`.
+Further probes exposed and fixed ASCII STL keyword case detection and a
+`vertex` token in the solid name; malformed facet structure is now rejected
+while ignored facet-normal, structural-line trailing, and vertex trailing
+tokens follow VTK. A comment line that VTK rejects is also rejected by the
+Rust reader. Multiple solid sections match VTK's merged point order and face
+indices. A VTK 9.5.2 probe also confirmed that binary STL facets are derived
+from complete 50-byte records available after the header, regardless of its
+declared triangle count; incomplete trailing records are ignored. Rust follows
+that behavior, while long malformed ASCII files are rejected instead of being
+reinterpreted as binary. A 134-byte binary STL with a `solid` header and an
+entirely printable facet payload is also interpreted as ASCII by VTK 9.5.2,
+which yields no points or cells; the native CSXCAD reader rejects it, and Rust
+matches that detection behavior. Broader edge-case parity with VTK's readers
+remains unverified. A
+separate VTK 9.5.2 probe confirmed that
+`vtkPLYReader` retains ASCII and binary PLY face lists with zero through three
+indices as cells; a binary fixture returned four cells with point counts
+`[0, 1, 2, 3]`. The native `CSPrimPolyhedronReader` copies each PLY polygon
+cell without requiring three vertices, and Rust preserves those face lists.
+VTK also accepts both `vertex_indices` and `vertex_index` face-list property
+names; dedicated ASCII, little-endian binary, and big-endian binary Rust
+fixtures exercise the singular alias.
+An ASCII PLY probe with both `comment` and `obj_info` header directives
+produced the same single triangle in VTK and Rust.
+An ASCII PLY with an intervening `edge` element and scalar edge properties
+also produces the same three points and one face in VTK 9.5.2 and Rust; the
+reader consumes unsupported geometry elements without losing body alignment.
+ASCII and little-endian binary edge elements with list-valued vertex-index
+properties preserve body alignment and the same three points and one face in
+both readers.
+VTK 9.5.2 also reads little-endian binary PLY with reordered vertex
+coordinates, an ignored color field, 64-bit floating-point coordinates, and
+16-bit face indices; the corresponding Rust fixture preserves the same point
+order and triangle.
+Standalone `vtkPLYReader` returns empty polydata for empty and vertex-only PLY
+files, but `CSPrimPolyhedronReader::ReadFile()` rejects inputs without points
+or polygon cells. Rust keeps that wrapper-level rejection, with regressions
+for both cases.
+Malformed ASCII STL fixtures missing `outer loop`, `endloop`, or `endsolid`
+produce no points or cells in VTK 9.5.2; Rust's existing parser regressions
+reject these incomplete facets as well.
+The native CGAL builder probe rejected PLY-equivalent face lists with zero,
+one, or two vertices (invalid-face dimension 3); a three-vertex open facet was
+accepted (dimension 2). Native and Rust containment both returned false for
+the interior-of-triangle query on each of those single-face meshes.
+CGAL accepted duplicate triangle facets with either matching or opposite
+winding, assigned dimension 3, and returned outside for queries below, on, and
+above the degenerate sheet; Rust regression cases match.
+A two-component tetrahedron probe also confirmed that CGAL accepts all eight
+facets and classifies points inside either component as inside while a point
+in the gap remains outside; the Rust regression matches.
+A nested-tetrahedra probe confirmed that CGAL accepts all eight facets,
+classifies the inner volume as outside, and classifies the space between shells
+as inside; the Rust regression matches this odd/even behavior.
+Overlapping tetrahedra are also accepted as eight facets; points in either
+non-overlapping region classify as inside, while their overlap and exterior
+classify as outside. The Rust regression matches.
+When two tetrahedral shells share only one vertex, CGAL accepts five of the
+eight facets, retains containment in the first shell, and excludes the second;
+Rust matches the accepted-facet count, dimension, and containment.
+When shells share an edge, CGAL accepts only the first four facets and excludes
+the second shell; Rust matches.
+When shells share a face, CGAL likewise accepts only the first shell's four
+facets; Rust matches.
+User-Defined primitive tests cover parameterized
+function variables and shifts, primitive transforms, spherical `t` evaluation,
+unbounded bounds, dimension, and both `User-Defined` and native-dispatch
+`UserDefined` XML tag spellings, with canonical output using `User-Defined`.
+The strict XML reader still rejects unsupported property/primitive tags,
+malformed supported properties, and malformed supported primitives. The
+warning-returning compatibility reader skips unsupported property tags,
+retains a malformed supported property as `Unknown` when its base metadata is
+valid, and skips unsupported or malformed primitive nodes, reporting each
+recovery or skip. It also skips unsupported or malformed parameter entries
+while preserving valid parameters and reports each skipped entry. Properties
+without a primitive list are retained and reported in compatibility mode.
+Missing `Properties` nodes are also reported. Compatibility mode uses native
+integer semantics for property visibility.
+Native `CSPropUnknown` explicitly defaults to hidden with an empty property
+value; the Rust model and writer preserve them through a serialization
+round-trip.
+The
+hand-authored native-shaped fixture exercises the audited tag/attribute
+layout; `native_structure.xml` and `native_parameterized_structure.xml` were
+emitted by the built native C++ CSXCAD library. They verify grid/background
+defaults, material epsilon/color, box coordinates and bounds, non-empty grid
+lines, constant and linear parameters, and parameterized geometry. The first
+native fixture also survives a complete Rust parse/serialize/parse equality
+round-trip. The locally built native CSXCAD 0.7.0
+`ContinuousStructure::ReadFromXML` also accepted Rust-serialized output from
+the parameterized fixture without diagnostics and restored its two x-grid
+lines, one property, and one primitive. These targeted checks do not establish
+complete native CSXCAD equivalence.
+
+With the optional `hdf5` feature enabled, WSL HDF5 1.14.6 passes 146 Rust tests,
+Clippy with warnings denied, and formatting checks. A compact version-2
+fixture verifies `DiscreteMaterialProperties::load_grid()` reading `/DiscData`,
+`DB_Size`, all five optional material attributes, the three mesh-axis datasets,
+and invalid-path rejection. The
+feature uses the existing HDF5 C library through FFI; no Rust dependency was
+added. The default Windows build remains HDF5-independent and passes 127 tests;
+formatting and Clippy with warnings denied also pass.
+
+## openems-core FDTD verification (2026-10-17)
+
+Unit-level verification of the root workspace `openems-core` crate
+(`cargo test`, Windows, `rustc` stable). No differential run against the WSL
+C++ binary yet; the captured `reference-data/` baselines are the intended
+differential targets.
+
+| Check | Scenario | Metric | Result |
+|---|---|---|---|
+| CFL timestep | 1 mm uniform 3D mesh, factor 0.99 | dt in [1.8e-12, 2.0e-12] s | 1.9057e-12 s — pass |
+| Wave propagation | PEC box 10^3 cells, Gaussian at cell (5,5,5) | field reaches neighbor >1e-8 | pass |
+| Mur ABC absorption | 13^3 cells, 20 GHz Gaussian, full pulse then free run 450 steps | total field energy decay | 1.05e-8 -> 3.05e-14 (>5 orders) — pass |
+| Mur ABC (previous test) | 5 GHz, excitation truncated at step 60 | energy decay | plateau — test-design defect (sub-wavelength domain, pulse delay 133 steps not reached); engine verified correct via spatial trace; test redesigned |
+| PMC boundary | all-PMC 6^3 box | tangential curr exactly 0 on faces after 50 steps | exact zero — pass |
+| DFT probe | 10 GHz sine, 32 periods | amplitude N/2 rel err < 1e-9; off-bin >40 dB down | pass |
+
+Numerical notes: field arrays are f32 (`FDTD_FLOAT` semantics), coefficients
+and constants f64; Mur coefficient `(c0*dt - delta)/(c0*dt + delta)` with
+per-face grid delta matches `Operator_Ext_Mur_ABC`. The original implements
+Mur as a priority-ordered engine/operator extension pair; the Rust port
+applies it inline in the basic engine. No tolerance changes were made to make
+tests pass; the failing test was redesigned because its physical scenario
+could never exercise absorption.

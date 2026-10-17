@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "crates/fparser",
+    "crates/csxcad-core",
+    "crates/openems-core",
+]
+resolver = "2"
