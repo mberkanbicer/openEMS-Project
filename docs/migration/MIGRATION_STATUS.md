@@ -2,8 +2,9 @@
 
 **Status:** Audit consolidation, representative reference capture, and the
 Rust architecture proposal are complete. The user explicitly directed
-implementation to begin on 2026-10-16. The fparser and CSXCAD Rust crates are
-under development; no submodule pointer has been changed.
+implementation to begin on 2026-10-16. The fparser, CSXCAD, and CTB Rust crates are
+committed in their submodules and the meta-repo submodule pointers are bumped;
+openEMS solver port is the next implementation unit.
 
 ## Baseline
 
@@ -15,7 +16,7 @@ under development; no submodule pointer has been changed.
   | --- | --- |
   | AppCSXCAD | `f04d3a7d7cce31c57704f14abe46c66684c15c7d` |
   | CSXCAD | `c46e3206f20027b0b4605c797d07bddab76de942` |
-  | CTB | `5ac29367ebb7e30e78dd3db13a21464756855599` |
+  | CTB | `934c76543a5811e49b93bb7f6cc841a0d3931b9f` |
   | QCSXCAD | `26d7ee13440cff0e5621a6b9d325ae31d118bc2d` |
   | fparser | `4b9c845b449b520c4b8c5f23c74cd04820084f81` |
   | hyp2mat | `b15f749849610066e6c09da5b5e3f97e3317ba8a` |
