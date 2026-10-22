@@ -96,6 +96,19 @@ cd doc-src && pip install -r requirements.txt && make html   # → doc-src/_buil
   M-file docstring in the submodule, not the generated Markdown.
 - Documentation that duplicates a submodule's README drifts. Link instead.
 
+## Rust migration tracking
+
+The Rust migration audit and its verified status are tracked in
+`docs/migration/`. At the start of migration work, read `MIGRATION_STATUS.md`,
+`MIGRATION_PLAN.md`, `COVERAGE_MATRIX.csv`, and `VALIDATION.md`. These records
+supplement, but do not override, this repository's submodule ownership,
+licensing, build, testing, and commit rules.
+
+Do not rewrite simulation code until the source-level audit, original-behavior
+baselines, and dependency-aware migration plan are complete. Keep the existing
+implementations intact as references, and record only inspected facts and
+executed validation results.
+
 ## Testing
 
 The smoketests are what CI runs, and they exercise the whole stack:
