@@ -232,6 +232,15 @@ bitwise. Its solver timings are characterization only.
   not matched by the audited parser sources; this remains a compatibility
   question. The WSL baseline later built and installed hyp2mat and verified
   `hyp2mat --help`; no `.hyp` fixture was available for a conversion run.
+- Completed the hyp2mat-rs Rust port in `hyp2mat/rust/`. The crate implements
+  a hand-written recursive-descent .hyp parser (replacing Bison/Flex), PCB
+  model types (board, stackup, vias, devices, pins, polygons), clipper2
+  polygon operations, CSXCAD and QucsStudio output writers, and a clap-based
+  CLI with binary entry point. `cargo build`, `cargo clippy`, and `cargo test`
+  all pass (14/14 tests); the binary was verified end-to-end with a sample
+  .hyp file for both csxcad and qucs output formats. The PDF writer remains
+  stubbed because libhpdf is a C dependency and no new dependencies are added
+  per house rules. See `COVERAGE_MATRIX.csv` for the updated status row.
 - Completed the root build/CI/package source audit in
   `audits/root-orchestration.md`. The dependency graph, optional builds,
   package-manager dependency helper, Python environment modes, TinyXML source
