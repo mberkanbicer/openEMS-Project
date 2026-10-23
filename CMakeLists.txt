@@ -1,6 +1,7 @@
 
 ## usage: cmake -DCMAKE_INSTALL_PREFIX=<install/path> .
 ## use -DBUILD_APPCSXCAD=NO to not build QCSXCAD and AppCSXCAD
+## use -DBUILD_RUST=YES to build Rust extensions (openems-core, openems-py, hyp2mat-rs)
 
 # In CMake 4, 3.10 is deprecated and 3.5 has been removed.
 # use 3.0...3.10 so all of these versions are acceptable as min. version.
@@ -21,7 +22,12 @@ if (NOT DEFINED BUILD_APPCSXCAD)
     set(BUILD_APPCSXCAD "YES")
 endif()
 
+if (NOT DEFINED BUILD_RUST)
+    set(BUILD_RUST "NO")
+endif()
+
 message(STATUS "Build AppCSXCAD: " ${BUILD_APPCSXCAD})
+message(STATUS "Build Rust extensions: " ${BUILD_RUST})
 
 IF(EXISTS ${PROJECT_SOURCE_DIR}/localConfig.cmake)
    message(STATUS "include local config" )
@@ -63,5 +69,36 @@ if (${BUILD_APPCSXCAD})
     DEPENDS     QCSXCAD
     SOURCE_DIR  ${PROJECT_SOURCE_DIR}/AppCSXCAD
     CMAKE_ARGS  -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} -DCSXCAD_ROOT_DIR=${CMAKE_INSTALL_PREFIX} -DQCSXCAD_ROOT_DIR=${CMAKE_INSTALL_PREFIX} -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+    )
+endif()
+
+# build Rust extensions (openems-core, openems-py, hyp2mat-rs)
+if (${BUILD_RUST})
+    # build openems-core
+    ExternalProject_Add( openems-core
+      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/openEMS/rust
+      CONFIGURE_COMMAND ""
+      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/openEMS/rust/Cargo.toml
+      BUILD_IN_SOURCE 1
+      INSTALL_COMMAND ""
+    )
+
+    # build openems-py (Python bindings via maturin)
+    ExternalProject_Add( openems-py
+      DEPENDS     openems-core
+      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/openEMS/rust-py
+      CONFIGURE_COMMAND ""
+      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo maturin build --release --manifest-path ${PROJECT_SOURCE_DIR}/openEMS/rust-py/Cargo.toml
+      BUILD_IN_SOURCE 1
+      INSTALL_COMMAND ""
+    )
+
+    # build hyp2mat-rs
+    ExternalProject_Add( hyp2mat-rs
+      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/hyp2mat/rust
+      CONFIGURE_COMMAND ""
+      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/hyp2mat/rust/Cargo.toml
+      BUILD_IN_SOURCE 1
+      INSTALL_COMMAND ""
     )
 endif()

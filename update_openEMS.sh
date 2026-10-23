@@ -32,6 +32,7 @@ function help_msg {
   echo "                                enabled by default on macOS as TinyXML is desupported"
   echo "                                (need network access to SourceForge & GitHub)"
   echo "	--python		build python extensions"
+  echo "	--with-rust		build Rust extensions (openems-core, openems-py, hyp2mat-rs)"
   echo ""
   ./scripts/build_python.sh --help-python
 }
@@ -214,6 +215,10 @@ function parse_args {
         echo "enabling Python Extension build"
         BUILD_PY_EXT=1
 	;;
+      --with-rust)
+        echo "enabling Rust Extension build"
+        BUILD_RUST=1
+	;;
       --)
         shift
         break
@@ -267,6 +272,7 @@ function dependency_check {
   if [ "$BUILD_GUI" = "NO" ]; then dep_args+=("--disable-gui"); fi
   if [ "$BUILD_PY_EXT" -eq 1 ]; then dep_args+=("--python"); fi
   if [ "$BUILD_CTB" -eq 1 ]; then dep_args+=("--with-ctb"); fi
+  if [ "$BUILD_RUST" -eq 1 ]; then dep_args+=("--with-rust"); fi
 
   if ./scripts/install_deps.sh --check ${dep_args[@]+"${dep_args[@]}"}; then
     return 0
@@ -307,6 +313,7 @@ function show_postinstall_help {
   local build_hyp2mat="$2"
   local build_ctb="$3"
   local python_help="$4"
+  local build_rust="$5"
 
   echo " -------- "
   echo "openEMS and all modules have been updated successfully..."
@@ -317,7 +324,8 @@ function show_postinstall_help {
 
   if [ "$build_hyp2mat" -eq 1 ] ||
      [ "$build_ctb" -eq 1 ] ||
-     [ -n "$python_help" ];
+     [ -n "$python_help" ] ||
+     [ "$build_rust" -eq 1 ];
   then
     echo ""
     echo "% optional additional packages:"
@@ -329,6 +337,12 @@ function show_postinstall_help {
     fi
     if [ -n "$python_help" ]; then
       echo "$python_help"
+    fi
+    if [ "$build_rust" -eq 1 ]; then
+      echo "Rust crates built: openems-core, openems-py, hyp2mat-rs"
+      echo "  openems-core: $install_path/lib/openems_core (cargo build)"
+      echo "  openems-py:   $install_path/lib/python (maturin build)"
+      echo "  hyp2mat-rs:   $install_path/bin/hyp2mat-rs (cargo build)"
     fi
   fi
   echo ""
@@ -343,6 +357,7 @@ BUILD_HYP2MAT=0
 BUILD_CTB=0
 BUILD_GUI="YES"
 BUILD_PY_EXT=0
+BUILD_RUST=0
 BUILD_TINYXML=0
 SKIP_DEP_CHECK=0
 INSTALL_PATH=
@@ -417,10 +432,42 @@ if [ "$BUILD_PY_EXT" -eq 1 ]; then
   fi
   PYTHON_HELP=$(./scripts/build_python.sh --cpp-install-dir "$INSTALL_PATH" ${PYTHON_ARGS[@]+"${PYTHON_ARGS[@]}"} --help-postinst)
 fi
+
+#### rust extension build ####
+if [ "$BUILD_RUST" -eq 1 ]; then
+  echo "Building Rust extensions ... please wait"
+
+  # Build openems-core
+  echo "Building openems-core ... please wait"
+  if ! cargo build --release --manifest-path "$BASEDIR/openEMS/rust/Cargo.toml" \
+    2>&1 | tee -a "$LOG_FILE" >> "$STDOUT";
+  then
+    echo "openems-core build failed, please see logfile for more details... $LOG_FILE"
+    exit 1
+  fi
+
+  # Build openems-py (Python bindings via maturin)
+  echo "Building openems-py ... please wait"
+  if ! maturin build --release --manifest-path "$BASEDIR/openEMS/rust-py/Cargo.toml" \
+    2>&1 | tee -a "$LOG_FILE" >> "$STDOUT";
+  then
+    echo "openems-py build failed, please see logfile for more details... $LOG_FILE"
+    exit 1
+  fi
+
+  # Build hyp2mat-rs
+  echo "Building hyp2mat-rs ... please wait"
+  if ! cargo build --release --manifest-path "$BASEDIR/hyp2mat/rust/Cargo.toml" \
+    2>&1 | tee -a "$LOG_FILE" >> "$STDOUT";
+  then
+    echo "hyp2mat-rs build failed, please see logfile for more details... $LOG_FILE"
+    exit 1
+  fi
+fi
 cd "$BASEDIR" || die
 
 echo "build successful, cleaning up tmp dir ..."
 rm -rf "$TMPDIR"
 
 #####
-show_postinstall_help "$INSTALL_PATH" "$BUILD_HYP2MAT" "$BUILD_CTB" "$PYTHON_HELP"
+show_postinstall_help "$INSTALL_PATH" "$BUILD_HYP2MAT" "$BUILD_CTB" "$PYTHON_HELP" "$BUILD_RUST"
