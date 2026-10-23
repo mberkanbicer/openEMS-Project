@@ -101,4 +101,13 @@ if (${BUILD_RUST})
       BUILD_IN_SOURCE 1
       INSTALL_COMMAND ""
     )
+
+    # build qcsxcad-egui (QCSXCAD GUI: egui + wgpu)
+    ExternalProject_Add( qcsxcad-egui
+      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/QCSXCAD/rust-egui
+      CONFIGURE_COMMAND ""
+      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/QCSXCAD/rust-egui/Cargo.toml
+      BUILD_IN_SOURCE 1
+      INSTALL_COMMAND ""
+    )
 endif()

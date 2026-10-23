@@ -32,7 +32,7 @@ function help_msg {
   echo "                                enabled by default on macOS as TinyXML is desupported"
   echo "                                (need network access to SourceForge & GitHub)"
   echo "	--python		build python extensions"
-  echo "	--with-rust		build Rust extensions (openems-core, openems-py, hyp2mat-rs)"
+  echo "	--with-rust		build Rust extensions (openems-core, openems-py, hyp2mat-rs, qcsxcad-egui)"
   echo ""
   ./scripts/build_python.sh --help-python
 }
@@ -339,10 +339,11 @@ function show_postinstall_help {
       echo "$python_help"
     fi
     if [ "$build_rust" -eq 1 ]; then
-      echo "Rust crates built: openems-core, openems-py, hyp2mat-rs"
+      echo "Rust crates built: openems-core, openems-py, hyp2mat-rs, qcsxcad-egui"
       echo "  openems-core: $install_path/lib/openems_core (cargo build)"
       echo "  openems-py:   $install_path/lib/python (maturin build)"
       echo "  hyp2mat-rs:   $install_path/bin/hyp2mat-rs (cargo build)"
+      echo "  qcsxcad-egui: $install_path/bin/qcsxcad-egui (cargo build)"
     fi
   fi
   echo ""
@@ -461,6 +462,15 @@ if [ "$BUILD_RUST" -eq 1 ]; then
     2>&1 | tee -a "$LOG_FILE" >> "$STDOUT";
   then
     echo "hyp2mat-rs build failed, please see logfile for more details... $LOG_FILE"
+    exit 1
+  fi
+
+  # Build qcsxcad-egui (QCSXCAD GUI: egui + wgpu)
+  echo "Building qcsxcad-egui ... please wait"
+  if ! cargo build --release --manifest-path "$BASEDIR/QCSXCAD/rust-egui/Cargo.toml" \
+    2>&1 | tee -a "$LOG_FILE" >> "$STDOUT";
+  then
+    echo "qcsxcad-egui build failed, please see logfile for more details... $LOG_FILE"
     exit 1
   fi
 fi
