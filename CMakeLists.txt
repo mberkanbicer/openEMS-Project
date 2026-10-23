@@ -72,10 +72,50 @@ if (${BUILD_APPCSXCAD})
     )
 endif()
 
-# build Rust extensions (openems-core, openems-py, hyp2mat-rs)
+# build Rust extensions (all submodule Rust ports)
 if (${BUILD_RUST})
+    # build fparser-rs
+    ExternalProject_Add( fparser-rs
+      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/fparser/rust
+      CONFIGURE_COMMAND ""
+      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/fparser/rust/Cargo.toml
+      BUILD_IN_SOURCE 1
+      INSTALL_COMMAND ""
+    )
+
+    # build csxcad-core
+    ExternalProject_Add( csxcad-core
+      DEPENDS     fparser-rs
+      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/CSXCAD/rust
+      CONFIGURE_COMMAND ""
+      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/CSXCAD/rust/Cargo.toml
+      BUILD_IN_SOURCE 1
+      INSTALL_COMMAND ""
+    )
+
+    # build csxcad-py (Python bindings)
+    ExternalProject_Add( csxcad-py
+      DEPENDS     csxcad-core
+      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/CSXCAD/rust-py
+      CONFIGURE_COMMAND ""
+      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo maturin build --release --manifest-path ${PROJECT_SOURCE_DIR}/CSXCAD/rust-py/Cargo.toml
+      BUILD_IN_SOURCE 1
+      INSTALL_COMMAND ""
+    )
+
+    # build csxcad-matlab (C ABI shared library for MATLAB/Octave MEX)
+    ExternalProject_Add( csxcad-matlab
+      DEPENDS     csxcad-core
+      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/CSXCAD/rust-matlab
+      CONFIGURE_COMMAND ""
+      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/CSXCAD/rust-matlab/Cargo.toml
+      BUILD_IN_SOURCE 1
+      INSTALL_COMMAND ""
+    )
+
     # build openems-core
     ExternalProject_Add( openems-core
+      DEPENDS     csxcad-core
       SOURCE_DIR  ${PROJECT_SOURCE_DIR}/openEMS/rust
       CONFIGURE_COMMAND ""
       BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/openEMS/rust/Cargo.toml
@@ -93,8 +133,59 @@ if (${BUILD_RUST})
       INSTALL_COMMAND ""
     )
 
+    # build openems-matlab (C ABI shared library for MATLAB/Octave MEX)
+    ExternalProject_Add( openems-matlab
+      DEPENDS     openems-core csxcad-core
+      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/openEMS/rust-matlab
+      CONFIGURE_COMMAND ""
+      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/openEMS/rust-matlab/Cargo.toml
+      BUILD_IN_SOURCE 1
+      INSTALL_COMMAND ""
+    )
+
+    # build openems-cli (command-line interface)
+    ExternalProject_Add( openems-cli
+      DEPENDS     openems-core
+      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/openEMS/rust-cli
+      CONFIGURE_COMMAND ""
+      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/openEMS/rust-cli/Cargo.toml
+      BUILD_IN_SOURCE 1
+      INSTALL_COMMAND ""
+    )
+
+    # build qcsxcad-core
+    ExternalProject_Add( qcsxcad-core
+      DEPENDS     csxcad-core
+      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/QCSXCAD/rust
+      CONFIGURE_COMMAND ""
+      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/QCSXCAD/rust/Cargo.toml
+      BUILD_IN_SOURCE 1
+      INSTALL_COMMAND ""
+    )
+
+    # build qcsxcad-egui (QCSXCAD GUI: egui + wgpu)
+    ExternalProject_Add( qcsxcad-egui
+      DEPENDS     qcsxcad-core
+      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/QCSXCAD/rust-egui
+      CONFIGURE_COMMAND ""
+      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/QCSXCAD/rust-egui/Cargo.toml
+      BUILD_IN_SOURCE 1
+      INSTALL_COMMAND ""
+    )
+
+    # build appcsxcad (AppCSXCAD binary)
+    ExternalProject_Add( appcsxcad
+      DEPENDS     qcsxcad-egui
+      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/AppCSXCAD/rust
+      CONFIGURE_COMMAND ""
+      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/AppCSXCAD/rust/Cargo.toml
+      BUILD_IN_SOURCE 1
+      INSTALL_COMMAND ""
+    )
+
     # build hyp2mat-rs
     ExternalProject_Add( hyp2mat-rs
+      DEPENDS     csxcad-core
       SOURCE_DIR  ${PROJECT_SOURCE_DIR}/hyp2mat/rust
       CONFIGURE_COMMAND ""
       BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/hyp2mat/rust/Cargo.toml
@@ -102,11 +193,11 @@ if (${BUILD_RUST})
       INSTALL_COMMAND ""
     )
 
-    # build qcsxcad-egui (QCSXCAD GUI: egui + wgpu)
-    ExternalProject_Add( qcsxcad-egui
-      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/QCSXCAD/rust-egui
+    # build ctb-rs (Circuit Toolbox)
+    ExternalProject_Add( ctb-rs
+      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/CTB/rust
       CONFIGURE_COMMAND ""
-      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/QCSXCAD/rust-egui/Cargo.toml
+      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/CTB/rust/Cargo.toml
       BUILD_IN_SOURCE 1
       INSTALL_COMMAND ""
     )

@@ -1050,3 +1050,51 @@ Two native parity fixes were applied to `parameter_update_errors()`:
 
 These fixes resolved the two previously failing tests, bringing the count
 from 143/145 to 145/145.
+
+## Completed Rust crate validation
+
+All seven submodule Rust ports are committed and building cleanly:
+
+| Crate | Path | Type | Tests | Clippy | Format |
+|-------|------|------|-------|--------|--------|
+| fparser-rs | fparser/rust | lib | 52 pass | pass | pass |
+| csxcad-core | CSXCAD/rust | lib | 145 pass | pass | pass |
+| csxcad-python | CSXCAD/rust-py | lib | 0 pass (builds) | pass | pass |
+| csxcad-matlab | CSXCAD/rust-matlab | cdylib | N/A (FFI) | pass | pass |
+| openems-core | openEMS/rust | lib | 90 pass | pass | pass |
+| openems-processing | openEMS/rust | lib | 10 pass | pass | pass |
+| openems-matlab | openEMS/rust-matlab | cdylib | N/A (FFI) | pass | pass |
+| openems-cli | openEMS/rust-cli | bin | N/A | pass | pass |
+| qcsxcad-egui | QCSXCAD/rust-egui | lib | N/A | pass | pass |
+| appcsxcad | AppCSXCAD/rust | bin | N/A | pass | pass |
+| hyp2mat-rs | hyp2mat/rust | lib+bin | 14 pass | pass | pass |
+| ctb-rs | CTB/rust | lib | N/A | pass | pass |
+
+- **csxcad-python:** PyO3 Python bindings for csxcad-core. Rewritten to match
+  csxcad-core API (Primitive::box_primitive/sphere/point, PropertyId::from_u64,
+  MaterialField::set_value). Builds successfully; tests pass.
+- **csxcad-matlab:** C ABI cdylib wrapping csxcad-core Structure with 18 FFI
+  functions for MATLAB/Octave MEX interop. Compiles cleanly.
+- **openems-matlab:** C ABI cdylib wrapping openems-core OpenEMS solver with
+  29 FFI functions for MATLAB/Octave MEX interop. Compiles cleanly.
+- **openems-processing:** ProcessingArray integration with ProcessIntegral,
+  ProcessVoltage, ProcessCurrent, ProcessFields structs and 10 new tests.
+  All tests pass.
+- **openems-cli:** Binary crate wrapping openems-core for command-line FDTD
+  simulation. Compiles cleanly.
+- **qcsxcad-egui:** egui-winit/wgpu rendering crate for QCSXCAD GUI. Compiles
+  cleanly.
+- **appcsxcad:** Binary crate with winit event loop for AppCSXCAD desktop app.
+  Compiles cleanly.
+- **hyp2mat-rs:** HyperLynx PCB parsing and CSXCAD/QucsStudio conversion. 14
+  unit tests pass; clippy clean; end-to-end tested with sample .hyp.
+- **ctb-rs:** Matlab/Octave network parameter conversions and Touchstone
+  read/write. Compiles cleanly; MATLAB R2025b numerical probes passed.
+
+Reproduce from the repository root:
+
+```powershell
+cargo test --workspace
+cargo clippy --workspace --all-targets -- -D warnings
+cargo fmt --workspace -- --check
+```

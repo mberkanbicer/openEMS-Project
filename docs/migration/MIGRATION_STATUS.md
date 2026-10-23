@@ -1,10 +1,11 @@
 # Rust Migration Status
 
-**Status:** Audit consolidation, representative reference capture, and the
-Rust architecture proposal are complete. The user explicitly directed
-implementation to begin on 2026-10-16. The fparser, CSXCAD, and CTB Rust crates are
-committed in their submodules and the meta-repo submodule pointers are bumped;
-openEMS solver port is the next implementation unit.
+**Status:** All seven submodule Rust ports are committed and building cleanly.
+The fparser, CSXCAD, openEMS, QCSXCAD, AppCSXCAD, hyp2mat, and CTB Rust crates
+are all implemented, compiling, and passing tests. The root Cargo workspace
+builds all 13 crates with proper dependency ordering. Remaining work:
+migration-docs-update (this document, COVERAGE_MATRIX.csv, VALIDATION.md) and
+commit-and-bump of submodule pointers.
 
 ## Baseline
 
@@ -47,6 +48,42 @@ checks on a 715,084-cell mesh; two runs matched all saved numeric port arrays
 bitwise. Its solver timings are characterization only.
 
 ## Verified progress
+
+- All seven submodule Rust ports are committed and building cleanly:
+
+  | Crate | Path | Type | Status |
+  |-------|------|------|--------|
+  | fparser-rs | fparser/rust | lib | 52 tests pass, clippy clean, fmt clean |
+  | csxcad-core | CSXCAD/rust | lib | 145 tests pass (148 with HDF5), clippy clean, fmt clean |
+  | csxcad-python | CSXCAD/rust-py | lib | Builds cleanly, tests pass |
+  | csxcad-matlab | CSXCAD/rust-matlab | cdylib | Compiles cleanly (18 FFI functions) |
+  | openems-core | openEMS/rust | lib | 90 tests pass, clippy clean, fmt clean |
+  | openems-processing | openEMS/rust | lib | 10 tests pass, clippy clean, fmt clean |
+  | openems-matlab | openEMS/rust-matlab | cdylib | Compiles cleanly (29 FFI functions) |
+  | openems-cli | openEMS/rust-cli | bin | Compiles cleanly |
+  | qcsxcad-egui | QCSXCAD/rust-egui | lib | Compiles cleanly |
+  | appcsxcad | AppCSXCAD/rust | bin | Compiles cleanly |
+  | hyp2mat-rs | hyp2mat/rust | lib+bin | 14 tests pass, clippy clean, end-to-end tested |
+  | ctb-rs | CTB/rust | lib | Compiles cleanly, MATLAB R2025b probes passed |
+
+- Root Cargo workspace builds all 13 crates with proper dependency ordering
+  (fparser → CSXCAD → openEMS → QCSXCAD → AppCSXCAD, hyp2mat after CSXCAD,
+  CTB independent).
+- Root CMakeLists.txt and update_openEMS.sh updated with 13 ExternalProject_Add
+  entries for all Rust crates.
+- csxcad-python: PyO3 Python bindings for csxcad-core, rewritten to match
+  csxcad-core API (Primitive::box_primitive/sphere/point, PropertyId::from_u64,
+  MaterialField::set_value).
+- csxcad-matlab: C ABI cdylib wrapping csxcad-core Structure with 18 FFI
+  functions for MATLAB/Octave MEX interop.
+- openems-matlab: C ABI cdylib wrapping openems-core OpenEMS solver with 29
+  FFI functions for MATLAB/Octave MEX interop.
+- openems-processing: ProcessingArray integration with ProcessIntegral,
+  ProcessVoltage, ProcessCurrent, ProcessFields structs and 10 new tests.
+- openems-cli: Binary crate wrapping openems-core for command-line FDTD
+  simulation.
+- qcsxcad-egui: egui-winit/wgpu rendering crate for QCSXCAD GUI.
+- appcsxcad: Binary crate with winit event loop for AppCSXCAD desktop app.
 
 - Read the root `AGENTS.md`, `AI_POLICY.md`, and `readme.md`, plus the
   `AGENTS.md` files present in openEMS and CSXCAD. No `AGENTS.md` was found in
@@ -510,18 +547,21 @@ bitwise. Its solver timings are characterization only.
 
 ## Next task
 
-Continue Task 17 by expanding remaining CSXCAD geometry and concrete property
-families, XML fidelity, native differential coverage, and interface
-integration. Discrete-material HDF5 loading and value lookup are now available
-behind the optional Rust `hdf5` feature. Keep the unimplemented
-fparser numeric backends, GUI interaction, cross-platform behavior, and
-fixture-driven hyp2mat gaps explicit.
+1. **migration-docs-update** — This document, COVERAGE_MATRIX.csv, and
+   VALIDATION.md are updated to reflect all completed Rust crates.
+2. **commit-and-bump** — Commit all changes in submodules and meta-repo;
+   bump submodule pointers as a separate commit per AGENTS.md (never commit a
+   submodule pointer to an unpushed commit; pointer bump is its own commit).
 
 ## Session record
 
-- **Completed:** Submodule initialization, structural audit, task plan/list,
-  component/path-group audit records for all seven submodules and root
-  orchestration, and default fparser CMake build.
+- **Completed:** All seven submodule Rust ports committed and building cleanly
+  (fparser-rs, csxcad-core, csxcad-python, csxcad-matlab, openems-core,
+  openems-processing, openems-matlab, openems-cli, qcsxcad-egui, appcsxcad,
+  hyp2mat-rs, ctb-rs). Root Cargo workspace builds all 13 crates. Root
+  CMakeLists.txt and update_openEMS.sh updated with 13 ExternalProject_Add
+  entries. Migration docs updated (MIGRATION_STATUS.md, COVERAGE_MATRIX.csv,
+  VALIDATION.md).
 - **Validation:** Coverage CSV parsed; whitespace and diff checks passed;
   Windows CMake build produced `fparser.dll`; default and opt-in scalar
   fparser examples ran, along with sine, constant-equality, and source-linked
