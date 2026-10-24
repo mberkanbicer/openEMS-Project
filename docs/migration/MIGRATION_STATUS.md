@@ -1,11 +1,28 @@
 # Rust Migration Status
 
-**Status:** All seven submodule Rust ports are committed and building cleanly.
-The fparser, CSXCAD, openEMS, QCSXCAD, AppCSXCAD, hyp2mat, and CTB Rust crates
-are all implemented, compiling, and passing tests. The root Cargo workspace
-builds all 13 crates with proper dependency ordering. Remaining work:
-migration-docs-update (this document, COVERAGE_MATRIX.csv, VALIDATION.md) and
-commit-and-bump of submodule pointers.
+**Status (2026-10-25):** The canonical tree is
+`mberkanbicer-rust-migration-audit` in this worktree. All seven submodule ports
+are committed on their own `mberkanbicer-rust-migration-audit` branches, pushed,
+and pinned by the root repository; the archived three-crate tree is tagged
+`archive/rust-3crate-tree-2026-10`. The numerical core builds and its 375 tests
+pass, including analytic propagation, UPML absorption, CFL, quarter-cell
+material averaging and native-HDF5 dump reading.
+
+Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
+(1 `Verified`, 30 `Implemented`, 104 `Not Started` at the last update; see the
+snapshot there for the live count). The largest open areas are the extension
+framework and remaining physics extensions, NF2FF/SAR, the native CLI and
+scripting interfaces, the GUI feature surface, and the differential harness over
+`reference-data/`.
+
+### Status and evidence policy
+
+`Not Started` -> `Analyzed` -> `Implemented` -> `Integrated` -> `Verified`, plus
+`Blocked`. `Verified` requires an executed comparison recorded in
+`VALIDATION.md` with an approved tolerance; a build is not a verification. The
+authoritative counts and evidence are in `REMEDIATION_TASKS.md`. See Section 0 of
+`REMEDIATION_PLAN.md` and `EXCEPTIONS.md`.
+
 
 ## Baseline
 

@@ -1230,3 +1230,68 @@ cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs
   like `ProcessFields::CalcMeshPos`. The reduced coordinates and `/Mesh`
   datasets are written, not the full mesh.
 - Each dump opens and closes its file, so every file is flushed on return.
+
+---
+
+## Wave A evidence — build, install and packaging (2026-10-25)
+
+### One workspace build through CMake (RM-009)
+
+```
+Windows (VS 2022 generator, MSVC 14.44):
+  cmake -S . -B build-cmake-test -G "Visual Studio 17 2022" -A x64 \
+        -DBUILD_APPCSXCAD=NO -DBUILD_RUST=YES -DCMAKE_INSTALL_PREFIX=...
+  cmake --build build-cmake-test --target rust-workspace --config Release
+    -> Finished `release` profile in 1m 50s
+  cmake --install build-cmake-test --config Release
+    -> bin/openEMS.exe, bin/AppCSXCAD.exe, bin/hyp2mat.exe
+       lib/csxcad_matlab.dll, lib/openems_matlab.dll
+       share/openEMS/matlab, share/CSXCAD/matlab, share/openEMS/python/Tutorials
+```
+
+```
+WSL Ubuntu (CMake 4.2.3, GCC 15.2, cargo 1.99):
+  cmake -S . -B build-wsl -DBUILD_APPCSXCAD=NO -DBUILD_RUST=YES \
+        -DCMAKE_INSTALL_PREFIX=/tmp/openems-prefix
+  cmake --build build-wsl --target rust-workspace -j 4
+    -> Finished `release` profile in 3m 25s
+  cmake --install build-wsl
+    -> bin/openEMS, bin/AppCSXCAD, bin/hyp2mat
+       lib/libcsxcad_matlab.so, lib/libopenems_matlab.so
+       share/openEMS/..., share/CSXCAD/matlab
+  /tmp/openems-prefix/bin/openEMS --version  -> openems-cli 0.1.0
+  /tmp/openems-prefix/bin/hyp2mat --help      -> usage line printed
+```
+
+The `default-members` list in the root `Cargo.toml` excludes the two PyO3 crates,
+so a plain workspace build needs no Python interpreter; `--workspace` (or
+`-DBUILD_RUST_PYTHON=YES`) adds them.
+
+### Python wheels (RM-012)
+
+PyO3 was upgraded from 0.23 to 0.30 to support the installed CPython 3.14; the
+only API change was the two-lifetime `FromPyObject<'a, 'py>` bound in the two
+`extract` helpers.
+
+```
+maturin build --release --interpreter <python 3.14> \
+  --manifest-path CSXCAD/rust-py/Cargo.toml --out build-wheels
+maturin build --release --interpreter <python 3.14> \
+  --manifest-path openEMS/rust-py/Cargo.toml --out build-wheels
+python -m venv build-venv
+build-venv/Scripts/pip install --no-index --find-links build-wheels \
+  csxcad_python openems_py
+python -c "import csxcad_py, openems_py"
+  -> csxcad_py: PyStructure, PyProperty, ...
+  -> openems_py: PyOpenEMS, BC_PEC, BC_PMC, BC_MUR, BC_PML
+```
+
+### Current counts
+
+```
+cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs
+  fparser 52, csxcad 148, openems 159 + 2 integration, hyp2mat 14
+  total 375 passed, 0 failed
+cargo test -p openems-core --features hdf5   -> 162 + 2 passed
+cargo check --workspace                      -> ok (PyO3 0.30, CPython 3.14)
+```

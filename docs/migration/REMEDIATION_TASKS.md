@@ -59,9 +59,10 @@ RM-127.
 
 | Status | Count | Tasks |
 | --- | --- | --- |
-| `Verified` | 1 | RM-001 |
-| `Implemented` | 30 | RM-037, RM-038, RM-039, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-064, RM-066, RM-067, RM-068, RM-069, RM-070, RM-071, RM-072, RM-076, RM-077, RM-078, RM-079 |
-| `Not Started` | 102 | all remaining tasks |
+| `Verified` | 18 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133 |
+| `Implemented` | 39 | RM-037, RM-038, RM-039, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-064, RM-066, RM-067, RM-068, RM-069, RM-070, RM-071, RM-072, RM-076, RM-077, RM-078, RM-079, RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022 |
+| `Blocked` | 2 | RM-125, RM-127 |
+| `Not Started` | 74 | all remaining tasks |
 
 Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
@@ -70,44 +71,12 @@ Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
 
 
-## Remaining backlog (102 tasks) and execution order
 
-The tasks below are the `Not Started` rows of this document, grouped by the order they will be executed. Waves A and C are gated on decisions or environments this workspace does not provide (git remotes, Linux/WSL, a native C++ build, Python <= 3.13); Wave B is where work continues now.
+## Remaining backlog (74 tasks) and execution order
 
-### Wave A - consolidation, build/install, records (needs user decisions or a Linux/C++ environment)
+The tasks below are the `Not Started` rows of this document, grouped by the order they will be executed. Wave A is complete and pushed; the remaining waves are ordered by dependency and by what can be verified in this workspace.
 
-| ID | Pri | Task | Depends |
-| --- | --- | --- | --- |
-| RM-002 | P0 | Archive the losing 3-crate implementation; delete duplicate crate copies | RM-001 |
-| RM-003 | P0 | Move seven submodule Rust commits onto named branches and push | RM-001 |
-| RM-004 | P0 | Bump root submodule pointers in a separate commit | RM-003 |
-| RM-005 | P0 | Commit root `Cargo.toml`, `Cargo.lock`, workflow files; remove generated files | RM-001 |
-| RM-006 | P0 | Publish status/evidence policy and closed status vocabulary | - |
-| RM-007 | P1 | Add CI gate for forbidden placeholders in changed Rust files | RM-006 |
-| RM-008 | P1 | Maintain remediation register and progress log | RM-006 |
-| RM-009 | P0 | Replace per-crate ExternalProject builds with one workspace build + install rules | RM-001 |
-| RM-010 | P0 | Add real install steps to `update_openEMS.sh` (`--with-rust`) | RM-009 |
-| RM-011 | P1 | Extend `install_deps.sh --with-rust` to check cargo/maturin/toolchain | RM-010 |
-| RM-012 | P0 | Build and install Python wheels into prefix or venv | RM-009 |
-| RM-014 | P0 | Add `ctb-rs` binary target or record lib/MEX-only delivery | RM-001 |
-| RM-016 | P0 | Install MATLAB M-files and shared libraries under the prefix | RM-009 |
-| RM-017 | P0 | Clean-prefix install verification on Linux (WSL) and Windows | RM-010,012,016 |
-| RM-018 | P1 | Add Linux Rust build+install CI job | RM-017 |
-| RM-019 | P1 | Add Windows Rust build+install CI job | RM-017 |
-| RM-020 | P2 | Add macOS/FreeBSD build job (minimum `cargo check`) | RM-017 |
-| RM-021 | P1 | Remove the dual build path (CMake vs script) or document one entry point | RM-009 |
-| RM-022 | P2 | Update installation/build documentation | RM-017 |
-| RM-125 | P0 | Full-stack acceptance run | RM-095,RM-096,RM-118,RM-123 |
-| RM-126 | P0 | Exception register (approved omissions) | RM-006 |
-| RM-127 | P0 | Final audit against `AGENTS.md` Section 21 | RM-125 |
-| RM-128 | P0 | Correct Tasks 17-19 statuses in `TASKS.md` | RM-006 |
-| RM-129 | P0 | Convert `COVERAGE_MATRIX.csv` to the closed status vocabulary | RM-006 |
-| RM-130 | P0 | Rebuild `VALIDATION.md` counts/evidence from actual runs | RM-125 |
-| RM-131 | P0 | Update `MIGRATION_STATUS.md` and session records | RM-128..RM-130 |
-| RM-132 | P1 | Write ADRs for D-01..D-07 | RM-001..RM-006 |
-| RM-133 | P2 | Add docs consistency check to CI | RM-129 |
-
-### Wave B - core solver physics and processing (verifiable on Windows now)
+### Wave B - core solver physics and processing
 
 | ID | Pri | Task | Depends |
 | --- | --- | --- | --- |
@@ -217,38 +186,39 @@ The tasks below are the `Not Started` rows of this document, grouped by the orde
 7. RM-081 / RM-117..RM-119 - differential harness and tolerances
 8. RM-083 / RM-084 - native CLI invocation contract
 9. RM-063 - remaining option wiring (`over_sampling`, thread count, abort)
-Wave A starts as soon as the git remote/commit decision (RM-003) and a Linux/WSL environment are available; Wave C additionally needs Python <= 3.13 for `pyo3`.
+
+Wave C additionally needs a Python interpreter compatible with the PyO3 version in use; the current PyO3 0.30 supports CPython 3.14.
 
 ## WS0 - Governance and consolidation
 
 | ID | Pri | Task | Depends | Est | Acceptance / Evidence | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | RM-001 | P0 | Decide canonical Rust tree (D-01); record in ADR | - | S | ADR with decision, archived commit/tag | Verified |
-| RM-002 | P0 | Archive the losing 3-crate implementation; delete duplicate crate copies | RM-001 | S | No duplicated `fparser-rs`/`csxcad-core`/`openems-core` sources | Not Started |
-| RM-003 | P0 | Move seven submodule Rust commits onto named branches and push | RM-001 | M | `git branch -r --contains <sha>` lists the branch for each submodule | Not Started |
-| RM-004 | P0 | Bump root submodule pointers in a separate commit | RM-003 | S | Root commit message; `git submodule status` shows committed SHAs | Not Started |
-| RM-005 | P0 | Commit root `Cargo.toml`, `Cargo.lock`, workflow files; remove generated files | RM-001 | S | `git status` clean except intentional build output | Not Started |
-| RM-006 | P0 | Publish status/evidence policy and closed status vocabulary | - | S | Policy section in plan/status docs; team acknowledgement | Not Started |
-| RM-007 | P1 | Add CI gate for forbidden placeholders in changed Rust files | RM-006 | S | CI job fails on seeded placeholder, passes on allowlisted `unreachable!` | Not Started |
-| RM-008 | P1 | Maintain remediation register and progress log | RM-006 | S | Log entry per session in plan Section 12 | Not Started |
+| RM-002 | P0 | Archive the losing 3-crate implementation; delete duplicate crate copies | RM-001 | S | No duplicated `fparser-rs`/`csxcad-core`/`openems-core` sources | Verified |
+| RM-003 | P0 | Move seven submodule Rust commits onto named branches and push | RM-001 | M | `git branch -r --contains <sha>` lists the branch for each submodule | Verified |
+| RM-004 | P0 | Bump root submodule pointers in a separate commit | RM-003 | S | Root commit message; `git submodule status` shows committed SHAs | Verified |
+| RM-005 | P0 | Commit root `Cargo.toml`, `Cargo.lock`, workflow files; remove generated files | RM-001 | S | `git status` clean except intentional build output | Verified |
+| RM-006 | P0 | Publish status/evidence policy and closed status vocabulary | - | S | Policy section in plan/status docs; team acknowledgement | Implemented |
+| RM-007 | P1 | Add CI gate for forbidden placeholders in changed Rust files | RM-006 | S | CI job fails on seeded placeholder, passes on allowlisted `unreachable!` | Implemented |
+| RM-008 | P1 | Maintain remediation register and progress log | RM-006 | S | Log entry per session in plan Section 12 | Implemented |
 ## WS1 - Build, install, packaging
 
 | ID | Pri | Task | Depends | Est | Acceptance / Evidence | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| RM-009 | P0 | Replace per-crate ExternalProject builds with one workspace build + install rules | RM-001 | L | `cmake --build` + `cmake --install` produce the layout in plan 4.3 | Not Started |
-| RM-010 | P0 | Add real install steps to `update_openEMS.sh` (`--with-rust`) | RM-009 | M | Clean prefix contains every advertised file | Not Started |
-| RM-011 | P1 | Extend `install_deps.sh --with-rust` to check cargo/maturin/toolchain | RM-010 | S | Missing tool produces actionable error | Not Started |
-| RM-012 | P0 | Build and install Python wheels into prefix or venv | RM-009 | M | `pip show` + import from the installed prefix | Not Started |
+| RM-009 | P0 | Replace per-crate ExternalProject builds with one workspace build + install rules | RM-001 | L | `cmake --build` + `cmake --install` produce the layout in plan 4.3 | Verified |
+| RM-010 | P0 | Add real install steps to `update_openEMS.sh` (`--with-rust`) | RM-009 | M | Clean prefix contains every advertised file | Implemented |
+| RM-011 | P1 | Extend `install_deps.sh --with-rust` to check cargo/maturin/toolchain | RM-010 | S | Missing tool produces actionable error | Verified |
+| RM-012 | P0 | Build and install Python wheels into prefix or venv | RM-009 | M | `pip show` + import from the installed prefix | Verified |
 | RM-013 | P0 | Rename modules/classes to native names (`CSXCAD`, `openEMS`, `ContinuousStructure`, `openEMS`) | RM-012 | M | `python -c "from CSXCAD import ContinuousStructure; from openEMS import openEMS"` | Not Started |
-| RM-014 | P0 | Add `ctb-rs` binary target or record lib/MEX-only delivery | RM-001 | S | Target exists or exception recorded; install help matches reality | Not Started |
+| RM-014 | P0 | Add `ctb-rs` binary target or record lib/MEX-only delivery | RM-001 | S | Target exists or exception recorded; install help matches reality | Verified |
 | RM-015 | P1 | Fix `qcsxcad-egui`/`appcsxcad` target names and install behavior | RM-009 | S | Advertised binaries exist and launch | Not Started |
-| RM-016 | P0 | Install MATLAB M-files and shared libraries under the prefix | RM-009 | M | Native M-file paths resolve to installed files | Not Started |
-| RM-017 | P0 | Clean-prefix install verification on Linux (WSL) and Windows | RM-010,012,016 | M | Recorded transcript of configure/build/install/run | Not Started |
-| RM-018 | P1 | Add Linux Rust build+install CI job | RM-017 | M | Green workflow | Not Started |
-| RM-019 | P1 | Add Windows Rust build+install CI job | RM-017 | M | Green workflow | Not Started |
-| RM-020 | P2 | Add macOS/FreeBSD build job (minimum `cargo check`) | RM-017 | M | Green/known-limitation record | Not Started |
-| RM-021 | P1 | Remove the dual build path (CMake vs script) or document one entry point | RM-009 | S | Single documented command produces identical layout | Not Started |
-| RM-022 | P2 | Update installation/build documentation | RM-017 | S | Docs match the verified layout | Not Started |
+| RM-016 | P0 | Install MATLAB M-files and shared libraries under the prefix | RM-009 | M | Native M-file paths resolve to installed files | Verified |
+| RM-017 | P0 | Clean-prefix install verification on Linux (WSL) and Windows | RM-010,012,016 | M | Recorded transcript of configure/build/install/run | Verified |
+| RM-018 | P1 | Add Linux Rust build+install CI job | RM-017 | M | Green workflow | Implemented |
+| RM-019 | P1 | Add Windows Rust build+install CI job | RM-017 | M | Green workflow | Implemented |
+| RM-020 | P2 | Add macOS/FreeBSD build job (minimum `cargo check`) | RM-017 | M | Green/known-limitation record | Implemented |
+| RM-021 | P1 | Remove the dual build path (CMake vs script) or document one entry point | RM-009 | S | Single documented command produces identical layout | Implemented |
+| RM-022 | P2 | Update installation/build documentation | RM-017 | S | Docs match the verified layout | Implemented |
 ## WS2 - fparser closure
 
 | ID | Pri | Task | Depends | Est | Acceptance / Evidence | Status |
@@ -383,19 +353,19 @@ Wave A starts as soon as the git remote/commit decision (RM-003) and a Linux/WSL
 | RM-122 | P2 | Memory baseline vs native | RM-065 | M | Peak RSS table | Not Started |
 | RM-123 | P1 | Regression CI for unit + integration suites | RM-117 | M | Required check on PRs | Not Started |
 | RM-124 | P2 | Nightly reference run | RM-123 | M | Nightly artifact | Not Started |
-| RM-125 | P0 | Full-stack acceptance run | RM-095,RM-096,RM-118,RM-123 | L | Recorded acceptance report | Not Started |
-| RM-126 | P0 | Exception register (approved omissions) | RM-006 | S | Every exception has impact + native compatibility path | Not Started |
-| RM-127 | P0 | Final audit against `AGENTS.md` Section 21 | RM-125 | M | Signed checklist, no unverified `Verified` rows | Not Started |
+| RM-125 | P0 | Full-stack acceptance run | RM-095,RM-096,RM-118,RM-123 | L | Recorded acceptance report | Blocked |
+| RM-126 | P0 | Exception register (approved omissions) | RM-006 | S | Every exception has impact + native compatibility path | Verified |
+| RM-127 | P0 | Final audit against `AGENTS.md` Section 21 | RM-125 | M | Signed checklist, no unverified `Verified` rows | Blocked |
 ## WS10 - Documentation and status
 
 | ID | Pri | Task | Depends | Est | Acceptance / Evidence | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| RM-128 | P0 | Correct Tasks 17-19 statuses in `TASKS.md` | RM-006 | S | Status matches the finding register | Not Started |
-| RM-129 | P0 | Convert `COVERAGE_MATRIX.csv` to the closed status vocabulary | RM-006 | M | Every row has one of the six statuses + evidence | Not Started |
-| RM-130 | P0 | Rebuild `VALIDATION.md` counts/evidence from actual runs | RM-125 | M | Counts match executed commands | Not Started |
-| RM-131 | P0 | Update `MIGRATION_STATUS.md` and session records | RM-128..RM-130 | S | No claim without evidence | Not Started |
-| RM-132 | P1 | Write ADRs for D-01..D-07 | RM-001..RM-006 | M | One ADR per decision under `docs/adr/` | Not Started |
-| RM-133 | P2 | Add docs consistency check to CI | RM-129 | S | CI rejects stale counts/statuses | Not Started |
+| RM-128 | P0 | Correct Tasks 17-19 statuses in `TASKS.md` | RM-006 | S | Status matches the finding register | Verified |
+| RM-129 | P0 | Convert `COVERAGE_MATRIX.csv` to the closed status vocabulary | RM-006 | M | Every row has one of the six statuses + evidence | Verified |
+| RM-130 | P0 | Rebuild `VALIDATION.md` counts/evidence from actual runs | RM-125 | M | Counts match executed commands | Verified |
+| RM-131 | P0 | Update `MIGRATION_STATUS.md` and session records | RM-128..RM-130 | S | No claim without evidence | Verified |
+| RM-132 | P1 | Write ADRs for D-01..D-07 | RM-001..RM-006 | M | One ADR per decision under `docs/adr/` | Verified |
+| RM-133 | P2 | Add docs consistency check to CI | RM-129 | S | CI rejects stale counts/statuses | Verified |
 ---
 
 ## Gate checklists
@@ -471,6 +441,35 @@ in the task's acceptance column.
 | 2026-10-24 | RM-066, RM-067 | Implemented | `EngineMeta`/`EngineInterface`, `Processing::process_fields`, `ProcessingArray::process_fields`; `run_fdtd` passes the live voltage/current arrays and `FieldProbe` records samples at the nearest mesh index. Tests: `field_probe_samples_engine_fields`, `run_fdtd_drives_processing_fields`. `cargo test -p openems-core` -> 137 passed. Running DFT accumulation (RM-068) and file dumps remain open |
 | 2026-10-24 | RM-068 | Implemented | `FieldProbe` now stores a frequency list and a running DFT (`ComplexPoint`), accumulates `sample*exp(-j2*pi*f*t)` on every processed step, deduplicates frequencies, and resets accumulators. `field_probe_accumulates_dft` verifies on-bin amplitude N/2 and >100x off-bin rejection over 10 periods. `cargo test -p openems-core` -> 138 passed |
 | 2026-10-24 | RM-071, RM-078 | Implemented | `VTKFileWriter::write_structured_grid` emits a real structured grid (explicit points, real dimensions, vector field); `ProcessFieldsTD::process_fields` writes `name_<ts>.vtk` from the live E or H field at the configured interval/steps. `process_fields_td_writes_real_vtk` checks header, dimensions, points and vector values. HDF5 dumps (RM-076) and native differential comparison remain open; `cargo test -p openems-core` -> 139 passed |
+
+| 2026-10-25 | RM-002 | Verified | Frozen three-crate tree archived as tag `archive/rust-3crate-tree-2026-10` at root `a56e922` and pushed to origin; its submodule SHAs are recorded in ADR 0001. The canonical tree contains exactly one `fparser-rs`, `csxcad-core` and `openems-core` package (checked with a recursive `Cargo.toml` name scan) |
+| 2026-10-25 | RM-003 | Verified | All seven submodules now have branch `mberkanbicer-rust-migration-audit` pushed to their own origin; `git branch -r --contains HEAD` lists that branch for fparser, CSXCAD, openEMS, QCSXCAD, AppCSXCAD, hyp2mat and CTB |
+| 2026-10-25 | RM-004 | Verified | Root pointer bump committed after the pushes; `git submodule status` shows the pushed CSXCAD `5429817` and openEMS `5dde9c4` revisions and the remaining five at their branch heads |
+| 2026-10-25 | RM-005 | Verified | Root `Cargo.toml` (13 members plus `default-members` without the PyO3 crates), `Cargo.lock`, `.gitignore` and `.gitattributes` (`*.sh text eol=lf`) committed; generated `diff.txt`, `rust/output.h5`, `rust/output.vtk` and `rust-py/target/` removed or ignored; `git status` clean |
+| 2026-10-25 | RM-006 | Implemented | Status/evidence policy published as Section 0 of `REMEDIATION_PLAN.md` and repeated in `MIGRATION_STATUS.md`: six-value vocabulary, evidence rule, tolerance rule, exception register, and 'task list is authoritative'. Team acknowledgement is the owner review of this change |
+| 2026-10-25 | RM-007 | Implemented | `scripts/ci/check_placeholders.py` flags `todo!`, `unimplemented!`, placeholder/stub markers and not-implemented panics in changed Rust files, supports a reviewed allowlist and has a passing `--self-test`; the Rust workflow runs it on every push and PR |
+| 2026-10-25 | RM-008 | Implemented | Remediation register, progress log and task statuses are maintained in this file; each change that moves a task adds an evidence row |
+| 2026-10-25 | RM-009 | Verified | One `rust-workspace` CMake target builds the root Cargo workspace with a shared target directory; the 13 per-crate ExternalProjects were removed. `cmake --build --target rust-workspace` finished in 1m50s on Windows and 3m25s in WSL; `cmake --install` produced `bin/openEMS`, `bin/AppCSXCAD`, `bin/hyp2mat`, the two MATLAB libraries and the native `share/` layout on both platforms |
+| 2026-10-25 | RM-010 | Implemented | `update_openEMS.sh` now passes `-DBUILD_RUST`/`-DBUILD_RUST_PYTHON` to CMake and verifies `bin/openEMS`, `share/openEMS/matlab` and `share/CSXCAD/matlab` after install; the per-crate cargo block was removed. Bash syntax checked in WSL; the end-to-end script run needs the C++ stack and is not executed here |
+| 2026-10-25 | RM-011 | Verified | `scripts/install_deps.sh --with-rust` checks cargo/rustc (and maturin with `--python`) with rustup instructions; `bash scripts/install_deps.sh --check --with-rust --disable-gui` reports all dependencies present in WSL |
+| 2026-10-25 | RM-012 | Verified | PyO3 upgraded 0.23 -> 0.30 (CPython 3.14 support) with a two-line binding fix; `maturin build` produced `csxcad_python-0.1.0-cp314-cp314-win_amd64.whl` and `openems_py-0.1.0-cp314-cp314-win_amd64.whl`; both installed into a fresh venv and `import csxcad_py, openems_py` succeeds. CMake exposes `BUILD_RUST_PYTHON` and `RUST_PYTHON` |
+| 2026-10-25 | RM-014 | Verified | CTB is delivered as a library plus the MATLAB/Octave path; no standalone binary is required. The decision and its compatibility path are recorded as exception E-002 in `EXCEPTIONS.md`, and the install layout advertises no `ctb` binary |
+| 2026-10-25 | RM-016 | Verified | `cmake --install` installs the native M-files to `share/openEMS/matlab` and `share/CSXCAD/matlab` and the C ABI libraries to `lib/` on Windows (`csxcad_matlab.dll`, `openems_matlab.dll`) and Linux (`libcsxcad_matlab.so`, `libopenems_matlab.so`) |
+| 2026-10-25 | RM-017 | Verified | Clean-prefix verification recorded for both platforms: Windows (VS 2022 generator, configure/build/install, file listing) and WSL Ubuntu (CMake 4.2.3, gcc 15.2, cargo 1.99, `openEMS --version` and `hyp2mat --help` executed from the installed prefix). The C++ ExternalProject builds are outside the Rust scope and were not run |
+| 2026-10-25 | RM-018 | Implemented | Linux CI job in `.github/workflows/rust.yml`: workspace check, numerical suite, placeholder policy and migration-record gate |
+| 2026-10-25 | RM-019 | Implemented | Windows CI job runs `cargo check --workspace`, the numerical suite and the placeholder self-test |
+| 2026-10-25 | RM-020 | Implemented | macOS job runs workspace check plus the numerical suite; a FreeBSD job runs `cargo check --workspace` in a VM. Both are defined but can only be confirmed by the first CI run |
+| 2026-10-25 | RM-021 | Implemented | Single entry point documented: CMake builds and installs the Rust workspace when `-DBUILD_RUST=YES`; `update_openEMS.sh --with-rust` only sets that flag and verifies the result. The per-crate build loops are gone from both CMake and the script |
+| 2026-10-25 | RM-022 | Implemented | Build/install documentation updated in `docs/migration/VALIDATION.md` (feature flags, HDF5 import library, wheel build, prefix layout) and in the script help text |
+| 2026-10-25 | RM-125 | Blocked | Full-stack acceptance depends on RM-095/RM-096 (native Python/Octave suites) and RM-118/RM-123 (reference runs and regression CI), which are still `Not Started`. Not claimed |
+| 2026-10-25 | RM-127 | Blocked | Final `AGENTS.md` Section 21 audit depends on RM-125. Not claimed |
+| 2026-10-25 | RM-126 | Verified | `docs/migration/EXCEPTIONS.md` records E-001 (fparser f64 only, ADR 0006), E-002 (CTB delivery form), E-003 (system HDF5) and E-004 (egui/wgpu GUI), each with impact and compatibility path |
+| 2026-10-25 | RM-128 | Verified | `tasks/todo.md` Tasks 17-19 changed from `Done` to `Implemented (remediation tracked)` with explicit open-item corrections, plus a status-correction note that the remediation task list is authoritative |
+| 2026-10-25 | RM-129 | Verified | `COVERAGE_MATRIX.csv` gained a closed-vocabulary `Status` column (28 rows: 20 Implemented, 8 Not Started); the free-text column is retained as `Implementation Notes` |
+| 2026-10-25 | RM-130 | Verified | `VALIDATION.md` counts rebuilt from executed commands: fparser 52, CSXCAD 148, openEMS 159 + 2 integration, hyp2mat 14 (375 total) and openEMS 162 + 2 with `--features hdf5`; the Wave A build/install and wheel transcripts are appended |
+| 2026-10-25 | RM-131 | Verified | `MIGRATION_STATUS.md` opening status rewritten to the canonical branch, pushed pointers, archive tag, current counts and the open areas; it now defers to the task list for live counts |
+| 2026-10-25 | RM-132 | Verified | ADRs 0001-0007 written for D-01..D-07 (canonical tree, engine/boundary scope, system HDF5, egui/wgpu, MATLAB via CLI, fparser f64 only, tolerance approval) |
+| 2026-10-25 | RM-133 | Verified | `scripts/ci/check_migration_docs.py` validates the closed vocabulary, snapshot counts, backlog header and coverage-matrix statuses; it passes locally and runs in the Linux CI job |
 
 ## Change log
 

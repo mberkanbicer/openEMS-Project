@@ -6,6 +6,12 @@ done. Build/test results must reflect commands actually run.
 
 ## Phase 1: Audit
 
+> **Status correction (2026-10-25).** The authoritative status of every
+> migration unit is `docs/migration/REMEDIATION_TASKS.md`. The phase headings
+> below were written before the remediation audit and overstated completion;
+> where they disagree, the remediation task list wins.
+
+
 ### 1. Initial repository and submodule inventory — Done
 
 - [x] Confirm pinned submodules, project instructions, root build graph, and
@@ -608,7 +614,13 @@ done. Build/test results must reflect commands actually run.
   optimizer-rule equivalence; both pass with zero mismatches.
 - **Dependencies:** Task 15.
 
-### 17. Port CSXCAD — Done
+### 17. Port CSXCAD - Implemented (remediation tracked)
+
+> **Correction:** the model, grid, materials, XML and HDF5 reading are
+> implemented and tested. The Python/MATLAB class surface (RM-031,
+> RM-032, RM-090) and full native XML/primitive differential coverage
+> (RM-027..RM-029) are still open; see `REMEDIATION_TASKS.md`.
+
 
 - [x] Implement audited geometry, properties, transforms, parameters, mesh,
   XML, and required interfaces.
@@ -729,7 +741,14 @@ done. Build/test results must reflect commands actually run.
   and compatibility tests meet approved criteria.
 - **Dependencies:** Task 16.
 
-### 18. Port openEMS solver and physics — Done
+### 18. Port openEMS solver and physics - Implemented (remediation tracked)
+
+> **Correction:** the FDTD core, materials, boundaries, CFL and UPML are
+> implemented and validated. The extension framework (RM-040), dispersive
+> materials (RM-056), conducting sheet (RM-057), lumped RLC (RM-058), TFSF
+> (RM-059), steady state (RM-060), multi-threading (RM-062) and the full
+> analytic suite (RM-065) are still open.
+
 
 - [x] Implement audited FDTD core, operators/engines, extensions, and supported
   compute paths in Rust.
@@ -738,7 +757,12 @@ done. Build/test results must reflect commands actually run.
 - **Dependencies:** Task 17.
 - **Progress:** The openEMS Rust crate (`openems-core`) under `openEMS/rust/` is fully ported: core types (FDTD_FLOAT, ArrayNIJK, AdrOp, constants), Operator (EC operator, material averaging, PEC), Operator_Base (mesh, disc lines, boundary conditions), Engine (time stepping, voltage/current updates), Excitation (time signals), all operator/engine extensions (PML, Mur, excitation, dispersive Debye/Lorentz, conducting sheet, lumped RLC, steady-state, TFSF, cylinder coordinates), and the openEMS orchestrator (ParseFDTDSetup, SetupFDTD, RunFDTD). All committed in the openEMS submodule; meta-repo pointer bumped. Processing (Task 19) also completed.
 
-### 19. Port openEMS processing and post-processing — Done
+### 19. Port openEMS processing and post-processing - Implemented (remediation tracked)
+
+> **Correction:** probes, DFT, HDF5/VTK dumps, dump scheduling and the
+> integral/port probes are implemented. NF2FF (RM-074), SAR (RM-073),
+> mode matching (RM-075) and the Python readers (RM-080) are still open.
+
 
 - [x] Implement audited probes/dumps, field I/O, NF2FF, SAR, and numerical tools.
 - [x] Preserve data formats, units, scaling, and numerical semantics.

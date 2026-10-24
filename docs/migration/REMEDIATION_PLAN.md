@@ -9,6 +9,36 @@ audit, baseline, or coverage records.
 
 ---
 
+## 0. Status and evidence policy (RM-006)
+
+Only these status values are used, here and in the task list, the coverage
+matrix and the status document:
+
+| Status | Meaning |
+| --- | --- |
+| `Not Started` | No work begun |
+| `Analyzed` | Source behavior understood and recorded, no implementation |
+| `Implemented` | Code exists and is reachable from a real entry point |
+| `Integrated` | Wired into the product path (CLI, library, GUI, binding) |
+| `Verified` | Executed comparison against a reference/analytic result, with an approved tolerance |
+| `Blocked` | Cannot progress; the blocker is recorded with a reason |
+
+Rules:
+
+1. A task may only move forward with evidence in its `Evidence` column. The
+   evidence names a test or a command and its result.
+2. Compilation is not verification. A numerical component reaches `Verified`
+   only through an executed comparison recorded in `VALIDATION.md`.
+3. A tolerance is only changed with a recorded justification; reference data is
+   never edited to make output match (ADR 0007).
+4. Accepted scope reductions live in `docs/migration/EXCEPTIONS.md`, never only
+   in a conversation or a commit message.
+5. Where this plan, the task list and `MIGRATION_STATUS.md` disagree, the task
+   list is authoritative and the others are corrected in the same change.
+
+---
+
+
 ## 1. Why a remediation plan is needed
 
 A read-only audit of both Rust trees found that the migration is not complete
@@ -508,3 +538,4 @@ blockers, next task. Do not rewrite history.
 | 2026-10-24 | RM-076, RM-077 | Implemented | Real system-HDF5 writer/reader (`hdf5` feature, `build.rs`) with the native `/Mesh` + `/FieldData/{TD,FD}` layout, `d_order`, `time` and `frequency` attributes; reads the recorded C++ dump `Et_ref.h5` and round-trips its layout. 158 openEMS-core tests pass with `--features hdf5` |
 | 2026-10-24 | RM-053 | Implemented | CSXCAD infers anisotropy from per-direction property vectors (`Epsilon="2,4,6"`) and the EC coefficients follow each edge direction (vi_x:vi_y:vi_z = 1/2:1/4:1/6) |
 | 2026-10-24 | RM-065 (partial) | Not Started | New analytic integration suite: vacuum pulse speed 2.9404e8 m/s (1.9% vs c) and dielectric speed c/2 (1.0%); full case set still open |
+| 2026-10-25 | Wave A (RM-002..022, RM-126..133) | Verified/Implemented | Wave A completed and pushed: archive tag `archive/rust-3crate-tree-2026-10`; all seven submodules on pushed `mberkanbicer-rust-migration-audit` branches; root pointers bumped; one CMake `rust-workspace` build replaces 13 per-crate ExternalProjects and installs the native layout on Windows and WSL; PyO3 0.30 wheels build and import on CPython 3.14; placeholder and migration-record CI gates pass locally and are wired into `.github/workflows/rust.yml`; ADRs 0001-0007, exception register, corrected task statuses and rebuilt validation counts. RM-125 and RM-127 remain `Blocked` on the acceptance suites |
