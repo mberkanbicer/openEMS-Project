@@ -1295,3 +1295,46 @@ cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs
 cargo test -p openems-core --features hdf5   -> 162 + 2 passed
 cargo check --workspace                      -> ok (PyO3 0.30, CPython 3.14)
 ```
+
+## Steady-state detection and end criteria (RM-060, 2026-10-25)
+
+`EngineExtSteadyState` mirrors `Engine_Ext_SteadyState`:
+
+- 21 probes (centre plus quarter/three-quarter on each axis, all three E
+  components), recorded in a `2 * period` circular buffer;
+- every period, the maximum of the total-energy change (`CalcFastEnergy`) and
+  the per-probe period difference, initialized to 1.0 and never above 1.0;
+- the metric is exported through `EngineExtension::get_last_diff` and consumed
+  by `run_fdtd`; without a periodic excitation the native `currE / maxE` energy
+  criterion is used instead.
+
+Measured on a 21^3 vacuum box with 4-cell UPML and a 5 GHz sinusoidal sheet
+source (period = 120 steps):
+
+| block (120 steps) | metric |
+| --- | --- |
+| 1 | 3.2e-7 |
+| 2 | 0.120 |
+| 3 | 0.0285 |
+| 4 | 6.8e-3 |
+| 6 | 9.0e-5 |
+| 10 | 2.3e-4 (numerical floor) |
+
+With `end_crit = 0.5` the run stops after 240 of 4000 steps. At the default
+`1e-6` the floor around 2e-4 means the run uses the full step count, which is
+the expected behaviour for a continuously driven cavity with finite PML
+reflection.
+
+Compatibility bug found and fixed: `Engine_Ext_Excitation` wraps the sample
+index modulo the signal period, so a sinusoidal source keeps driving. The Rust
+excitation previously read past the two-period sample array and stopped, which
+made every periodic run decay to zero. `periodic_sources_repeat_every_period`
+covers the wrap and the delay interaction.
+
+Tests: `steady_state_extension_uses_the_native_probe_layout`,
+`energy_term_detects_a_decaying_field`,
+`probes_are_bounds_checked_when_the_mesh_is_known`,
+`periodic_excitation_registers_steady_state_detection`,
+`steady_state_end_criteria_stops_a_periodic_run_early`,
+`aperiodic_excitation_uses_the_energy_end_criteria`,
+`periodic_sources_repeat_every_period`, `excitation_delay_skips_earlier_steps`.

@@ -60,9 +60,9 @@ RM-127.
 | Status | Count | Tasks |
 | --- | --- | --- |
 | `Verified` | 18 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133 |
-| `Implemented` | 39 | RM-037, RM-038, RM-039, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-064, RM-066, RM-067, RM-068, RM-069, RM-070, RM-071, RM-072, RM-076, RM-077, RM-078, RM-079, RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022 |
+| `Implemented` | 40 | RM-037, RM-038, RM-039, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-064, RM-066, RM-067, RM-068, RM-069, RM-070, RM-071, RM-072, RM-076, RM-077, RM-078, RM-079, RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022 |
 | `Blocked` | 2 | RM-125, RM-127 |
-| `Not Started` | 74 | all remaining tasks |
+| `Not Started` | 73 | all remaining tasks |
 
 Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
@@ -72,7 +72,8 @@ Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
 
 
-## Remaining backlog (74 tasks) and execution order
+
+## Remaining backlog (73 tasks) and execution order
 
 The tasks below are the `Not Started` rows of this document, grouped by the order they will be executed. Wave A is complete and pushed; the remaining waves are ordered by dependency and by what can be verified in this workspace.
 
@@ -85,7 +86,6 @@ The tasks below are the `Not Started` rows of this document, grouped by the orde
 | RM-057 | P1 | Wire conducting-sheet extension | RM-041 |
 | RM-058 | P1 | Wire lumped RLC extension | RM-041 |
 | RM-059 | P1 | Wire TFSF extension | RM-041 |
-| RM-060 | P1 | Wire steady-state extension and end criteria | RM-041 |
 | RM-061 | P1 | Cylinder/multigrid: implement or fail loudly (D-02) | RM-047 |
 | RM-062 | P1 | Engine variants: multithread first; SSE decision (D-02) | RM-049 |
 | RM-063 | P1 | Wire `over_sampling`, `max_time`, thread count, abort | RM-041 |
@@ -268,7 +268,7 @@ Wave C additionally needs a Python interpreter compatible with the PyO3 version 
 | RM-057 | P1 | Wire conducting-sheet extension | RM-041 | M | Conducting-sheet reference case | Not Started |
 | RM-058 | P1 | Wire lumped RLC extension | RM-041 | M | Native lumped-port comparison | Not Started |
 | RM-059 | P1 | Wire TFSF extension | RM-041 | M | TFSF plane-wave case | Not Started |
-| RM-060 | P1 | Wire steady-state extension and end criteria | RM-041 | M | End criteria stops the run; log matches native semantics | Not Started |
+| RM-060 | P1 | Wire steady-state extension and end criteria | RM-041 | M | End criteria stops the run; log matches native semantics | Implemented |
 | RM-061 | P1 | Cylinder/multigrid: implement or fail loudly (D-02) | RM-047 | L | Either analytic cylinder case or explicit error + exception | Not Started |
 | RM-062 | P1 | Engine variants: multithread first; SSE decision (D-02) | RM-049 | L | Threaded run matches single-thread within tolerance; ADR for SSE | Not Started |
 | RM-063 | P1 | Wire `over_sampling`, `max_time`, thread count, abort | RM-041 | M | Each option has an observable effect or an error | Not Started |
@@ -470,6 +470,8 @@ in the task's acceptance column.
 | 2026-10-25 | RM-131 | Verified | `MIGRATION_STATUS.md` opening status rewritten to the canonical branch, pushed pointers, archive tag, current counts and the open areas; it now defers to the task list for live counts |
 | 2026-10-25 | RM-132 | Verified | ADRs 0001-0007 written for D-01..D-07 (canonical tree, engine/boundary scope, system HDF5, egui/wgpu, MATLAB via CLI, fparser f64 only, tolerance approval) |
 | 2026-10-25 | RM-133 | Verified | `scripts/ci/check_migration_docs.py` validates the closed vocabulary, snapshot counts, backlog header and coverage-matrix statuses; it passes locally and runs in the Linux CI job |
+
+| 2026-10-25 | RM-060 | Implemented | Steady-state detection completed and wired: `EngineExtSteadyState` now includes the native `CalcFastEnergy` term, starts at 1.0, bounds-checks probes and exposes the native probe layout (centre plus quarter/three-quarter on each axis, all components); `Operator::build_steady_state_extension` creates it for periodic excitations and `setup_fdtd` registers it. `run_fdtd` uses the extension metric when present and otherwise the native `currE / maxE` energy criterion, which also removes the infinite-loop case when `nr_ts` and `max_time` are both zero. Fixed a real compatibility bug: periodic excitations were not repeated (`Engine_Ext_Excitation` wraps the sample index modulo the period), so sinusoidal sources stopped after two periods. Tests: `steady_state_extension_uses_the_native_probe_layout` (21 probes), `energy_term_detects_a_decaying_field`, `periodic_excitation_registers_steady_state_detection`, `steady_state_end_criteria_stops_a_periodic_run_early` (stops at 240 of 4000 steps), `aperiodic_excitation_uses_the_energy_end_criteria`, `periodic_sources_repeat_every_period` |
 
 ## Change log
 
