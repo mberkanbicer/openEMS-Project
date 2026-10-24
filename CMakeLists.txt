@@ -26,8 +26,13 @@ if (NOT DEFINED BUILD_RUST)
     set(BUILD_RUST "NO")
 endif()
 
+if (NOT DEFINED BUILD_RUST_PYTHON)
+    set(BUILD_RUST_PYTHON "NO")
+endif()
+
 message(STATUS "Build AppCSXCAD: " ${BUILD_APPCSXCAD})
 message(STATUS "Build Rust extensions: " ${BUILD_RUST})
+message(STATUS "Build Rust Python wheels: " ${BUILD_RUST_PYTHON})
 
 IF(EXISTS ${PROJECT_SOURCE_DIR}/localConfig.cmake)
    message(STATUS "include local config" )
@@ -72,133 +77,86 @@ if (${BUILD_APPCSXCAD})
     )
 endif()
 
-# build Rust extensions (all submodule Rust ports)
+# ---------------------------------------------------------------------------
+# Rust workspace
+#
+# All submodule crates are members of the root Cargo workspace, so one cargo
+# invocation builds them with a shared target directory. Python bindings and
+# wheels are only built with -DBUILD_RUST_PYTHON=YES (native --python).
+# ---------------------------------------------------------------------------
 if (${BUILD_RUST})
-    # build fparser-rs
-    ExternalProject_Add( fparser-rs
-      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/fparser/rust
-      CONFIGURE_COMMAND ""
-      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/fparser/rust/Cargo.toml
-      BUILD_IN_SOURCE 1
-      INSTALL_COMMAND ""
+    find_program(CARGO_EXECUTABLE cargo REQUIRED)
+    set(RUST_TARGET_DIR "${CMAKE_BINARY_DIR}/rust-target" CACHE PATH "Cargo target directory")
+    set(RUST_CARGO_HOME "" CACHE PATH "Optional CARGO_HOME for the Rust build")
+    if (RUST_CARGO_HOME)
+        set(RUST_ENV ${CMAKE_COMMAND} -E env CARGO_HOME=${RUST_CARGO_HOME})
+    else()
+        set(RUST_ENV ${CMAKE_COMMAND} -E env)
+    endif()
+
+    set(RUST_CARGO_ARGS build --release --target-dir "${RUST_TARGET_DIR}")
+    if (BUILD_RUST_PYTHON)
+        # The PyO3 crates need a compatible Python interpreter; the native
+        # build also gates them behind --python.
+        set(RUST_CARGO_ARGS build --workspace --release --target-dir "${RUST_TARGET_DIR}")
+    endif()
+
+    add_custom_target(rust-workspace ALL
+        COMMAND ${RUST_ENV} ${CARGO_EXECUTABLE} ${RUST_CARGO_ARGS}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+        COMMENT "Building the Rust workspace"
+        VERBATIM
     )
 
-    # build csxcad-core
-    ExternalProject_Add( csxcad-core
-      DEPENDS     fparser-rs
-      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/CSXCAD/rust
-      CONFIGURE_COMMAND ""
-      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/CSXCAD/rust/Cargo.toml
-      BUILD_IN_SOURCE 1
-      INSTALL_COMMAND ""
-    )
+    if (BUILD_RUST_PYTHON)
+        find_program(MATURIN_EXECUTABLE maturin REQUIRED)
+        set(RUST_PYTHON "" CACHE FILEPATH "Python interpreter used for the wheels")
+        set(RUST_PYTHON_ARG "")
+        if (RUST_PYTHON)
+            set(RUST_PYTHON_ARG --interpreter ${RUST_PYTHON})
+        endif()
+        add_custom_target(rust-wheels ALL
+            COMMAND ${RUST_ENV} ${MATURIN_EXECUTABLE} build --release ${RUST_PYTHON_ARG}
+                    --manifest-path ${PROJECT_SOURCE_DIR}/CSXCAD/rust-py/Cargo.toml
+                    --out ${CMAKE_BINARY_DIR}/wheels
+            COMMAND ${RUST_ENV} ${MATURIN_EXECUTABLE} build --release ${RUST_PYTHON_ARG}
+                    --manifest-path ${PROJECT_SOURCE_DIR}/openEMS/rust-py/Cargo.toml
+                    --out ${CMAKE_BINARY_DIR}/wheels
+            DEPENDS rust-workspace
+            COMMENT "Building the Python wheels"
+            VERBATIM
+        )
+        install(DIRECTORY ${CMAKE_BINARY_DIR}/wheels/ DESTINATION share/openEMS/python/wheels)
+    endif()
 
-    # build csxcad-py (Python bindings)
-    ExternalProject_Add( csxcad-py
-      DEPENDS     csxcad-core
-      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/CSXCAD/rust-py
-      CONFIGURE_COMMAND ""
-      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo maturin build --release --manifest-path ${PROJECT_SOURCE_DIR}/CSXCAD/rust-py/Cargo.toml
-      BUILD_IN_SOURCE 1
-      INSTALL_COMMAND ""
-    )
+    if (WIN32)
+        set(RUST_SHARED_PREFIX "")
+        set(RUST_SHARED_SUFFIX ".dll")
+    elseif (APPLE)
+        set(RUST_SHARED_PREFIX "lib")
+        set(RUST_SHARED_SUFFIX ".dylib")
+    else()
+        set(RUST_SHARED_PREFIX "lib")
+        set(RUST_SHARED_SUFFIX ".so")
+    endif()
 
-    # build csxcad-matlab (C ABI shared library for MATLAB/Octave MEX)
-    ExternalProject_Add( csxcad-matlab
-      DEPENDS     csxcad-core
-      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/CSXCAD/rust-matlab
-      CONFIGURE_COMMAND ""
-      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/CSXCAD/rust-matlab/Cargo.toml
-      BUILD_IN_SOURCE 1
-      INSTALL_COMMAND ""
-    )
+    # Executables: the native names are part of the user-facing contract.
+    install(PROGRAMS ${RUST_TARGET_DIR}/release/openems-cli${CMAKE_EXECUTABLE_SUFFIX}
+            DESTINATION bin RENAME openEMS${CMAKE_EXECUTABLE_SUFFIX})
+    install(PROGRAMS ${RUST_TARGET_DIR}/release/appcsxcad${CMAKE_EXECUTABLE_SUFFIX}
+            DESTINATION bin RENAME AppCSXCAD${CMAKE_EXECUTABLE_SUFFIX})
+    install(PROGRAMS ${RUST_TARGET_DIR}/release/hyp2mat-rs${CMAKE_EXECUTABLE_SUFFIX}
+            DESTINATION bin RENAME hyp2mat${CMAKE_EXECUTABLE_SUFFIX})
 
-    # build openems-core
-    ExternalProject_Add( openems-core
-      DEPENDS     csxcad-core
-      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/openEMS/rust
-      CONFIGURE_COMMAND ""
-      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/openEMS/rust/Cargo.toml
-      BUILD_IN_SOURCE 1
-      INSTALL_COMMAND ""
-    )
+    # C ABI libraries consumed by the MATLAB/Octave MEX layer.
+    install(FILES
+            ${RUST_TARGET_DIR}/release/${RUST_SHARED_PREFIX}csxcad_matlab${RUST_SHARED_SUFFIX}
+            ${RUST_TARGET_DIR}/release/${RUST_SHARED_PREFIX}openems_matlab${RUST_SHARED_SUFFIX}
+            DESTINATION lib)
 
-    # build openems-py (Python bindings via maturin)
-    ExternalProject_Add( openems-py
-      DEPENDS     openems-core
-      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/openEMS/rust-py
-      CONFIGURE_COMMAND ""
-      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo maturin build --release --manifest-path ${PROJECT_SOURCE_DIR}/openEMS/rust-py/Cargo.toml
-      BUILD_IN_SOURCE 1
-      INSTALL_COMMAND ""
-    )
-
-    # build openems-matlab (C ABI shared library for MATLAB/Octave MEX)
-    ExternalProject_Add( openems-matlab
-      DEPENDS     openems-core csxcad-core
-      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/openEMS/rust-matlab
-      CONFIGURE_COMMAND ""
-      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/openEMS/rust-matlab/Cargo.toml
-      BUILD_IN_SOURCE 1
-      INSTALL_COMMAND ""
-    )
-
-    # build openems-cli (command-line interface)
-    ExternalProject_Add( openems-cli
-      DEPENDS     openems-core
-      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/openEMS/rust-cli
-      CONFIGURE_COMMAND ""
-      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/openEMS/rust-cli/Cargo.toml
-      BUILD_IN_SOURCE 1
-      INSTALL_COMMAND ""
-    )
-
-    # build qcsxcad-core
-    ExternalProject_Add( qcsxcad-core
-      DEPENDS     csxcad-core
-      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/QCSXCAD/rust
-      CONFIGURE_COMMAND ""
-      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/QCSXCAD/rust/Cargo.toml
-      BUILD_IN_SOURCE 1
-      INSTALL_COMMAND ""
-    )
-
-    # build qcsxcad-egui (QCSXCAD GUI: egui + wgpu)
-    ExternalProject_Add( qcsxcad-egui
-      DEPENDS     qcsxcad-core
-      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/QCSXCAD/rust-egui
-      CONFIGURE_COMMAND ""
-      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/QCSXCAD/rust-egui/Cargo.toml
-      BUILD_IN_SOURCE 1
-      INSTALL_COMMAND ""
-    )
-
-    # build appcsxcad (AppCSXCAD binary)
-    ExternalProject_Add( appcsxcad
-      DEPENDS     qcsxcad-egui
-      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/AppCSXCAD/rust
-      CONFIGURE_COMMAND ""
-      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/AppCSXCAD/rust/Cargo.toml
-      BUILD_IN_SOURCE 1
-      INSTALL_COMMAND ""
-    )
-
-    # build hyp2mat-rs
-    ExternalProject_Add( hyp2mat-rs
-      DEPENDS     csxcad-core
-      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/hyp2mat/rust
-      CONFIGURE_COMMAND ""
-      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/hyp2mat/rust/Cargo.toml
-      BUILD_IN_SOURCE 1
-      INSTALL_COMMAND ""
-    )
-
-    # build ctb-rs (Circuit Toolbox)
-    ExternalProject_Add( ctb-rs
-      SOURCE_DIR  ${PROJECT_SOURCE_DIR}/CTB/rust
-      CONFIGURE_COMMAND ""
-      BUILD_COMMAND ${CMAKE_COMMAND} -E env CARGO_HOME=${CMAKE_INSTALL_PREFIX}/cargo cargo build --release --manifest-path ${PROJECT_SOURCE_DIR}/CTB/rust/Cargo.toml
-      BUILD_IN_SOURCE 1
-      INSTALL_COMMAND ""
-    )
+    # Scripting layers keep the native install layout.
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/openEMS/matlab DESTINATION share/openEMS)
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/CSXCAD/matlab DESTINATION share/CSXCAD)
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/openEMS/python/Tutorials
+            DESTINATION share/openEMS/python)
 endif()

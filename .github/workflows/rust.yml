@@ -1,0 +1,116 @@
+name: Rust
+
+on:
+  push:
+    branches:
+      - master
+      - "mberkanbicer-**"
+    paths:
+      - "**/*.rs"
+      - "**/Cargo.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "**/build.rs"
+      - ".github/workflows/rust.yml"
+      - "scripts/ci/**"
+  pull_request:
+    paths:
+      - "**/*.rs"
+      - "**/Cargo.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "**/build.rs"
+      - ".github/workflows/rust.yml"
+      - "scripts/ci/**"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  linux:
+    name: Linux (build, tests, policy gates)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Check the whole workspace
+        run: cargo check --workspace
+      - name: Numerical core tests
+        run: cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs
+      - name: Placeholder policy
+        run: |
+          python3 scripts/ci/check_placeholders.py --self-test
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="origin/${{ github.base_ref }}"
+          else
+            BASE="${{ github.event.before }}"
+          fi
+          if git rev-parse --verify "$BASE" > /dev/null 2>&1; then
+            python3 scripts/ci/check_placeholders.py --changed --base "$BASE"
+          else
+            python3 scripts/ci/check_placeholders.py --changed
+          fi
+      - name: Migration records
+        run: python3 scripts/ci/check_migration_docs.py
+
+  hdf5:
+    name: Linux (HDF5 feature)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Install HDF5 development files
+        run: sudo apt-get update && sudo apt-get install -y libhdf5-dev pkg-config
+      - name: Build and test with the hdf5 feature
+        run: cargo test -p openems-core --features hdf5
+
+  windows:
+    name: Windows (build, tests)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Check the whole workspace
+        run: cargo check --workspace
+      - name: Numerical core tests
+        run: cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs
+      - name: Placeholder policy self-test
+        run: python scripts/ci/check_placeholders.py --self-test
+
+  macos:
+    name: macOS (build)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Check the whole workspace
+        run: cargo check --workspace
+      - name: Numerical core tests
+        run: cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs
+
+  freebsd:
+    name: FreeBSD (check)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: cargo check in a FreeBSD VM
+        uses: vmactions/freebsd-vm@v1
+        with:
+          usesh: true
+          prepare: pkg install -y rust
+          run: cargo check --workspace

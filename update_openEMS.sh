@@ -409,8 +409,14 @@ if [ "$BUILD_TINYXML" -eq 1 ]; then
 fi
 
 # build openEMS Project
+RUST_CMAKE=NO
+if [ "$BUILD_RUST" -eq 1 ]; then RUST_CMAKE=YES; fi
+RUST_PY_CMAKE=NO
+if [ "$BUILD_RUST" -eq 1 ] && [ "$BUILD_PY_EXT" -eq 1 ]; then RUST_PY_CMAKE=YES; fi
 build "$BASEDIR" "$TMPDIR" "$NJOBS" "$LOG_FILE" "$STDOUT" \
       "-DBUILD_APPCSXCAD=$BUILD_GUI" \
+      "-DBUILD_RUST=$RUST_CMAKE" \
+      "-DBUILD_RUST_PYTHON=$RUST_PY_CMAKE" \
       "-DCMAKE_INSTALL_PREFIX=$INSTALL_PATH"
 
 ##### additional packages #####
@@ -444,115 +450,29 @@ if [ "$BUILD_PY_EXT" -eq 1 ]; then
 fi
 
 #### rust extension build ####
+# The Rust workspace is built and installed by CMake (BUILD_RUST), so the
+# script only verifies the advertised files after `make install`.
 if [ "$BUILD_RUST" -eq 1 ]; then
-  echo "Building Rust extensions ... please wait"
+  echo "Verifying the Rust installation in $INSTALL_PATH ..."
 
-  # Build fparser-rs
-  echo "Building fparser-rs ... please wait"
-  if ! cargo build --release --manifest-path "$BASEDIR/fparser/rust/Cargo.toml" \
-    2>&1 | tee -a "$LOG_FILE" >> "$STDOUT"; then
-    echo "fparser-rs build failed, please see logfile for more details... $LOG_FILE"
-    exit 1
+  RUST_MISSING=0
+  if ! compgen -G "$INSTALL_PATH/bin/openEMS*" > /dev/null; then
+    echo "missing: bin/openEMS"
+    RUST_MISSING=1
   fi
-
-  # Build csxcad-core
-  echo "Building csxcad-core ... please wait"
-  if ! cargo build --release --manifest-path "$BASEDIR/CSXCAD/rust/Cargo.toml" \
-    2>&1 | tee -a "$LOG_FILE" >> "$STDOUT"; then
-    echo "csxcad-core build failed, please see logfile for more details... $LOG_FILE"
-    exit 1
+  if [ ! -d "$INSTALL_PATH/share/openEMS/matlab" ]; then
+    echo "missing: share/openEMS/matlab"
+    RUST_MISSING=1
   fi
-
-  # Build csxcad-py (Python bindings via maturin)
-  echo "Building csxcad-py ... please wait"
-  if ! maturin build --release --manifest-path "$BASEDIR/CSXCAD/rust-py/Cargo.toml" \
-    2>&1 | tee -a "$LOG_FILE" >> "$STDOUT"; then
-    echo "csxcad-py build failed, please see logfile for more details... $LOG_FILE"
-    exit 1
+  if [ ! -d "$INSTALL_PATH/share/CSXCAD/matlab" ]; then
+    echo "missing: share/CSXCAD/matlab"
+    RUST_MISSING=1
   fi
-
-  # Build csxcad-matlab (C ABI shared library for MATLAB/Octave MEX)
-  echo "Building csxcad-matlab ... please wait"
-  if ! cargo build --release --manifest-path "$BASEDIR/CSXCAD/rust-matlab/Cargo.toml" \
-    2>&1 | tee -a "$LOG_FILE" >> "$STDOUT"; then
-    echo "csxcad-matlab build failed, please see logfile for more details... $LOG_FILE"
-    exit 1
-  fi
-
-  # Build openems-core
-  echo "Building openems-core ... please wait"
-  if ! cargo build --release --manifest-path "$BASEDIR/openEMS/rust/Cargo.toml" \
-    2>&1 | tee -a "$LOG_FILE" >> "$STDOUT"; then
-    echo "openems-core build failed, please see logfile for more details... $LOG_FILE"
-    exit 1
-  fi
-
-  # Build openems-py (Python bindings via maturin)
-  echo "Building openems-py ... please wait"
-  if ! maturin build --release --manifest-path "$BASEDIR/openEMS/rust-py/Cargo.toml" \
-    2>&1 | tee -a "$LOG_FILE" >> "$STDOUT"; then
-    echo "openems-py build failed, please see logfile for more details... $LOG_FILE"
-    exit 1
-  fi
-
-  # Build openems-matlab (C ABI shared library for MATLAB/Octave MEX)
-  echo "Building openems-matlab ... please wait"
-  if ! cargo build --release --manifest-path "$BASEDIR/openEMS/rust-matlab/Cargo.toml" \
-    2>&1 | tee -a "$LOG_FILE" >> "$STDOUT"; then
-    echo "openems-matlab build failed, please see logfile for more details... $LOG_FILE"
-    exit 1
-  fi
-
-  # Build openems-cli (command-line interface)
-  echo "Building openems-cli ... please wait"
-  if ! cargo build --release --manifest-path "$BASEDIR/openEMS/rust-cli/Cargo.toml" \
-    2>&1 | tee -a "$LOG_FILE" >> "$STDOUT"; then
-    echo "openems-cli build failed, please see logfile for more details... $LOG_FILE"
-    exit 1
-  fi
-
-  # Build qcsxcad-core
-  echo "Building qcsxcad-core ... please wait"
-  if ! cargo build --release --manifest-path "$BASEDIR/QCSXCAD/rust/Cargo.toml" \
-    2>&1 | tee -a "$LOG_FILE" >> "$STDOUT"; then
-    echo "qcsxcad-core build failed, please see logfile for more details... $LOG_FILE"
-    exit 1
-  fi
-
-  # Build qcsxcad-egui (QCSXCAD GUI: egui + wgpu)
-  echo "Building qcsxcad-egui ... please wait"
-  if ! cargo build --release --manifest-path "$BASEDIR/QCSXCAD/rust-egui/Cargo.toml" \
-    2>&1 | tee -a "$LOG_FILE" >> "$STDOUT"; then
-    echo "qcsxcad-egui build failed, please see logfile for more details... $LOG_FILE"
-    exit 1
-  fi
-
-  # Build appcsxcad (AppCSXCAD binary)
-  echo "Building appcsxcad ... please wait"
-  if ! cargo build --release --manifest-path "$BASEDIR/AppCSXCAD/rust/Cargo.toml" \
-    2>&1 | tee -a "$LOG_FILE" >> "$STDOUT"; then
-    echo "appcsxcad build failed, please see logfile for more details... $LOG_FILE"
-    exit 1
-  fi
-
-  # Build hyp2mat-rs
-  echo "Building hyp2mat-rs ... please wait"
-  if ! cargo build --release --manifest-path "$BASEDIR/hyp2mat/rust/Cargo.toml" \
-    2>&1 | tee -a "$LOG_FILE" >> "$STDOUT"; then
-    echo "hyp2mat-rs build failed, please see logfile for more details... $LOG_FILE"
-    exit 1
-  fi
-
-  # Build ctb-rs (Circuit Toolbox)
-  echo "Building ctb-rs ... please wait"
-  if ! cargo build --release --manifest-path "$BASEDIR/CTB/rust/Cargo.toml" \
-    2>&1 | tee -a "$LOG_FILE" >> "$STDOUT"; then
-    echo "ctb-rs build failed, please see logfile for more details... $LOG_FILE"
+  if [ "$RUST_MISSING" -ne 0 ]; then
+    echo "Rust installation is incomplete, please see logfile for more details... $LOG_FILE"
     exit 1
   fi
 fi
-cd "$BASEDIR" || die
-
 echo "build successful, cleaning up tmp dir ..."
 rm -rf "$TMPDIR"
 

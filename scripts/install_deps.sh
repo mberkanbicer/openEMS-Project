@@ -39,6 +39,7 @@ Options:
   --python      Include Python binding deps (Cython, numpy, h5py, matplotlib)
   --disable-gui Exclude Qt and VTK-Qt deps (headless / server builds)
   --with-ctb    Include Octave (Circuit Toolbox / Matlab interface)
+  --with-rust   Include the Rust toolchain (cargo, rustc, maturin with --python)
   -h, --help    Show this help
 EOF
 }
@@ -48,6 +49,7 @@ MODE=check
 WITH_PYTHON=false
 WITH_GUI=true
 WITH_OCTAVE=false
+WITH_RUST=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -57,6 +59,7 @@ while [[ $# -gt 0 ]]; do
     --python)      WITH_PYTHON=true ;;
     --disable-gui|--disable-GUI) WITH_GUI=false ;;
     --with-ctb)    WITH_OCTAVE=true ;;
+    --with-rust)   WITH_RUST=true ;;
     -h|--help)     usage; exit 0 ;;
     *) printf 'Unknown option: %s\n\n' "$1" >&2; usage >&2; exit 1 ;;
   esac
@@ -333,6 +336,17 @@ _ensure_epel_crb() {
 
 # ── Check phase ───────────────────────────────────────────────────────────────
 declare -a MISSING=()
+declare -a MISSING_TOOLS=()
+
+_check_rust_tools() {
+  MISSING_TOOLS=()
+  [[ "$WITH_RUST" == true ]] || return 0
+  command -v cargo  >/dev/null 2>&1 || MISSING_TOOLS+=( "cargo (install from https://rustup.rs)" )
+  command -v rustc  >/dev/null 2>&1 || MISSING_TOOLS+=( "rustc (install from https://rustup.rs)" )
+  if [[ "$WITH_PYTHON" == true ]]; then
+    command -v maturin >/dev/null 2>&1 || MISSING_TOOLS+=( "maturin (cargo install maturin)" )
+  fi
+}
 
 _check_all() {
   MISSING=()
@@ -340,6 +354,7 @@ _check_all() {
   for spec in "${ALL_PKGS[@]}"; do
     _spec_installed "$spec" || MISSING+=( "$spec" )
   done
+  _check_rust_tools
 }
 
 # ── Main ──────────────────────────────────────────────────────────────────────
@@ -356,9 +371,18 @@ printf 'Options: GUI=%-3s  Python=%-3s  Octave=%-3s\n\n' \
 echo "Checking installed packages..."
 _check_all
 
-if [[ ${#MISSING[@]} -eq 0 ]]; then
+if [[ ${#MISSING[@]} -eq 0 && ${#MISSING_TOOLS[@]} -eq 0 ]]; then
   echo "All required dependencies are installed."
   exit 0
+fi
+
+if [[ ${#MISSING_TOOLS[@]} -gt 0 ]]; then
+  printf '\nMissing Rust tools (--with-rust):\n'
+  for tool in "${MISSING_TOOLS[@]}"; do
+    printf '  %s\n' "$tool"
+  done
+  printf '\nThe Rust toolchain is not installed by the system package manager.\n'
+  printf 'Install it with https://rustup.rs and re-run this check.\n'
 fi
 
 # Print missing packages and the suggested install command

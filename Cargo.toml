@@ -16,6 +16,23 @@ members = [
     "CTB/rust",
 ]
 
+# Everything except the PyO3 bindings. `cargo build` at the root builds these,
+# so a plain build does not require a Python interpreter. Use
+# `cargo build --workspace` (or CMake's BUILD_RUST_PYTHON=YES) for the wheels.
+default-members = [
+    "fparser/rust",
+    "CSXCAD/rust",
+    "CSXCAD/rust-matlab",
+    "openEMS/rust",
+    "openEMS/rust-matlab",
+    "openEMS/rust-cli",
+    "QCSXCAD/rust",
+    "QCSXCAD/rust-egui",
+    "AppCSXCAD/rust",
+    "hyp2mat/rust",
+    "CTB/rust",
+]
+
 [workspace.dependencies]
 # Shared dependency versions across all crates
 num-complex = "0.4"
@@ -28,7 +45,7 @@ egui-winit = "0.37"
 egui-wgpu = "0.37"
 wgpu = "30"
 winit = "0.30"
-pyo3 = { version = "0.23", features = ["extension-module"] }
+pyo3 = { version = "0.30", features = ["extension-module"] }
 
 [profile.release]
 opt-level = 3

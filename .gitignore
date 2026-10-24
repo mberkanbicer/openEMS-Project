@@ -28,3 +28,6 @@ CLAUDE.md
 /target/
 **/target/
 diff.txt
+build-*/
+build-wheels/
+build-venv/
