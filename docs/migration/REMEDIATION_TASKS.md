@@ -60,9 +60,9 @@ RM-127.
 | Status | Count | Tasks |
 | --- | --- | --- |
 | `Verified` | 18 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133 |
-| `Implemented` | 40 | RM-037, RM-038, RM-039, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-064, RM-066, RM-067, RM-068, RM-069, RM-070, RM-071, RM-072, RM-076, RM-077, RM-078, RM-079, RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022 |
+| `Implemented` | 41 | RM-037, RM-040, RM-038, RM-039, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-064, RM-066, RM-067, RM-068, RM-069, RM-070, RM-071, RM-072, RM-076, RM-077, RM-078, RM-079, RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022 |
 | `Blocked` | 2 | RM-125, RM-127 |
-| `Not Started` | 73 | all remaining tasks |
+| `Not Started` | 72 | all remaining tasks |
 
 Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
@@ -73,7 +73,8 @@ Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
 
 
-## Remaining backlog (73 tasks) and execution order
+
+## Remaining backlog (72 tasks) and execution order
 
 The tasks below are the `Not Started` rows of this document, grouped by the order they will be executed. Wave A is complete and pushed; the remaining waves are ordered by dependency and by what can be verified in this workspace.
 
@@ -81,7 +82,6 @@ The tasks below are the `Not Started` rows of this document, grouped by the orde
 
 | ID | Pri | Task | Depends |
 | --- | --- | --- | --- |
-| RM-040 | P0 | Introduce `OperatorExtension` trait and priority handling | RM-004 |
 | RM-056 | P1 | Wire Debye/Lorentz operator+engine extensions | RM-041 |
 | RM-057 | P1 | Wire conducting-sheet extension | RM-041 |
 | RM-058 | P1 | Wire lumped RLC extension | RM-041 |
@@ -248,7 +248,7 @@ Wave C additionally needs a Python interpreter compatible with the PyO3 version 
 | RM-037 | P0 | Implement native excitation arrays (Gaussian/Sinus/Dirac/Step) | RM-004 | L | Element-wise comparison with native arrays | Implemented |
 | RM-038 | P0 | Add current half-step signal, Nyquist count, max excitation timestep | RM-037 | M | Native array comparison for both signals | Implemented |
 | RM-039 | P1 | Implement custom excitation through fparser with parse-error reporting | RM-037 | S | Native comparison for two expressions | Implemented |
-| RM-040 | P0 | Introduce `OperatorExtension` trait and priority handling | RM-004 | L | Unit tests for ordering and hook dispatch | Not Started |
+| RM-040 | P0 | Introduce `OperatorExtension` trait and priority handling | RM-004 | L | Unit tests for ordering and hook dispatch | Implemented |
 | RM-041 | P0 | Register extension pairs from `setup_fdtd` in native order | RM-040 | L | Integration test asserts the registered set/order for a fixture | Implemented |
 | RM-042 | P0 | Implement UPML operator coefficients (vv/vvfo/vvfn, ii/iifo/iifn) | RM-040 | L | Coefficient comparison with native for a small box | Implemented |
 | RM-043 | P0 | Wire UPML engine extension and measure reflection | RM-042,RM-041 | M | Reflection below approved bound; native comparison | Implemented |
@@ -472,6 +472,8 @@ in the task's acceptance column.
 | 2026-10-25 | RM-133 | Verified | `scripts/ci/check_migration_docs.py` validates the closed vocabulary, snapshot counts, backlog header and coverage-matrix statuses; it passes locally and runs in the Linux CI job |
 
 | 2026-10-25 | RM-060 | Implemented | Steady-state detection completed and wired: `EngineExtSteadyState` now includes the native `CalcFastEnergy` term, starts at 1.0, bounds-checks probes and exposes the native probe layout (centre plus quarter/three-quarter on each axis, all components); `Operator::build_steady_state_extension` creates it for periodic excitations and `setup_fdtd` registers it. `run_fdtd` uses the extension metric when present and otherwise the native `currE / maxE` energy criterion, which also removes the infinite-loop case when `nr_ts` and `max_time` are both zero. Fixed a real compatibility bug: periodic excitations were not repeated (`Engine_Ext_Excitation` wraps the sample index modulo the period), so sinusoidal sources stopped after two periods. Tests: `steady_state_extension_uses_the_native_probe_layout` (21 probes), `energy_term_detects_a_decaying_field`, `periodic_excitation_registers_steady_state_detection`, `steady_state_end_criteria_stops_a_periodic_run_early` (stops at 240 of 4000 steps), `aperiodic_excitation_uses_the_energy_end_criteria`, `periodic_sources_repeat_every_period` |
+
+| 2026-10-25 | RM-040 | Implemented | New `operator_extension` module: `OperatorExtension` trait (`name`, `priority`, `is_active`, `build -> Result<Vec<Box<dyn EngineExtension>>, String>`) and a stable-priority `OperatorExtensionRegistry`. The four existing builders (Mur, UPML, steady state, excitation) are now extensions, and `setup_fdtd` builds them all through the registry in one ordered pass instead of ad-hoc calls. Errors abort setup instead of dropping physics. Tests: `extensions_build_in_priority_order`, `inactive_extensions_are_skipped_and_errors_propagate`, `engine_extensions_are_forwarded_in_order`, `upml_is_inactive_without_sizes`; all 171 openems-core unit tests pass and the existing UPML/excitation/steady-state end-to-end tests still pass |
 
 ## Change log
 
