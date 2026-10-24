@@ -23,3 +23,8 @@ CLAUDE.md
 .cursor*
 .windsurf*
 .copilot*
+
+# Rust workspace build output and local scratch files
+/target/
+**/target/
+diff.txt
