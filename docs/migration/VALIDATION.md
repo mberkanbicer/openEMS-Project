@@ -1098,3 +1098,135 @@ cargo test --workspace
 cargo clippy --workspace --all-targets -- -D warnings
 cargo fmt --workspace -- --check
 ```
+
+---
+
+## Session evidence — 2026-10-24 (HDF5, UPML, CFL, averaging, FD dumps)
+
+Environment: Windows 11, Rust stable (MSVC), HDF5 1.14 from the FreeCAD 1.1
+installation. The import library was generated once from the shipped DLL:
+
+```powershell
+dumpbin /exports "C:\Program Files\FreeCAD 1.1\bin\hdf5.dll" > exports.txt
+# hdf5.def lists the used C symbols (plus DATA entries for H5T_*_g)
+lib /def:hdf5.def /machine:x64 /out:hdf5.lib
+$env:HDF5_LIB_DIR = "<dir containing hdf5.lib>"
+$env:PATH = "C:\Program Files\FreeCAD 1.1\bin;$env:PATH"
+cargo test -p openems-core --features hdf5
+```
+
+Without the `hdf5` feature every writer/reader call returns
+`Hdf5Error::Unsupported`; no private substitute format is written.
+
+### UPML absorption (RM-042/RM-043)
+
+Test: `openems::upml_absorption_tests::upml_absorbs_a_gaussian_pulse`.
+41 x 21 x 21 uniform cells, 1 mm, hard E_z 6 GHz Gaussian pulse at the centre,
+8-cell UPML on all six faces, 900 timesteps.
+
+| Boundary | max E^2 in the last 10 samples | ratio to peak |
+| --- | --- | --- |
+| 8-cell UPML | 1.118e-4 | 1.36e-6 (-117 dB) |
+| PEC reference | 1.051e-1 | 1.28e-3 |
+
+Acceptance used here: the PML tail must be below 1e-3 of the peak and at least
+10x below the PEC tail. A coefficient-by-coefficient comparison against a native
+PML box is still open (RM-042 acceptance).
+
+### CFL variants (RM-049)
+
+Uniform mesh with spacing delta, vacuum:
+
+| Variant | Measured | Analytic | Relative error |
+| --- | --- | --- | --- |
+| `Rennings_1` (Var1) | delta/(2c) | delta/(2c) | < 1e-6 |
+| `Rennings_2` (Var3) | delta/(sqrt(3) c) | delta/(sqrt(3) c) | < 1e-6 |
+
+Tests: `operator::timestep_tests::var1_and_var3_match_the_uniform_mesh_analytic_values`,
+`var3_is_larger_than_var1_on_a_nonuniform_mesh`.
+
+### Quarter-cell material averaging (RM-052)
+
+Half-space eps=4 for x >= 5 on a uniform mesh, E-y edge on the interface:
+measured eps_r = 2.5 (two of four quarter cells inside), 4.0 deep inside and 1.0
+outside. Test: `quarter_cell_averaging_matches_the_analytic_half_space`.
+
+### HDF5 layout (RM-076/RM-077)
+
+`hdf5::native_reader_tests::reads_a_native_openems_dump` opens the recorded C++
+dump `docs/migration/reference-data/msl-notchfilter-wsl/field-run-1/Et_ref.h5`
+and asserts:
+
+- root links `Mesh`, `FieldData`; `/Mesh` links `x`, `y`, `z`
+- `/Mesh@mesh_type = 0`, `/Mesh@mesh_scaling = 1e-6`, mesh lines in metres
+- `/FieldData/TD` has 10 entries, the first is `00000000`, shape `[3, 5, 5, 1]`
+- `d_order = NXYZ`, `time = 0` and `1.774336e-11`
+
+`round_trips_the_native_field_layout` writes the same layout with the Rust
+writer and reads it back. A check with the native Python/Octave reader is still
+open (no C++ build in this environment).
+
+### Current test counts
+
+```
+cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs
+  fparser     52
+  csxcad     145
+  openems    152
+  hyp2mat     14
+  total      363 passed, 0 failed
+
+cargo test -p openems-core --features hdf5
+  openems    158 passed, 0 failed
+```
+
+`cargo check -p openems-cli -p openems-matlab` passes. `cargo check --workspace`
+fails in `pyo3-ffi` because the local Python is 3.14, which pyo3 0.23 does not
+support; this is an environment issue unrelated to the migration.
+
+### Analytic propagation suite (RM-065, partial)
+
+`openEMS/rust/tests/analytic_validation.rs` compares the solver with closed-form
+results. Both cases use a uniform 1 mm mesh, a Gaussian point source and 4-6
+cell UPML, and measure the delay between two probes by cross-correlation
+(sub-sample interpolation).
+
+| Case | Analytic | Measured | Error | Tolerance |
+| --- | --- | --- | --- | --- |
+| vacuum speed (8 GHz) | 2.9979e8 m/s | 2.9404e8 m/s | 1.9% | 3% |
+| `eps_r = 4` speed (4 GHz) | 1.4990e8 m/s | 1.5140e8 m/s | 1.0% | 3% |
+
+The tolerance is dominated by the pulse bandwidth and the probe spacing, not by
+the update scheme: with `dx/c = 2 dt` (Var1) the axial numerical phase velocity
+is within 0.1% of `c` at these frequencies.
+
+### Anisotropic materials (RM-053)
+
+`Epsilon="2,4,6"` on a material property now sets `is_isotropic = false` in
+CSXCAD (unless an explicit `Isotropy` attribute overrides it), and the EC
+capacitance follows the edge direction: `vi_x : vi_y : vi_z = 1/2 : 1/4 : 1/6`
+when only epsilon is anisotropic. Tests:
+`operator::anisotropy_tests::anisotropic_epsilon_scales_each_edge_direction`,
+`csxcad_core::serialization::anisotropic_parse_tests::*`.
+
+### Current test counts (after RM-053 / RM-065 partial)
+
+```
+cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs
+  fparser     52
+  csxcad     148
+  openems    153 + 2 integration
+  hyp2mat     14
+  total      369 passed, 0 failed
+```
+
+### Dump scheduling and file sequence (RM-079)
+
+- VTK time-domain dumps: `<name>_<10-digit timestep>.vtk` (native VTK writer
+  default pad length 10); HDF5 dumps: `/FieldData/TD/<8-digit timestep>`
+  (`ProcessFieldsTD::pad_length = 8`).
+- `set_sub_sampling(rate, dir)` and `set_opt_resolution(resolution, dir)` now
+  honour the direction argument (`-1` = all axes) and reduce the written grid
+  like `ProcessFields::CalcMeshPos`. The reduced coordinates and `/Mesh`
+  datasets are written, not the full mesh.
+- Each dump opens and closes its file, so every file is flushed on return.
