@@ -60,9 +60,9 @@ RM-127.
 | Status | Count | Tasks |
 | --- | --- | --- |
 | `Verified` | 18 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133 |
-| `Implemented` | 41 | RM-037, RM-040, RM-038, RM-039, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-064, RM-066, RM-067, RM-068, RM-069, RM-070, RM-071, RM-072, RM-076, RM-077, RM-078, RM-079, RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022 |
+| `Implemented` | 42 | RM-037, RM-040, RM-038, RM-039, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-057, RM-064, RM-066, RM-067, RM-068, RM-069, RM-070, RM-071, RM-072, RM-076, RM-077, RM-078, RM-079, RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022 |
 | `Blocked` | 2 | RM-125, RM-127 |
-| `Not Started` | 72 | all remaining tasks |
+| `Not Started` | 71 | all remaining tasks |
 
 Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
@@ -74,7 +74,8 @@ Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
 
 
-## Remaining backlog (72 tasks) and execution order
+
+## Remaining backlog (71 tasks) and execution order
 
 The tasks below are the `Not Started` rows of this document, grouped by the order they will be executed. Wave A is complete and pushed; the remaining waves are ordered by dependency and by what can be verified in this workspace.
 
@@ -83,7 +84,6 @@ The tasks below are the `Not Started` rows of this document, grouped by the orde
 | ID | Pri | Task | Depends |
 | --- | --- | --- | --- |
 | RM-056 | P1 | Wire Debye/Lorentz operator+engine extensions | RM-041 |
-| RM-057 | P1 | Wire conducting-sheet extension | RM-041 |
 | RM-058 | P1 | Wire lumped RLC extension | RM-041 |
 | RM-059 | P1 | Wire TFSF extension | RM-041 |
 | RM-061 | P1 | Cylinder/multigrid: implement or fail loudly (D-02) | RM-047 |
@@ -265,7 +265,7 @@ Wave C additionally needs a Python interpreter compatible with the PyO3 version 
 | RM-054 | P0 | Fix `EC_G`/`EC_R` units (remove `EPS0`) | RM-050 | S | Coefficient comparison with native; lossy-medium test | Implemented |
 | RM-055 | P0 | Metal/PEC edges and caps | RM-050 | M | PEC cavity test; native comparison | Implemented |
 | RM-056 | P1 | Wire Debye/Lorentz operator+engine extensions | RM-041 | L | Dispersive slab differential case | Not Started |
-| RM-057 | P1 | Wire conducting-sheet extension | RM-041 | M | Conducting-sheet reference case | Not Started |
+| RM-057 | P1 | Wire conducting-sheet extension | RM-041 | M | Conducting-sheet reference case | Implemented |
 | RM-058 | P1 | Wire lumped RLC extension | RM-041 | M | Native lumped-port comparison | Not Started |
 | RM-059 | P1 | Wire TFSF extension | RM-041 | M | TFSF plane-wave case | Not Started |
 | RM-060 | P1 | Wire steady-state extension and end criteria | RM-041 | M | End criteria stops the run; log matches native semantics | Implemented |
@@ -474,6 +474,9 @@ in the task's acceptance column.
 | 2026-10-25 | RM-060 | Implemented | Steady-state detection completed and wired: `EngineExtSteadyState` now includes the native `CalcFastEnergy` term, starts at 1.0, bounds-checks probes and exposes the native probe layout (centre plus quarter/three-quarter on each axis, all components); `Operator::build_steady_state_extension` creates it for periodic excitations and `setup_fdtd` registers it. `run_fdtd` uses the extension metric when present and otherwise the native `currE / maxE` energy criterion, which also removes the infinite-loop case when `nr_ts` and `max_time` are both zero. Fixed a real compatibility bug: periodic excitations were not repeated (`Engine_Ext_Excitation` wraps the sample index modulo the period), so sinusoidal sources stopped after two periods. Tests: `steady_state_extension_uses_the_native_probe_layout` (21 probes), `energy_term_detects_a_decaying_field`, `periodic_excitation_registers_steady_state_detection`, `steady_state_end_criteria_stops_a_periodic_run_early` (stops at 240 of 4000 steps), `aperiodic_excitation_uses_the_energy_end_criteria`, `periodic_sources_repeat_every_period` |
 
 | 2026-10-25 | RM-040 | Implemented | New `operator_extension` module: `OperatorExtension` trait (`name`, `priority`, `is_active`, `build -> Result<Vec<Box<dyn EngineExtension>>, String>`) and a stable-priority `OperatorExtensionRegistry`. The four existing builders (Mur, UPML, steady state, excitation) are now extensions, and `setup_fdtd` builds them all through the registry in one ordered pass instead of ad-hoc calls. Errors abort setup instead of dropping physics. Tests: `extensions_build_in_priority_order`, `inactive_extensions_are_skipped_and_errors_propagate`, `engine_extensions_are_forwarded_in_order`, `upml_is_inactive_without_sizes`; all 171 openems-core unit tests pass and the existing UPML/excitation/steady-state end-to-end tests still pass |
+
+| 2026-10-25 | RM-057 | Implemented | Conducting-sheet ADE model added: `conducting_sheet` module carries the native rational-approximation table and builds `vv`/`vi`/`v_int_ade`/`v_ext_ade`; `Operator::build_conducting_sheet_extension` samples CSX `ConductingSheet` properties per Yee edge, applies the native PEC fallbacks (non-2D primitive, boundary layer, zero sigma/thickness) and the shared-edge `factor`, and writes the modified coefficients. `ConductingSheetOperatorExtension` registers it through the extension registry with the excitation's `f_max` and the Mur/PML boundary sizes. Tests: `two_dimensional_sheet_gets_the_ade_model`, `volume_primitive_falls_back_to_pec_and_is_not_registered`, `boundary_layer_edges_fall_back_to_pec`, plus the coefficient tests in `conducting_sheet::tests` |
+| 2026-10-25 | RM-047/050 (bug fix) | Implemented | Fixed a science bug in the Yee geometry convention: `yee_coordinates` had transverse/along-axis dual flags inverted relative to native `GetYeeCoords`, and `edge_area_value` used the wrong transverse mesh relative to native `GetNodeArea`. On uniform meshes the two agree, which is why earlier tests passed; on non-uniform meshes the capacitance used the primary area instead of the dual area (and the material/PEC/excitation sampling was shifted by half a cell). Both helpers now match native exactly, the material `mue`/`sigma` width and the sheet `node_width` use the native `GetNodeWidth = GetEdgeLength(!dual)` relation, and the fixtures that relied on the old shift were corrected. Regression tests: `yee_coordinates_use_nodes_transverse_and_dual_along_the_edge`, `capacitance_uses_the_dual_area_on_a_nonuniform_mesh` |
 
 ## Change log
 

@@ -1338,3 +1338,42 @@ Tests: `steady_state_extension_uses_the_native_probe_layout`,
 `steady_state_end_criteria_stops_a_periodic_run_early`,
 `aperiodic_excitation_uses_the_energy_end_criteria`,
 `periodic_sources_repeat_every_period`, `excitation_delay_skips_earlier_steps`.
+
+## Conducting sheet and the Yee geometry convention (2026-10-25)
+
+### Yee convention fix
+
+`yee_coordinates` and `edge_area_value` had the dual-mesh flags inverted with
+respect to native `GetYeeCoords` / `GetNodeArea`. On a uniform mesh the two
+conventions agree, which is why every earlier test passed; on a graded mesh:
+
+- the edge was sampled half a cell away (material/PEC/excitation/sheet lookup),
+- the capacitance used the primary transverse area instead of the dual area,
+- `L` used the dual transverse area instead of the primary one.
+
+Both helpers now match native, and `GetNodeWidth(axis, pos, dual)` is used as
+`GetEdgeLength(axis, pos, !dual)` where the native relation applies (material
+`mue`/`sigma` width, sheet width-to-length factor). Regression test on a graded
+mesh (spacing 1/2 mm, 3/4 mm, 5/6 mm):
+
+| quantity | analytic | measured |
+| --- | --- | --- |
+| C (E_x at (1,1,1)) | eps0 * 3.5e-3 * 5.5e-3 / 2e-3 | matches to < 1e-12 relative |
+| L (E_x at (1,1,1)) | mu0 * 4e-3 * 6e-3 / 1.5e-3 | matches to < 1e-12 relative |
+
+The fixtures that had been written around the old half-cell shift (excitation
+and steady-state source boxes) were corrected to span the edge properly.
+
+### Conducting sheet
+
+`sheet_coefficients` reproduces the native band selection and ADE model from
+`cond_sheet_parameter.h` (table copied verbatim). Edge handling:
+
+- 2-D primitive inside the sheet: ADE model, `vv`/`vi` rewritten;
+- 3-D/1-D primitive, zero conductivity/thickness, or an edge inside a Mur/PML
+  boundary layer: PEC fallback (`vv = vi = 0`), not registered;
+- shared edge with a non-sheet neighbour: native `factor = 2`.
+
+Tests: `two_dimensional_sheet_gets_the_ade_model` (tangential `vv < 1`, normal
+edge untouched, finite ADE coefficients), `volume_primitive_falls_back_to_pec_and_is_not_registered`,
+`boundary_layer_edges_fall_back_to_pec`, and coefficient sanity/finiteness.
