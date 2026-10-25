@@ -1,0 +1,7 @@
+# Reviewed, bounded exceptions to the placeholder gate.
+#
+# Format: <path or path:line>: <reason>
+# A line entry exempts exactly one known gap; remove it once the gap is closed.
+QCSXCAD/rust-egui/src/renderer.rs:300: RM-105 (PNG capture from the wgpu frame) is open; the renderer reports it instead of writing a fake image
+AppCSXCAD/rust/src/app.rs:166: RM-097 (render every primitive type) owns the real structure tree/central panel content
+AppCSXCAD/rust/src/app.rs:307: RM-104 (real POV/X3D exports) owns the real scene export

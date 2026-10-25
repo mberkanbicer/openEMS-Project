@@ -46,14 +46,45 @@ def load_allowlist() -> dict[str, str]:
     return entries
 
 
-def tracked_rust_files() -> list[Path]:
-    output = subprocess.run(
-        ["git", "ls-files", "*.rs"],
-        check=True,
+def repository_roots() -> list[Path]:
+    """The repository root plus every initialized submodule.
+
+    The Rust sources live in their owning submodule repositories, so scanning
+    only the root repository would check nothing at all.
+    """
+    roots = [Path(".")]
+    configuration = subprocess.run(
+        ["git", "config", "--file", ".gitmodules", "--get-regexp", r"^submodule\..*\.path$"],
         capture_output=True,
         text=True,
-    ).stdout
-    return [Path(line) for line in output.splitlines() if line]
+    )
+    if configuration.returncode not in (0, 1):
+        configuration.check_returncode()
+    for line in configuration.stdout.splitlines():
+        _, _, path = line.partition(" ")
+        path = path.strip()
+        if not path:
+            continue
+        candidate = Path(path)
+        if candidate.is_dir():
+            roots.append(candidate)
+    return roots
+
+
+def tracked_rust_files() -> list[Path]:
+    files: list[Path] = []
+    for root in repository_roots():
+        output = subprocess.run(
+            ["git", "-C", str(root), "ls-files", "*.rs"],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+        for line in output.splitlines():
+            if not line:
+                continue
+            files.append(root / line if root != Path(".") else Path(line))
+    return files
 
 
 def changed_rust_files(base: str) -> list[Path]:
