@@ -64,6 +64,26 @@ A converged 3D coaxial-line reference now adds analytic port and impedance
 checks on a 715,084-cell mesh; two runs matched all saved numeric port arrays
 bitwise. Its solver timings are characterization only.
 
+## Wave C status (2026-10-25)
+
+The scripting wave is verified for the Python interfaces: the **unmodified**
+native CSXCAD suite (150 tests) and the **unmodified** native openEMS Python
+suite (298 tests) pass against the Rust core (`scripts/ci/run_rust_python_tests_wsl.sh`),
+covering the geometry API, the controller, all port classes, the XML round-trip,
+NF2FF results, SAR and the HDF5 dump readers.
+
+The Octave/MATLAB interface loads and runs through the Rust CLI
+(`scripts/ci/install_openems_cli_wsl.sh` links the CLI as `openEMS/openEMS`, so
+`openEMS.sh` and the M-files find it). `unittests/transforms` passes and the
+`combinedtests/Coax` case runs the solver and produces `ut1`/`it1`, but the
+port amplitudes still disagree with the native reference (`ut1` ~168x high,
+`it1` far too small). Root cause identified: the excitation path evaluates the
+excitation weight function without vertex coordinates (`operator.rs`, so the
+weight silently becomes 1.0), and the probe amplitude/snapping is not yet the
+native `GetWeightedExcitation` * `GetEdgeLength` (drawing units) with the native
+dual-mesh snap rule. Fixing that, plus the dump-box probing, the mode-match
+wiring and the `nf2ff`/`sar` CLIs, is what remains for RM-091..RM-096.
+
 ## Verified progress
 
 - All seven submodule Rust ports are committed and building cleanly:
