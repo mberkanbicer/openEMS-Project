@@ -59,10 +59,10 @@ RM-127.
 
 | Status | Count | Tasks |
 | --- | --- | --- |
-| `Verified` | 34 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-073, RM-074, RM-075, RM-082, RM-083, RM-084, RM-085, RM-087, RM-089, RM-090 |
-| `Implemented` | 47 | RM-037, RM-040, RM-038, RM-039, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-057, RM-064, RM-066, RM-067, RM-068, RM-069, RM-070, RM-071, RM-072, RM-076, RM-077, RM-078, RM-079, RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022, RM-065, RM-080, RM-081, RM-086, RM-095 |
+| `Verified` | 37 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-073, RM-074, RM-075, RM-082, RM-083, RM-084, RM-085, RM-086, RM-087, RM-088, RM-089, RM-090, RM-095 |
+| `Implemented` | 45 | RM-037, RM-040, RM-038, RM-039, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-057, RM-064, RM-066, RM-067, RM-068, RM-069, RM-070, RM-071, RM-072, RM-076, RM-077, RM-078, RM-079, RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022, RM-065, RM-080, RM-081 |
 | `Blocked` | 2 | RM-125, RM-127 |
-| `Not Started` | 50 | all remaining tasks |
+| `Not Started` | 49 | all remaining tasks |
 
 Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
@@ -75,7 +75,7 @@ Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
 
 
-## Remaining backlog (50 tasks) and execution order
+## Remaining backlog (49 tasks) and execution order
 
 The tasks below are the `Not Started` rows of this document, grouped by the order they will be executed. Wave A is complete and pushed; the remaining waves are ordered by dependency and by what can be verified in this workspace.
 
@@ -84,7 +84,6 @@ The tasks below are the `Not Started` rows of this document, grouped by the orde
 | ID | Pri | Task | Depends |
 | --- | --- | --- | --- |
 | RM-013 | P0 | Rename modules/classes to native names (`CSXCAD`, `openEMS`, `ContinuousStructure`, `openEMS`) | RM-012 |
-| RM-088 | P0 | Implement Python NF2FF module | RM-074,RM-085 |
 | RM-091 | P0 | Make native MATLAB/Octave M-file suite work through CLI | RM-083 |
 | RM-092 | P0 | Match MATLAB `calcPort`, `CalcNF2FF`, post-processing | RM-091,RM-074 |
 | RM-093 | P1 | Implement CSXCAD MATLAB M-file surface | RM-032 |
@@ -276,16 +275,16 @@ Wave C additionally needs a Python interpreter compatible with the PyO3 version 
 | ID | Pri | Task | Depends | Est | Acceptance / Evidence | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | RM-085 | P0 | Build native Python package layout | RM-013 | M | `import CSXCAD`, `import openEMS` from installed prefix | Verified |
-| RM-086 | P0 | Match Controller method surface, defaults, errors | RM-085 | L | Native `test_*.py` controller tests pass | Implemented |
+| RM-086 | P0 | Match Controller method surface, defaults, errors | RM-085 | L | Native `test_*.py` controller tests pass | Verified |
 | RM-087 | P0 | Implement Python port classes | RM-085 | L | Port tests pass | Verified |
-| RM-088 | P0 | Implement Python NF2FF module | RM-074,RM-085 | L | NF2FF tests pass | Not Started |
+| RM-088 | P0 | Implement Python NF2FF module | RM-074,RM-085 | L | NF2FF tests pass | Verified |
 | RM-089 | P1 | Implement Python automesh and utilities | RM-085 | L | Automesh/utility tests pass | Verified |
 | RM-090 | P0 | Raise CSXCAD Python classes to native surface | RM-031 | L | Native CSXCAD Python suite passes | Verified |
 | RM-091 | P0 | Make native MATLAB/Octave M-file suite work through CLI | RM-083 | L | 10 suite cases + 2 smoke tests pass | Not Started |
 | RM-092 | P0 | Match MATLAB `calcPort`, `CalcNF2FF`, post-processing | RM-091,RM-074 | L | Port/NF2FF comparisons recorded | Not Started |
 | RM-093 | P1 | Implement CSXCAD MATLAB M-file surface | RM-032 | L | 58 public + 12 private M-files resolve | Not Started |
 | RM-094 | P1 | Match error identifiers, ownership, array orientation | RM-090,RM-093 | M | Contract tests from the interface audits | Not Started |
-| RM-095 | P0 | Run native Python suite (31 tests + 150 CSXCAD) unchanged | RM-085..RM-090 | M | Recorded pass counts | Implemented |
+| RM-095 | P0 | Run native Python suite (31 tests + 150 CSXCAD) unchanged | RM-085..RM-090 | M | Recorded pass counts | Verified |
 | RM-096 | P0 | Run native Octave suite and MSL smoke tests unchanged | RM-091..RM-093 | M | Recorded pass counts | Not Started |
 ## WS7 - GUI
 
@@ -484,3 +483,6 @@ in the task's acceptance column.
 | 2026-10-25 | RM-089 | Verified | The native `test_Automesh` (14 tests) and the CSXCAD `test_Utilities` (8 tests) pass against the Rust packages. `openEMS/automesh.py` and `CSXCAD/Utilities.py` are the unchanged native modules |
 | 2026-10-25 | RM-087 | Verified | The unchanged native `ports.py` (73 kB) runs on the Rust CSXCAD surface: the unmodified `test_Ports` suite passes 104/104 (`scripts/ci/run_openems_port_tests_wsl.sh`), covering lumped, curve, waveguide, rectangular/circular waveguide, coaxial, MSL, strip-line and CPW ports |
 | 2026-10-25 | RM-086 | Implemented | Controller XML: `Write2XML` now emits the native `<openEMS>` document (`<FDTD>` attributes and children plus the embedded CSX), and `ReadFromXML` restores the solver options and replaces the CSX. The unmodified `test_XML_RoundTrip` (26) and `test_sim_scripts` (3) pass; the controller suite is 48/50 with the two `CreateNF2FFBox` cases waiting for RM-088 |
+| 2026-10-25 | RM-088 | Verified | The NF2FF transform runs on the Rust core: `nf2ff_hdf5` reads a recorded box face (frequency-domain, or a time-domain DFT fallback), accumulates it in `Nf2ffCalc` for every requested frequency, and writes the native result layout (`/Mesh`, `/nf2ff/E_theta|E_phi|P_rad/FD/f{n}`, `Frequency`/`Prad`/`Dmax` attributes, optional legacy layout). Python side: `openEMS._nf2ff` provides the native class (`AnalyseFile`, `SetMirror`, `SetRadius`, `Write2HDF5`, `SetVerboseLevel`, `SetLegacyFormat`). Evidence: the unmodified `test_nf2ff` (4) and the Rust driver test `analyses_planes_and_writes_the_native_result_layout` |
+| 2026-10-25 | RM-086 | Verified | With the NF2FF module in place the whole controller suite passes: `test_openEMS` 50/50 (constructor options, boundary conditions, excitations, CSX handling, every port factory, `CreateNF2FFBox` directions/mirror, `Run` path handling) |
+| 2026-10-25 | RM-095 | Verified | `scripts/ci/run_rust_python_tests_wsl.sh` runs the complete unmodified native Python suites against the Rust packages: openEMS 298 tests and CSXCAD 150 tests pass (CPython 3.14, numpy 2.3.5, h5py 3.15.1, scipy 1.18.1, matplotlib 3.10.7) |

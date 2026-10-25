@@ -42,6 +42,8 @@ for crate in CSXCAD/rust-py openEMS/rust-py; do
   ( cd "$REPO_ROOT/$crate" && maturin develop "$MODE" )
 done
 
+export PYTHONPATH="$REPO_ROOT/CSXCAD/rust-py/python:$REPO_ROOT/openEMS/rust-py/python${PYTHONPATH:+:$PYTHONPATH}"
+
 python - <<'PY'
 import csxcad_py
 import openEMS

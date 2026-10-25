@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
-# Run the native Python tests that the Rust packages already support.
+# Run the native Python test suites against the Rust packages.
 #
-# Slice of RM-095: the unmodified HDF5/SAR reader modules, the grid API, the
-# mesh smoothing module and the CSXCAD utilities are exercised against the Rust
-# core. The remaining CSXCAD class surface (properties, primitives,
-# ContinuousStructure, transforms) is tracked in RM-090.
+# Slice of RM-095: the unmodified CSXCAD and openEMS Python test modules run
+# against the Rust core (CSXCAD geometry, openEMS controller, ports, NF2FF,
+# SAR, HDF5 dumps).
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -18,9 +17,28 @@ if [ ! -x "$PYTHON" ]; then
 fi
 
 cd "$REPO_ROOT/openEMS/python/Tests"
-"$PYTHON" -m unittest test_hdf5_utils test_sar_utils -v
+"$PYTHON" -m unittest \
+  test_hdf5_utils \
+  test_sar_utils \
+  test_sar_analytic \
+  test_SAR_Calculation \
+  test_Automesh \
+  test_openEMS \
+  test_Ports \
+  test_XML_RoundTrip \
+  test_nf2ff \
+  test_sim_scripts
 
 cd "$REPO_ROOT/CSXCAD/python/tests"
-"$PYTHON" -m unittest test_Utilities test_CSRectGrid test_SmoothMeshLines test_CSTransform test_CSXCAD test_CSPrimitives test_CSProperties test_XML_RoundTrip test_WrapperCache -v
+"$PYTHON" -m unittest \
+  test_Utilities \
+  test_CSRectGrid \
+  test_SmoothMeshLines \
+  test_CSTransform \
+  test_CSXCAD \
+  test_CSPrimitives \
+  test_CSProperties \
+  test_XML_RoundTrip \
+  test_WrapperCache
 
-echo "native python test slice passed"
+echo "native python suites passed"
