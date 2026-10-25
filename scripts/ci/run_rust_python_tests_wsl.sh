@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# Run the native openEMS Python tests that only need the pure-Python modules.
+# Run the native Python tests that the Rust packages already support.
 #
-# The full native suite additionally needs the CSXCAD class surface; the
-# modules below exercise the HDF5 reader and the SAR reader against the native
-# dump layout and are a first, verifiable slice of RM-095.
+# Slice of RM-095: the unmodified HDF5/SAR reader modules, the grid API, the
+# mesh smoothing module and the CSXCAD utilities are exercised against the Rust
+# core. The remaining CSXCAD class surface (properties, primitives,
+# ContinuousStructure, transforms) is tracked in RM-090.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -18,6 +19,8 @@ fi
 
 cd "$REPO_ROOT/openEMS/python/Tests"
 "$PYTHON" -m unittest test_hdf5_utils test_sar_utils -v
-status=$?
-echo "native python tests exit: $status"
-exit $status
+
+cd "$REPO_ROOT/CSXCAD/python/tests"
+"$PYTHON" -m unittest test_Utilities test_CSRectGrid test_SmoothMeshLines test_CSTransform test_CSXCAD test_CSPrimitives test_CSProperties test_XML_RoundTrip test_WrapperCache -v
+
+echo "native python test slice passed"
