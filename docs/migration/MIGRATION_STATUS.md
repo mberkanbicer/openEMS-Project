@@ -614,3 +614,20 @@ Wave B is closed. The next dependency-ready work is Wave C:
 - **Unresolved:** the three deferred analytic cases (Fresnel slab, anisotropic
   guide, graded dispersion), the byte-level dump comparison, and the blocked
   full-stack acceptance tasks that depend on the CLI/Python work.
+
+## Session record 2026-10-25 (Wave C, CLI)
+
+- **Completed:** RM-083 and RM-084. The `openEMS` binary now takes the native
+  positional FDTD XML file, parses the `<FDTD>` element into the solver, and
+  implements the native execution options (`--engine`, `--numThreads`,
+  `--disable-dumps`, `--no-simulation`, `--dump-statistics`,
+  `--exact-endcriteria`, `-v/-vv/-vvv`, the five `--debug-*` switches), the
+  native exit codes (0/1/255) and the two statistics files.
+- **Validation:** `openEMS/rust-cli/tests/cli_contract.rs` (6 tests) drives the
+  built binary; the whole suite is now 438 tests, all passing.
+- **Still open in Wave C:** RM-013 (native module names), RM-080 (Python
+  HDF5/SAR/NF2FF readers), RM-085..RM-090 (native Python package and class
+  surfaces), RM-091..RM-096 (MATLAB/Octave suite and the native test runs).
+  The native Python package is ~6k lines of Cython plus ~2.3k lines of
+  pure-Python modules; porting the class surface to PyO3 is the next block of
+  work and was not started in this session.

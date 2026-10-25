@@ -1445,3 +1445,21 @@ and are **not** claimed as verified: 1-D Fresnel slab, anisotropic guide
 birefringence, graded-mesh dispersion (`RM-065`), a byte-level native-vs-Rust
 HDF5 comparison (`RM-081`) and the blocked native differential runs that need
 the pinned WSL toolchain to be driven from this session.
+
+## Native CLI contract evidence (2026-10-25)
+
+`openEMS/rust-cli/tests/cli_contract.rs` drives the built binary exactly like
+the installed `openEMS` entry point:
+
+- no arguments: usage text and exit code 255 (the native `-1`);
+- `--help`: exit 0 and the native option list;
+- an input whose `<FDTD NumberOfTimesteps="6">` produces exactly 6 timesteps
+  (`openEMS_run_stats.txt`), proving the `<FDTD>` element reaches the solver;
+- `--no-simulation` returns before the run and writes no run statistics;
+- `--debug-CSX`, `--debug-material`, `--debug-PEC`, `--debug-operator` and
+  `--debug-boxes` write `debugCSX.xml`, `material_dump.vtk`, `PEC_dump.vtk`,
+  `operator_dump.vtk` and `box_dump_0.vtk`;
+- an unknown option exits 1.
+
+The Python and MATLAB/Octave layers are not part of this evidence; they remain
+open under Wave C (`RM-013`, `RM-080`, `RM-085`..`RM-096`).
