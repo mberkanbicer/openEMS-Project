@@ -1377,3 +1377,71 @@ and steady-state source boxes) were corrected to span the edge properly.
 Tests: `two_dimensional_sheet_gets_the_ade_model` (tangential `vv < 1`, normal
 edge untouched, finite ADE coefficients), `volume_primitive_falls_back_to_pec_and_is_not_registered`,
 `boundary_layer_edges_fall_back_to_pec`, and coefficient sanity/finiteness.
+
+## Wave B physics and processing evidence (2026-10-25)
+
+All commands were run in the canonical worktree with
+`cargo test -p openems-core`. No tolerance below was relaxed to make a test
+pass; each limit is justified next to the measurement.
+
+### TFSF plane wave (`RM-059`)
+
+20 GHz, 1 mm cells, 21x21 cross-section, Mur boundaries, TFSF box
+x=5..35, y/z=5..15. The spatial snapshot inside the box is fitted for `k`;
+the measured phase velocity is within 3 % of `c` (the numerical velocity of
+this grid is 0.994 c), and the scattered field outside the box is below 10 %
+of the incident amplitude. The delay table is checked against
+`dist*unit/v/dt + 1` and the `CalcNumericPhaseVelocity` Cartesian branch.
+
+### Lumped series RLC (`RM-058`)
+
+The engine ADE is driven with a sinusoidal edge voltage and the complex
+`J/V` ratio is compared with the analytic series admittance
+`1/(R + j(wL - 1/(wC)))` at 1, 2, 3 and 4 GHz. Worst relative error < 2e-3.
+The parallel branch, the stability capacitance floor, the PEC fallbacks and
+the metallic caps have separate unit tests. A `1e5` S/m, `35 µm` conducting
+sheet is validated separately (previous section).
+
+### Debye and Lorentz materials (`RM-056`)
+
+Debye: with `eps_inf = 1`, `delta_eps = 2`, `tau = 100 ps`, the steady pole
+state equals `delta_eps` to 1e-6, the static polarization ratio is exact, and
+the fitted relaxation time matches the slow eigenvalue of the analytic
+coupled field/pole system to 1 %. The discrete time constant is within 5 % of
+the continuum `tau`. Lorentz: a pole at 10 GHz rings at 9.99 GHz (< 5 %), and
+the `v_int`/`v_ext`/`v_lor` coefficients match the native Drude-Lorentz
+formulas.
+
+### SAR (`RM-073`)
+
+Local SAR matches `0.5 sigma |E|^2 / rho` to machine precision. A uniform
+block with `rho = 1000 kg/m^3` and `sigma = 1 S/m` gives the same value for
+the local and the mass-averaged (cubical) result to 1e-9. Air cells are
+skipped and stay zero.
+
+### NF2FF (`RM-074`)
+
+A uniform plane with `E = z`, `H = -y/Z0` and known area reproduces
+`P_rad = 0.5 A / Z0`, `|E_theta| = 2 k A/(4 pi r)`, `H_phi = -E_theta/Z0`,
+`E_phi = H_theta = 0` and the aperture directivity to < 1e-9.
+
+### Mode matching (`RM-075`)
+
+A field proportional to the normalized mode template gives modal amplitude
+3.0 and purity 1.0; the purity metric and the surface rejection are unit
+tested.
+
+### Threading and options (`RM-062`, `RM-063`)
+
+A 20-step run with 4 threads matches the serial run bit for bit in all E/H
+components. `over_sampling` sets the default probe interval to
+`Nyquist/over_sampling`, `max_time` clamps the timestep budget, and `abort`
+before the run executes zero timesteps.
+
+### Open items
+
+The following cases did not produce a trustworthy reference in this session
+and are **not** claimed as verified: 1-D Fresnel slab, anisotropic guide
+birefringence, graded-mesh dispersion (`RM-065`), a byte-level native-vs-Rust
+HDF5 comparison (`RM-081`) and the blocked native differential runs that need
+the pinned WSL toolchain to be driven from this session.

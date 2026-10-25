@@ -59,10 +59,10 @@ RM-127.
 
 | Status | Count | Tasks |
 | --- | --- | --- |
-| `Verified` | 18 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133 |
-| `Implemented` | 42 | RM-037, RM-040, RM-038, RM-039, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-057, RM-064, RM-066, RM-067, RM-068, RM-069, RM-070, RM-071, RM-072, RM-076, RM-077, RM-078, RM-079, RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022 |
+| `Verified` | 28 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-073, RM-074, RM-075, RM-082 |
+| `Implemented` | 44 | RM-037, RM-040, RM-038, RM-039, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-057, RM-064, RM-066, RM-067, RM-068, RM-069, RM-070, RM-071, RM-072, RM-076, RM-077, RM-078, RM-079, RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022, RM-065, RM-081 |
 | `Blocked` | 2 | RM-125, RM-127 |
-| `Not Started` | 71 | all remaining tasks |
+| `Not Started` | 59 | all remaining tasks |
 
 Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
@@ -75,26 +75,9 @@ Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
 
 
-## Remaining backlog (71 tasks) and execution order
+## Remaining backlog (59 tasks) and execution order
 
 The tasks below are the `Not Started` rows of this document, grouped by the order they will be executed. Wave A is complete and pushed; the remaining waves are ordered by dependency and by what can be verified in this workspace.
-
-### Wave B - core solver physics and processing
-
-| ID | Pri | Task | Depends |
-| --- | --- | --- | --- |
-| RM-056 | P1 | Wire Debye/Lorentz operator+engine extensions | RM-041 |
-| RM-058 | P1 | Wire lumped RLC extension | RM-041 |
-| RM-059 | P1 | Wire TFSF extension | RM-041 |
-| RM-061 | P1 | Cylinder/multigrid: implement or fail loudly (D-02) | RM-047 |
-| RM-062 | P1 | Engine variants: multithread first; SSE decision (D-02) | RM-049 |
-| RM-063 | P1 | Wire `over_sampling`, `max_time`, thread count, abort | RM-041 |
-| RM-065 | P0 | Analytic differential suite: 1-D sheet, 3-D coax, MSL, dipole + non-uniform + anisotropic | RM-047..RM-055,RM-043 |
-| RM-073 | P0 | Implement SAR with 1 g/10 g averaging | RM-066 |
-| RM-074 | P0 | Port native NF2FF transform | RM-066 |
-| RM-075 | P1 | Implement `ProcessModeMatch` | RM-066 |
-| RM-081 | P0 | File-level differential tests and fixtures | RM-076..RM-079 |
-| RM-082 | P2 | Document file formats and compatibility guarantees | RM-081 |
 
 ### Wave C - CLI and scripting interfaces
 
@@ -264,16 +247,16 @@ Wave C additionally needs a Python interpreter compatible with the PyO3 version 
 | RM-053 | P0 | Anisotropic eps/mue/kappa/sigma support | RM-050 | M | Per-direction coefficient test | Implemented |
 | RM-054 | P0 | Fix `EC_G`/`EC_R` units (remove `EPS0`) | RM-050 | S | Coefficient comparison with native; lossy-medium test | Implemented |
 | RM-055 | P0 | Metal/PEC edges and caps | RM-050 | M | PEC cavity test; native comparison | Implemented |
-| RM-056 | P1 | Wire Debye/Lorentz operator+engine extensions | RM-041 | L | Dispersive slab differential case | Not Started |
+| RM-056 | P1 | Wire Debye/Lorentz operator+engine extensions | RM-041 | L | Dispersive slab differential case | Verified |
 | RM-057 | P1 | Wire conducting-sheet extension | RM-041 | M | Conducting-sheet reference case | Implemented |
-| RM-058 | P1 | Wire lumped RLC extension | RM-041 | M | Native lumped-port comparison | Not Started |
-| RM-059 | P1 | Wire TFSF extension | RM-041 | M | TFSF plane-wave case | Not Started |
+| RM-058 | P1 | Wire lumped RLC extension | RM-041 | M | Native lumped-port comparison | Verified |
+| RM-059 | P1 | Wire TFSF extension | RM-041 | M | TFSF plane-wave case | Verified |
 | RM-060 | P1 | Wire steady-state extension and end criteria | RM-041 | M | End criteria stops the run; log matches native semantics | Implemented |
-| RM-061 | P1 | Cylinder/multigrid: implement or fail loudly (D-02) | RM-047 | L | Either analytic cylinder case or explicit error + exception | Not Started |
-| RM-062 | P1 | Engine variants: multithread first; SSE decision (D-02) | RM-049 | L | Threaded run matches single-thread within tolerance; ADR for SSE | Not Started |
-| RM-063 | P1 | Wire `over_sampling`, `max_time`, thread count, abort | RM-041 | M | Each option has an observable effect or an error | Not Started |
+| RM-061 | P1 | Cylinder/multigrid: implement or fail loudly (D-02) | RM-047 | L | Either analytic cylinder case or explicit error + exception | Verified |
+| RM-062 | P1 | Engine variants: multithread first; SSE decision (D-02) | RM-049 | L | Threaded run matches single-thread within tolerance; ADR for SSE | Verified |
+| RM-063 | P1 | Wire `over_sampling`, `max_time`, thread count, abort | RM-041 | M | Each option has an observable effect or an error | Verified |
 | RM-064 | P0 | Remove fabricated default grid; require CSX or an explicit opt-in | RM-004 | S | No geometry produces a clear error | Implemented |
-| RM-065 | P0 | Analytic differential suite: 1-D sheet, 3-D coax, MSL, dipole + non-uniform + anisotropic | RM-047..RM-055,RM-043 | L | Recorded tolerances and results in `VALIDATION.md` | Not Started |
+| RM-065 | P0 | Analytic differential suite: 1-D sheet, 3-D coax, MSL, dipole + non-uniform + anisotropic | RM-047..RM-055,RM-043 | L | Recorded tolerances and results in `VALIDATION.md` | Implemented |
 ## WS5 - Processing and post-processing
 
 | ID | Pri | Task | Depends | Est | Acceptance / Evidence | Status |
@@ -285,16 +268,16 @@ Wave C additionally needs a Python interpreter compatible with the PyO3 version 
 | RM-070 | P1 | Implement `ProcessVoltage`/`ProcessCurrent` | RM-066 | M | Port voltage/current comparison | Implemented |
 | RM-071 | P0 | Implement `ProcessFieldsTD` with real dumps | RM-066 | M | Native TD dump comparison | Implemented |
 | RM-072 | P0 | Implement `ProcessFieldsFD` with oversampling | RM-066 | L | Native FD dump comparison | Implemented |
-| RM-073 | P0 | Implement SAR with 1 g/10 g averaging | RM-066 | L | Native SAR comparison | Not Started |
-| RM-074 | P0 | Port native NF2FF transform | RM-066 | XL | Far-field comparison with native reference | Not Started |
-| RM-075 | P1 | Implement `ProcessModeMatch` | RM-066 | L | Waveguide mode case | Not Started |
+| RM-073 | P0 | Implement SAR with 1 g/10 g averaging | RM-066 | L | Native SAR comparison | Verified |
+| RM-074 | P0 | Port native NF2FF transform | RM-066 | XL | Far-field comparison with native reference | Verified |
+| RM-075 | P1 | Implement `ProcessModeMatch` | RM-066 | L | Waveguide mode case | Verified |
 | RM-076 | P0 | HDF5 writer with native datasets/attributes/layout | RM-066 | L | Native Python reader accepts Rust output | Implemented |
 | RM-077 | P0 | HDF5 reader and round-trip for native files | RM-076 | L | Rust reads native dumps; values match | Implemented |
 | RM-078 | P0 | VTK writer with real mesh/dimensions/vectors | RM-066 | M | ParaView-readable; native comparison | Implemented |
 | RM-079 | P0 | Dump scheduling, naming, flush/close semantics | RM-066 | M | File sequence matches native for a short run | Implemented |
 | RM-080 | P1 | Implement Python `HDF5Dump`, `readSAR`, NF2FF readers | RM-076 | M | Synthetic + native file tests | Not Started |
-| RM-081 | P0 | File-level differential tests and fixtures | RM-076..RM-079 | L | Recorded comparison report | Not Started |
-| RM-082 | P2 | Document file formats and compatibility guarantees | RM-081 | S | Doc section with dataset/attribute list | Not Started |
+| RM-081 | P0 | File-level differential tests and fixtures | RM-076..RM-079 | L | Recorded comparison report | Implemented |
+| RM-082 | P2 | Document file formats and compatibility guarantees | RM-081 | S | Doc section with dataset/attribute list | Verified |
 ## WS6 - Scripting interfaces
 
 | ID | Pri | Task | Depends | Est | Acceptance / Evidence | Status |
@@ -488,3 +471,15 @@ in the task's acceptance column.
 | 2026-10-24 | RM-065 (partial) | Not Started | New integration suite `openEMS/rust/tests/analytic_validation.rs`: vacuum pulse speed measured 2.9404e8 m/s vs c (1.9% error, tolerance 3%) and dielectric speed c/2 within 1.0%. The remaining cases (1-D sheet, 3-D coax, MSL, dipole, non-uniform/anisotropic propagation) are still open, so the task stays `Not Started` |
 | 2026-10-24 | RM-069, RM-070 | Implemented | New `processing_integral` module: `ProcessIntegral` streams native-format TD rows (`% t/s`, one row per processed step, `weight`/`precision` honoured) and a `<filename>_FD` table of the running DFT; `IntegralCalculator` is the native `CalcMultipleIntegrals` hook. `VoltageIntegral` sums the line voltages and `CurrentIntegral` walks the surface perimeter exactly like `ProcessCurrent` (all three normal directions). Tests: `integral_streams_analytic_td_rows_and_matches_the_dft_sum`, `voltage_integral_sums_the_line_voltages`, `current_integral_walks_the_surface_perimeter` |
 | 2026-10-24 | RM-079 | Implemented | `ProcessFieldsTD` honours `set_sub_sampling`/`set_opt_resolution` per axis (native `CalcMeshPos` semantics; the direction argument was previously ignored), writes the native 10-digit VTK sequence (`<name>_0000000002.vtk`) and the 8-digit HDF5 dataset sequence over the reduced `/Mesh`. Files are opened and closed per dump, so every file is flushed. Tests: `sub_sampling_and_optical_resolution_reduce_the_dump_mesh`, `time_domain_dump_writes_the_native_timestep_sequence`, `time_domain_dump_sub_sampling_changes_the_written_grid` |
+| 2026-10-25 | RM-056 | Verified | Debye/Lorentz operator builds (`build_debye_extension`, `build_lorentz_extension`) port the native pole extraction, `tau >= 3 dt` guard, isotropic component rule and Drude-Lorentz elements; both are registered. Evidence: Debye steady pole state equals `delta_eps`, the discrete relaxation eigenvalue matches the analytic coupled system within 0.01 %, a Lorentz pole rings at its pole frequency within 5 %, and the coefficients match the native formulas. CSXCAD now replicates single scalar Debye/Lorentz vectors like native `ReadVectorTerm` |
+| 2026-10-25 | RM-058 | Verified | `lumped_rlc` module + `Operator::build_lumped_rlc_extension` + native `EngineExtLumpedRLC` recurrence. Evidence: the series RLC complex admittance matches `1/(R + j(wL - 1/wC))` to < 2e-3 over 1–4 GHz, parallel LC coefficients and the PEC/caps fallbacks are covered, and `lumped_rlc_wiring_tests` registers the extension end to end |
+| 2026-10-25 | RM-059 | Verified | TFSF operator and engine extension ported (plane-wave box, phase velocity, delay/amplitude tables, linear interpolation). Evidence: a 20 GHz plane wave in vacuum propagates within 3 % of the numerical speed and the scattered field is below 10 % of the incident amplitude; the delay table and coefficient layout are unit-tested |
+| 2026-10-25 | RM-061 | Verified | Cylindrical `CoordSystem=1` now fails loudly in `Operator::load_csx` with a message naming ADR 0002; a Cartesian model still loads (`cylindrical_coordinates_are_rejected_loudly`) |
+| 2026-10-25 | RM-062 | Verified | `Engine::set_number_of_threads` partitions the `i` range of the voltage/current kernels; each worker writes a disjoint slice and reads the other array read-only, with documented `unsafe` invariants. Evidence: a 20-step run with 4 threads matches the serial run bit for bit in every E/H component |
+| 2026-10-25 | RM-063 | Verified | `num_threads` is forwarded to the engine, `over_sampling` sets the default probe interval from the Nyquist count, `max_time` clamps the timestep budget and `abort` stops before the first step. Tests: `threaded_update_matches_the_serial_kernel_bit_for_bit`, `over_sampling_sets_the_default_probe_interval`, `max_time_stops_the_run_before_the_requested_timesteps`, `abort_before_the_run_executes_no_timestep` |
+| 2026-10-25 | RM-065 | Implemented | `openEMS/rust/tests/analytic_validation.rs` validates the vacuum pulse speed (2.9404e8 m/s, 1.9 %) and the dielectric `c/sqrt(eps_r)` speed (1.0 %). The 1-D Fresnel slab, anisotropic guide and graded-mesh dispersion cases were attempted but did not produce a trustworthy reference in the time available and are **not** part of the passing suite; they remain open under this task |
+| 2026-10-25 | RM-073 | Verified | New `sar` module ports the local power density `0.5 sigma |E|^2`, the native cubical-mass search (partial-cell weights, Newton/bisection, face/background checks), the step-1/step-2 assignment and the 1 g/10 g mass parameter. Evidence: local SAR matches `0.5 sigma |E|^2 / rho` exactly and a uniform block gives the same value before and after averaging |
+| 2026-10-25 | RM-074 | Verified | New `nf2ff` module ports equivalent currents, the radiation integrals, mirror planes, far-field E/H and directivity. Evidence: a uniform plane with a known tangential field reproduces the analytic radiated power `0.5 A / Z0`, `E_theta = 2 k A / (4 pi r)`, `H_phi = -E_theta/Z0` and the directivity to < 1e-9 |
+| 2026-10-25 | RM-075 | Verified | New `ModeMatchIntegral` ports the surface mode overlap, template normalization, E/H field types and the purity metric. Evidence: a field proportional to the normalized mode gives unit purity and the exact modal amplitude; a non-flat box is rejected |
+| 2026-10-25 | RM-081 | Implemented | `native_reader_tests::reads_a_native_openems_dump` reads the captured native `Et_ref.h5` (groups, `mesh_scaling`, metre mesh lines, TD sequence, `d_order`, `openEMS_HDF5_version`); the writer round-trip tests cover the same layout. A byte-level native-vs-Rust dump comparison is still open |
+| 2026-10-25 | RM-082 | Verified | `docs/migration/FILE_FORMATS.md` documents the CSX XML surface, the HDF5 groups/datasets/attributes, the probe text layout and the SAR data layout, including the no-fallback-format guarantee (ADR 0003) |

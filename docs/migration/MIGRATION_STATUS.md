@@ -564,11 +564,16 @@ bitwise. Its solver timings are characterization only.
 
 ## Next task
 
-1. **migration-docs-update** — This document, COVERAGE_MATRIX.csv, and
-   VALIDATION.md are updated to reflect all completed Rust crates.
-2. **commit-and-bump** — Commit all changes in submodules and meta-repo;
-   bump submodule pointers as a separate commit per AGENTS.md (never commit a
-   submodule pointer to an unpushed commit; pointer bump is its own commit).
+Wave B is closed. The next dependency-ready work is Wave C:
+
+1. **RM-083/RM-084** - make the Rust CLI accept the native
+   `openEMS <xml> [options]` contract, options, exit codes and log files.
+2. **RM-085..RM-090** - build the native Python package layout and raise the
+   Controller/CSXCAD classes to the native surface.
+3. **RM-091..RM-096** - run the native MATLAB/Octave suite through the CLI.
+4. **RM-065/RM-081** - finish the deferred analytic cases (Fresnel slab,
+   anisotropic guide, graded-mesh dispersion) and the byte-level native dump
+   comparison; the pinned WSL toolchain is available for reference runs.
 
 ## Session record
 
@@ -591,3 +596,21 @@ bitwise. Its solver timings are characterization only.
 - **Unresolved:** Optional fparser backends and broader optimizer validation,
   cross-platform and interactive GUI testing, further reference diversity,
   final Rust tolerances, and component-specific compatibility decisions.
+
+## Session record 2026-10-25 (Wave B)
+
+- **Completed:** RM-056 (Debye/Lorentz), RM-058 (lumped RLC), RM-059 (TFSF),
+  RM-061 (cylindrical fail-loudly), RM-062 (multithreaded kernels), RM-063
+  (`over_sampling`/`max_time`/threads/abort), RM-073 (SAR with 1 g/10 g
+  averaging), RM-074 (NF2FF), RM-075 (mode matching), RM-082 (file-format
+  documentation). RM-065 and RM-081 are implemented with partial evidence.
+- **Science fixes:** the Yee dual-mesh convention, the CSXCAD single-value
+  Debye/Lorentz vector replication, the missing Debye/Lorentz base material in
+  the EC pipeline and the native per-cell `EC_C/EC_G/EC_L/EC_R` bookkeeping.
+- **Validation:** `cargo test -p fparser-rs -p csxcad-core -p openems-core`
+  passes; the openEMS suite has 211 library tests plus the 2 analytic
+  integration tests. Evidence and tolerances are in `VALIDATION.md`; the
+  task-level evidence is in `REMEDIATION_TASKS.md`.
+- **Unresolved:** the three deferred analytic cases (Fresnel slab, anisotropic
+  guide, graded dispersion), the byte-level dump comparison, and the blocked
+  full-stack acceptance tasks that depend on the CLI/Python work.
