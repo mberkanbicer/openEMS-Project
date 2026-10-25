@@ -1463,3 +1463,19 @@ the installed `openEMS` entry point:
 
 The Python and MATLAB/Octave layers are not part of this evidence; they remain
 open under Wave C (`RM-013`, `RM-080`, `RM-085`..`RM-096`).
+
+## Rust Python extension build under WSL (2026-10-25)
+
+`scripts/ci/build_rust_python_wsl.sh` creates a venv with the system
+numpy/h5py visible, installs maturin, and builds both PyO3 extension crates:
+
+```
+building CSXCAD/rust-py   -> csxcad_python-0.1.0-cp314-cp314-linux_x86_64.whl
+building openEMS/rust-py  -> openems_py-0.1.0-cp314-cp314-linux_x86_64.whl
+csxcad_py: /home/.../rustpy-venv/lib/python3.14/site-packages/csxcad_py/__init__.py
+openems_py: /home/.../rustpy-venv/lib/python3.14/site-packages/openems_py/__init__.py
+```
+
+Both modules import successfully under CPython 3.14 with numpy 2.3.5 and h5py
+3.15.1. This unblocks the native Python suite runs (`RM-095`); the class
+surface itself is still the open part of `RM-085`..`RM-090`.
