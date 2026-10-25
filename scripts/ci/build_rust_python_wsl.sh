@@ -44,9 +44,11 @@ done
 
 python - <<'PY'
 import csxcad_py
-import openems_py
+import openEMS
+from openEMS import _openems
 
 print("csxcad_py:", csxcad_py.__file__)
-print("openems_py:", openems_py.__file__)
+print("openEMS:", openEMS.__file__)
+print("_openems:", _openems.__file__)
 PY
 echo "Rust Python extensions installed in $VENV"

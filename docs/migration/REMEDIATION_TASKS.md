@@ -59,10 +59,10 @@ RM-127.
 
 | Status | Count | Tasks |
 | --- | --- | --- |
-| `Verified` | 30 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-073, RM-074, RM-075, RM-082, RM-083, RM-084 |
-| `Implemented` | 44 | RM-037, RM-040, RM-038, RM-039, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-057, RM-064, RM-066, RM-067, RM-068, RM-069, RM-070, RM-071, RM-072, RM-076, RM-077, RM-078, RM-079, RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022, RM-065, RM-081 |
+| `Verified` | 31 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-073, RM-074, RM-075, RM-082, RM-083, RM-084, RM-085 |
+| `Implemented` | 45 | RM-037, RM-040, RM-038, RM-039, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-057, RM-064, RM-066, RM-067, RM-068, RM-069, RM-070, RM-071, RM-072, RM-076, RM-077, RM-078, RM-079, RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022, RM-065, RM-080, RM-081 |
 | `Blocked` | 2 | RM-125, RM-127 |
-| `Not Started` | 57 | all remaining tasks |
+| `Not Started` | 55 | all remaining tasks |
 
 Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
@@ -75,7 +75,7 @@ Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
 
 
-## Remaining backlog (57 tasks) and execution order
+## Remaining backlog (55 tasks) and execution order
 
 The tasks below are the `Not Started` rows of this document, grouped by the order they will be executed. Wave A is complete and pushed; the remaining waves are ordered by dependency and by what can be verified in this workspace.
 
@@ -84,8 +84,6 @@ The tasks below are the `Not Started` rows of this document, grouped by the orde
 | ID | Pri | Task | Depends |
 | --- | --- | --- | --- |
 | RM-013 | P0 | Rename modules/classes to native names (`CSXCAD`, `openEMS`, `ContinuousStructure`, `openEMS`) | RM-012 |
-| RM-080 | P1 | Implement Python `HDF5Dump`, `readSAR`, NF2FF readers | RM-076 |
-| RM-085 | P0 | Build native Python package layout | RM-013 |
 | RM-086 | P0 | Match Controller method surface, defaults, errors | RM-085 |
 | RM-087 | P0 | Implement Python port classes | RM-085 |
 | RM-088 | P0 | Implement Python NF2FF module | RM-074,RM-085 |
@@ -273,7 +271,7 @@ Wave C additionally needs a Python interpreter compatible with the PyO3 version 
 | RM-077 | P0 | HDF5 reader and round-trip for native files | RM-076 | L | Rust reads native dumps; values match | Implemented |
 | RM-078 | P0 | VTK writer with real mesh/dimensions/vectors | RM-066 | M | ParaView-readable; native comparison | Implemented |
 | RM-079 | P0 | Dump scheduling, naming, flush/close semantics | RM-066 | M | File sequence matches native for a short run | Implemented |
-| RM-080 | P1 | Implement Python `HDF5Dump`, `readSAR`, NF2FF readers | RM-076 | M | Synthetic + native file tests | Not Started |
+| RM-080 | P1 | Implement Python `HDF5Dump`, `readSAR`, NF2FF readers | RM-076 | M | Synthetic + native file tests | Implemented |
 | RM-081 | P0 | File-level differential tests and fixtures | RM-076..RM-079 | L | Recorded comparison report | Implemented |
 | RM-082 | P2 | Document file formats and compatibility guarantees | RM-081 | S | Doc section with dataset/attribute list | Verified |
 | RM-083 | P0 | Make Rust CLI accept the native `openEMS` invocation contract | RM-065 | L | Native M-file `RunOpenEMS` drives the Rust binary | Verified |
@@ -282,7 +280,7 @@ Wave C additionally needs a Python interpreter compatible with the PyO3 version 
 
 | ID | Pri | Task | Depends | Est | Acceptance / Evidence | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| RM-085 | P0 | Build native Python package layout | RM-013 | M | `import CSXCAD`, `import openEMS` from installed prefix | Not Started |
+| RM-085 | P0 | Build native Python package layout | RM-013 | M | `import CSXCAD`, `import openEMS` from installed prefix | Verified |
 | RM-086 | P0 | Match Controller method surface, defaults, errors | RM-085 | L | Native `test_*.py` controller tests pass | Not Started |
 | RM-087 | P0 | Implement Python port classes | RM-085 | L | Port tests pass | Not Started |
 | RM-088 | P0 | Implement Python NF2FF module | RM-074,RM-085 | L | NF2FF tests pass | Not Started |
@@ -483,3 +481,5 @@ in the task's acceptance column.
 | 2026-10-25 | RM-082 | Verified | `docs/migration/FILE_FORMATS.md` documents the CSX XML surface, the HDF5 groups/datasets/attributes, the probe text layout and the SAR data layout, including the no-fallback-format guarantee (ADR 0003) |
 | 2026-10-25 | RM-083 | Verified | The CLI now takes the native positional `FDTD_XML_FILE`, parses the `<FDTD>` element (`NumberOfTimesteps`, `EndCriteria`, `MaxTime`, `OverSampling`, `CellConstantMaterial`, `TimeStep`, `TimeStepFactor`, `TimeStepMethod`, `CoordSystem`) into the solver, and accepts the native debug/statistics switches. `openEMS/rust-cli/tests/cli_contract.rs` runs the built binary: FDTD NrTS=6 yields 6 timesteps, `--no-simulation` stops before the run, and the debug switches write `debugCSX.xml`, `material_dump.vtk`, `PEC_dump.vtk`, `operator_dump.vtk`, `box_dump_0.vtk` |
 | 2026-10-25 | RM-084 | Verified | Exit codes match the native entry point (`0` success, `1` parse/setup/option failure, `255` for no input file), `--help` lists the native options, `--dump-statistics` writes `openEMS_stats.txt` and `openEMS_run_stats.txt`, `-v/-vv/-vvv` set the verbosity, `--engine`/`--numThreads` select the worker count, and `--exact-endcriteria` switches the energy check to the Nyquist cadence. Evidence: `cli_contract.rs` (6 tests) and the recorded `openEMS_run_stats.txt` values |
+| 2026-10-25 | RM-085 | Verified | The Rust extension now builds as `openEMS._openems` with `python-source`, and the package keeps the native import paths (`openEMS/__init__.py`, `openEMS/openEMS.py`, `ports.py`, `nf2ff.py`, `automesh.py`, `utilities.py`, `physical_constants.py`, `sar_utils.py`). `scripts/ci/build_rust_python_wsl.sh` builds and installs it (CPython 3.14, numpy 2.3.5, h5py 3.15.1); `import openEMS` and `import CSXCAD` succeed |
+| 2026-10-25 | RM-080 | Implemented | `HDF5Dump` and `readSAR` are exercised by the **unmodified** native `test_hdf5_utils.py` and `test_sar_utils.py`: 84 tests pass under WSL (`scripts/ci/run_rust_python_tests_wsl.sh`). The NF2FF reader still needs the `_nf2ff` binding |
