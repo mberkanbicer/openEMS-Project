@@ -59,10 +59,10 @@ RM-127.
 
 | Status | Count | Tasks |
 | --- | --- | --- |
-| `Verified` | 32 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-073, RM-074, RM-075, RM-082, RM-083, RM-084, RM-085, RM-090 |
-| `Implemented` | 46 | RM-037, RM-040, RM-038, RM-039, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-057, RM-064, RM-066, RM-067, RM-068, RM-069, RM-070, RM-071, RM-072, RM-076, RM-077, RM-078, RM-079, RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022, RM-065, RM-080, RM-081, RM-095 |
+| `Verified` | 33 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-073, RM-074, RM-075, RM-082, RM-083, RM-084, RM-085, RM-089, RM-090 |
+| `Implemented` | 47 | RM-037, RM-040, RM-038, RM-039, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-057, RM-064, RM-066, RM-067, RM-068, RM-069, RM-070, RM-071, RM-072, RM-076, RM-077, RM-078, RM-079, RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022, RM-065, RM-080, RM-081, RM-086, RM-095 |
 | `Blocked` | 2 | RM-125, RM-127 |
-| `Not Started` | 53 | all remaining tasks |
+| `Not Started` | 51 | all remaining tasks |
 
 Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
@@ -75,7 +75,7 @@ Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
 
 
-## Remaining backlog (53 tasks) and execution order
+## Remaining backlog (51 tasks) and execution order
 
 The tasks below are the `Not Started` rows of this document, grouped by the order they will be executed. Wave A is complete and pushed; the remaining waves are ordered by dependency and by what can be verified in this workspace.
 
@@ -84,10 +84,8 @@ The tasks below are the `Not Started` rows of this document, grouped by the orde
 | ID | Pri | Task | Depends |
 | --- | --- | --- | --- |
 | RM-013 | P0 | Rename modules/classes to native names (`CSXCAD`, `openEMS`, `ContinuousStructure`, `openEMS`) | RM-012 |
-| RM-086 | P0 | Match Controller method surface, defaults, errors | RM-085 |
 | RM-087 | P0 | Implement Python port classes | RM-085 |
 | RM-088 | P0 | Implement Python NF2FF module | RM-074,RM-085 |
-| RM-089 | P1 | Implement Python automesh and utilities | RM-085 |
 | RM-091 | P0 | Make native MATLAB/Octave M-file suite work through CLI | RM-083 |
 | RM-092 | P0 | Match MATLAB `calcPort`, `CalcNF2FF`, post-processing | RM-091,RM-074 |
 | RM-093 | P1 | Implement CSXCAD MATLAB M-file surface | RM-032 |
@@ -279,10 +277,10 @@ Wave C additionally needs a Python interpreter compatible with the PyO3 version 
 | ID | Pri | Task | Depends | Est | Acceptance / Evidence | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | RM-085 | P0 | Build native Python package layout | RM-013 | M | `import CSXCAD`, `import openEMS` from installed prefix | Verified |
-| RM-086 | P0 | Match Controller method surface, defaults, errors | RM-085 | L | Native `test_*.py` controller tests pass | Not Started |
+| RM-086 | P0 | Match Controller method surface, defaults, errors | RM-085 | L | Native `test_*.py` controller tests pass | Implemented |
 | RM-087 | P0 | Implement Python port classes | RM-085 | L | Port tests pass | Not Started |
 | RM-088 | P0 | Implement Python NF2FF module | RM-074,RM-085 | L | NF2FF tests pass | Not Started |
-| RM-089 | P1 | Implement Python automesh and utilities | RM-085 | L | Automesh/utility tests pass | Not Started |
+| RM-089 | P1 | Implement Python automesh and utilities | RM-085 | L | Automesh/utility tests pass | Verified |
 | RM-090 | P0 | Raise CSXCAD Python classes to native surface | RM-031 | L | Native CSXCAD Python suite passes | Verified |
 | RM-091 | P0 | Make native MATLAB/Octave M-file suite work through CLI | RM-083 | L | 10 suite cases + 2 smoke tests pass | Not Started |
 | RM-092 | P0 | Match MATLAB `calcPort`, `CalcNF2FF`, post-processing | RM-091,RM-074 | L | Port/NF2FF comparisons recorded | Not Started |
@@ -483,3 +481,5 @@ in the task's acceptance column.
 | 2026-10-25 | RM-080 | Implemented | `HDF5Dump` and `readSAR` are exercised by the **unmodified** native `test_hdf5_utils.py` and `test_sar_utils.py`: 84 tests pass under WSL (`scripts/ci/run_rust_python_tests_wsl.sh`). The NF2FF reader still needs the `_nf2ff` binding |
 | 2026-10-25 | RM-090 | Verified | The CSXCAD Python API is complete on the Rust core: `ContinuousStructure` (properties, primitives, grid, background material, parameter set, XML I/O, coordinate priority), `CSProperties.*` (material, dispersive, conducting sheet, lumped element, excitation, probe, dump, absorbing BC, discrete material), `CSPrimitives.*` (point, box, multibox, sphere/shell, cylinder/shell, polygon/linpoly/rotpoly, curve, wire, polyhedron, polyhedron reader), `CSRectGrid`, `CSTransform` and `Utilities`. The **unmodified** native suite passes: 150 tests (`test_Utilities`, `test_CSRectGrid`, `test_SmoothMeshLines`, `test_CSTransform`, `test_CSXCAD`, `test_CSPrimitives`, `test_CSProperties`, `test_XML_RoundTrip`, `test_WrapperCache`), including wrapper identity/eviction, stale-wrapper errors, XML round-trips and the HDF5 mode/weight-file interpolation |
 | 2026-10-25 | RM-095 | Implemented | `scripts/ci/run_rust_python_tests_wsl.sh` runs the unmodified native modules against the Rust packages: 150 CSXCAD tests and 84 openEMS HDF5/SAR reader tests pass (CPython 3.14, numpy 2.3.5, h5py 3.15.1, scipy 1.18.1, matplotlib 3.10.7). The openEMS controller, port and NF2FF modules still need their Rust surface (RM-086..RM-088) |
+| 2026-10-25 | RM-086 | Implemented | The native controller surface lives on the Rust engine plus a Python orchestration layer: constructor keyword options, solver settings (including the native numeric coercions for `NrTS`/`CellConstantMaterial`), `SetBoundaryCond`, excitations, `SetCSX`/`GetCSX`, port factories (`AddLumpedPort`, `AddCurvePort`, `AddWaveGuidePort`, `AddRectWaveGuidePort`, `AddCircWaveGuidePort`, `AddCoaxialPort`, `AddMSLPort`, `AddStripLinePort`, `AddCPWPort`), `AddEdges2Grid`, `Run` (path/cleanup/option mapping/`setup_only`), `Write2XML`/`ReadFromXML`. `test_openEMS` passes 48 of 50 tests; the two `CreateNF2FFBox` cases need the `_nf2ff` module (RM-088) |
+| 2026-10-25 | RM-089 | Verified | The native `test_Automesh` (14 tests) and the CSXCAD `test_Utilities` (8 tests) pass against the Rust packages. `openEMS/automesh.py` and `CSXCAD/Utilities.py` are the unchanged native modules |
