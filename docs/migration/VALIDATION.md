@@ -1522,6 +1522,29 @@ raw dump of a lossy box, `sar_calc` processes it).
 
 Direct SAR result dumps (`DumpType` 20..22) are tracked separately as RM-136.
 
+## Cylindrical rho = 0 axis (RM-137)
+
+`scripts/ci/run_cylindrical_r0_check_wsl.sh` runs a closed PEC pillbox
+(R = 50 mm, h = 30 mm, dr = dz = 2.5 mm, 24 azimuthal sectors) on a mesh that
+includes the `rho = 0` axis, mirroring the plain part of the native
+`python/Tests/Cylindrical_Cavity.py`, and additionally runs the native solver
+on the very same `input.xml`:
+
+| Check | Measured | Bound | Verdict |
+| --- | --- | --- | --- |
+| TM010 resonance vs `x_01 c / (2 pi R)` | 2.2940 GHz vs 2.2949 GHz (-0.04 %) | 1 % | PASS |
+| TM110 resonance vs `x_11 c / (2 pi R)` | 3.6500 GHz vs 3.6565 GHz (-0.18 %) | 1 % | PASS |
+| probe `et` (Ez, r = 25 mm, alpha = pi/4) vs native | 4.162e-5 relative | 1e-2 | PASS |
+| native and Rust mode frequencies | identical (2.2940 / 3.6500 GHz) | - | PASS |
+
+The case is stable for the full 40000 steps only with native's conservative
+`Rennings_1` step: native `Operator_Cylinder::CalcTimestep` forces it whenever
+`discLines[0][0] == 0`, while `Rennings_2` produces a 3.2x larger step that
+diverges within a few dozen timesteps. Two collateral compatibility gaps were
+fixed on the way: `et`/`ht` must be written before `SetupProcessing` (a probe
+reusing those names truncates the file, as native does) and a non-positive
+`EndCriteria` must keep the native 1e-6 default.
+
 ## Cylindrical operator (RM-134)
 
 Command: `scripts/ci/run_octave_testsuite_wsl.sh` (native testsuite, unchanged).
