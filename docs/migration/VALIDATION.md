@@ -1522,6 +1522,29 @@ raw dump of a lossy box, `sar_calc` processes it).
 
 Direct SAR result dumps (`DumpType` 20..22) are tracked separately as RM-136.
 
+## Cylindrical field dumps (RM-138)
+
+`scripts/ci/run_cylindrical_dump_check_wsl.sh` mirrors the plain half of the
+native `python/Tests/Cylindrical_Cavity.py` (closed PEC pillbox with the
+`rho = 0` axis, E-field FD dump of `f_010` over the full ring at mid-height)
+and runs the native solver on the same `input.xml`:
+
+| Check | Measured | Bound | Verdict |
+| --- | --- | --- | --- |
+| `/Mesh` layout (`rho`,`alpha`,`z`, `mesh_type=1`, `mesh_scaling=1e-3`) | identical dataset shapes (21, 24, 1) | - | PASS |
+| `/Mesh` values | 0.000e+00 relative | 1e-9 | PASS |
+| `/FieldData/FD/f0` E-field DFT vs native | 5.221e-6 relative | 1e-2 | PASS |
+| TM010 radial Ez profile vs `J0(x_01 r / R)` | 0.0003 | 0.03 (native test bound) | PASS |
+
+The azimuth is written in radians (unscaled), rho/z in metres, exactly like
+the native `HDF5_File_Writer::WriteRectMesh`. Two collateral unit bugs were
+found by the case and fixed: the processing metadata used to scale azimuth
+coordinates by the grid delta (which snapped probes and dump boxes to wrong
+azimuth lines) and the dump files recorded `mesh_scaling = 1` instead of the
+grid delta. The cylindrical snapping now ports `FitToAlphaRange`, the
+cylindrical `SnapBox2Mesh` recentring and the `fullMesh = false` semantics of
+`Processing::DefineStartStopCoord`.
+
 ## Cylindrical rho = 0 axis (RM-137)
 
 `scripts/ci/run_cylindrical_r0_check_wsl.sh` runs a closed PEC pillbox

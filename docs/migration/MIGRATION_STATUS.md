@@ -9,7 +9,7 @@ pass, including analytic propagation, UPML absorption, CFL, quarter-cell
 material averaging and native-HDF5 dump reading.
 
 Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
-(55 `Verified`, 43 `Implemented`, 42 `Not Started`, 2 `Blocked` at the last
+(56 `Verified`, 43 `Implemented`, 43 `Not Started`, 2 `Blocked` at the last
 update; see the snapshot there for the live count). The largest open areas are the extension
 framework and remaining physics extensions, NF2FF/SAR, the native CLI and
 scripting interfaces, the GUI feature surface, and the differential harness over
@@ -121,8 +121,10 @@ the in-solver `SAR_Calculation` writes local and 1 g results, and the test
 script compares them against the raw dump + `sar_calc` path (peak 6.5e-9
 relative, homogeneous interior bit-identical).
 
-Known gaps tracked separately: a mesh that includes the `rho = 0` axis
-(RM-137, rejected loudly) and cylindrical field dumps (RM-138).
+Known gaps tracked separately: cylindrical multi-grid
+(`Engine_Ext_CylinderMultiGrid`, radii stored but the hierarchy is not ported),
+SAR on cylindrical meshes (RM-143) and cylindrical port/line snapping
+(RM-144).
 
 ## Verified progress
 
@@ -633,8 +635,7 @@ list below is the current execution plan.
 | Task | Work | Why it is first |
 | --- | --- | --- |
 | RM-123 | Regression CI gate (`.github/workflows/reference.yml`) | **Implemented**; the first GitHub Actions run must confirm the runner plumbing |
-| RM-138 | Cylindrical field dumps (`/Mesh/{rho,alpha,z}`, metric-aware values) | The last cylindrical gap; RM-137 (axis) is verified |
-| RM-097.. | GUI wave (QCSXCAD / AppCSXCAD) | Next large dependency block after the engine work |
+| RM-097.. | GUI wave (QCSXCAD / AppCSXCAD) | Next large dependency block after the engine work; the cylindrical engine chain (RM-134/137/138) is verified |
 
 ### 2. Engine and dump completeness (open, in order)
 
@@ -644,8 +645,8 @@ list below is the current execution plan.
 | RM-140 | Native FD sampling cadence, `.vtr` dumps and dump cropping | **Verified** on 2026-10-26 (`fieldprobes` PASS) |
 | RM-142 | Incident field in the 1 mm PEC/PMC channel | **Verified** on 2026-10-26 (native `ApplyMagneticBC` clearing rules) |
 | RM-139 | Conducting-sheet transmission | **Verified** on 2026-10-26 (0.036-0.073 dB, 0.18-0.20 deg) |
-| RM-137 | `rho = 0` axis in cylindrical meshes | Rejected loudly today; needed for the native cylindrical-wave tutorials |
-| RM-138 | Cylindrical field dumps (`/Mesh/{rho,alpha,z}` plus metric-aware values) | The engine runs, but dumps still assume Cartesian axes |
+| RM-137 | `rho = 0` axis in cylindrical meshes | **Verified** on 2026-10-26 (TM010/TM110 vs analytic, probe 4.2e-5 vs native) |
+| RM-138 | Cylindrical field dumps (`/Mesh/{rho,alpha,z}` plus metric-aware values) | **Verified** on 2026-10-26 (HDF5 mesh bit-identical, field 5.2e-6, profile 3e-4) |
 
 ### 3. Verification infrastructure
 
