@@ -9,7 +9,7 @@ pass, including analytic propagation, UPML absorption, CFL, quarter-cell
 material averaging and native-HDF5 dump reading.
 
 Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
-(46 `Verified`, 42 `Implemented`, 48 `Not Started`, 2 `Blocked` at the last
+(47 `Verified`, 42 `Implemented`, 47 `Not Started`, 2 `Blocked` at the last
 update; see the snapshot there for the live count). The largest open areas are the extension
 framework and remaining physics extensions, NF2FF/SAR, the native CLI and
 scripting interfaces, the GUI feature surface, and the differential harness over
@@ -629,7 +629,7 @@ list below is the current execution plan.
 
 | Task | Work | Why it is next |
 | --- | --- | --- |
-| RM-136 | Direct SAR result dumps (`DumpType` 20..22) | The raw dump (29) + `sar_calc` path works; the in-solver result dumps are the last native dump type without a writer |
+| RM-136 | Direct SAR result dumps (`DumpType` 20..22) | **Verified** on 2026-10-26: the in-solver `SAR_Calculation` writes local and 1 g results |
 | RM-137 | `rho = 0` axis in cylindrical meshes | Rejected loudly today; needed for the native cylindrical-wave tutorials |
 | RM-138 | Cylindrical field dumps (`/Mesh/{rho,alpha,z}` plus metric-aware values) | The engine runs, but dumps still assume Cartesian axes |
 

@@ -1540,3 +1540,20 @@ assertions in `extensions::tests_cylinder`.
 Not yet covered and therefore open: a mesh that includes the `rho = 0` axis
 (rejected explicitly, RM-137) and cylindrical field dumps with the native
 `/Mesh/{rho,alpha,z}` layout (RM-138).
+
+## Direct SAR result dumps (RM-136)
+
+Command: `scripts/ci/run_sar_dump_check_wsl.sh` (one Octave run with a
+`DumpType` 29 raw dump, a `DumpType` 20 local result and a `DumpType` 21 1 g
+result on the same lossy box).
+
+| Check | Result |
+| --- | --- |
+| raw + `sar_calc` vs `sigma|E|^2/(2 rho)` | peak 6.509386e-22 W/kg, 7.8e-8 relative |
+| direct type 20 vs raw + `sar_calc` peak | 6.5e-9 relative |
+| homogeneous interior (uniform conductivity) | 0.0 (bit-identical) |
+| whole block including the material boundary | 6.2e-3 relative, the native J-field vs cell-conductivity distinction (edge kappa is averaged over quarter cells that lie partly outside the box) |
+| 1 g averaged direct dump | finite maxSAR 1.531e-22 W/kg with a positive mass attribute |
+
+Rust unit coverage: `sar_hdf5::tests::direct_result_dump_matches_the_local_sar_formula`
+(0.5*|E|*|J|/rho = 1 W/kg) and the existing `sar` averaging tests.
