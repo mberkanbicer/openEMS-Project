@@ -59,10 +59,10 @@ RM-127.
 
 | Status | Count | Tasks |
 | --- | --- | --- |
-| `Verified` | 51 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-071, RM-072, RM-073, RM-074, RM-075, RM-079, RM-082, RM-083, RM-084, RM-085, RM-086, RM-087, RM-088, RM-089, RM-090, RM-091, RM-092, RM-093, RM-095, RM-096, RM-117, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133, RM-134, RM-135, RM-136, RM-139, RM-140, RM-142 |
+| `Verified` | 53 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-071, RM-072, RM-073, RM-074, RM-075, RM-079, RM-082, RM-083, RM-084, RM-085, RM-086, RM-087, RM-088, RM-089, RM-090, RM-091, RM-092, RM-093, RM-095, RM-096, RM-117, RM-118, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133, RM-134, RM-135, RM-136, RM-139, RM-140, RM-141, RM-142 |
 | `Implemented` | 43 | RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022, RM-037, RM-038, RM-039, RM-040, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-057, RM-060, RM-064, RM-065, RM-066, RM-067, RM-068, RM-069, RM-070, RM-076, RM-077, RM-078, RM-080, RM-081, RM-119 |
 | `Blocked` | 2 | RM-125, RM-127 |
-| `Not Started` | 46 | all remaining tasks |
+| `Not Started` | 44 | all remaining tasks |
 
 Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
@@ -75,7 +75,7 @@ Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
 
 
-## Remaining backlog (46 tasks) and execution order
+## Remaining backlog (44 tasks) and execution order
 
 The tasks below are the `Not Started` rows of this document, grouped by the order they will be executed. Wave A is complete and pushed; the remaining waves are ordered by dependency and by what can be verified in this workspace.
 
@@ -319,8 +319,8 @@ Wave C additionally needs a Python interpreter compatible with the PyO3 version 
 | ID | Pri | Task | Depends | Est | Acceptance / Evidence | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | RM-117 | P0 | Build differential harness over `reference-data/` | RM-065 | L | `scripts/ci/reference_harness.py` runs the unmodified pinned sources, keeps the solver output and `input.xml`, and compares the derived quantities against `reference-data/`; coax PASS (Z 7.5e-5 rel., S21 1.9e-4 dB, S11 0.05 dB) | Verified |
-| RM-118 | P0 | Execute all reference cases through the harness | RM-117,RM-066 | M | Result table with pass/fail | Not Started |
-| RM-119 | P0 | Approve and record tolerances | RM-118 | S | `REFERENCE_TOLERANCES.md` records the proposed differential bounds with justification and the measured values; owner approval is pending (two harness cases still fail on open defects) | Implemented |
+| RM-118 | P0 | Execute all reference cases through the harness | RM-117,RM-066 | M | All four reference cases run through `scripts/ci/reference_harness.py` and pass: coax (Z_ref 7.5e-5, S21 1.9e-4 dB, S11 0.05 dB), conducting-sheet (0.036-0.073 dB, 0.178-0.199 deg), fieldprobes (probes 1.5e-5, Ef/Hf 1.2e-5, H TD 3e-5) and msl-notchfilter (12/12: et/ht 2.1e-6, port_ut 3.9e-6..6.0e-6, port_it_1 1.5e-6..1.9e-6, port_it_2 1.4e-8) | Verified |
+| RM-119 | P0 | Approve and record tolerances | RM-118 | S | `REFERENCE_TOLERANCES.md` records the proposed differential bounds with justification and the measured values; all four harness cases now pass, so only the owner approval of those bounds is outstanding | Implemented |
 | RM-120 | P1 | Cross-platform runtime CI (Linux/Windows/macOS/FreeBSD) | RM-017,RM-117 | L | Platform result matrix | Not Started |
 | RM-121 | P2 | Performance baseline vs native | RM-065 | M | Solver time/throughput table | Not Started |
 | RM-122 | P2 | Memory baseline vs native | RM-065 | M | Peak RSS table | Not Started |
@@ -346,7 +346,7 @@ Wave C additionally needs a Python interpreter compatible with the PyO3 version 
 | RM-138 | P1 | Cylindrical field dumps: `/Mesh/{rho,alpha,z}` layout and metric-aware dump values | RM-134,RM-071 | M | Native cylindrical dump comparison | Not Started |
 | RM-139 | P0 | Conducting-sheet transmission differs from the native reference by 3.07 dB / 12.9 deg | RM-057,RM-117 | M | The sheet model was correct; the failure was the incident field (RM-142). With the native PMC clearing rules the differential harness passes every case: resistive film 0.036 dB / 0.178 deg, thin copper 0.036 dB / 0.188 deg, thick copper 0.073 dB / 0.199 deg (bounds 0.2 dB / 2 deg) | Verified |
 | RM-140 | P0 | Frequency-domain dump (`DumpType` 10..15) disagrees with the FD field probe by ~1.0 relative | RM-072,RM-117 | M | FD interval now uses native `min(global Nyquist, freq)`; probes default to FD oversampling 1; FD VTK dumps write `.vtr` with the real mesh; dump cropping applies `SnapMethod = 1`. `fieldprobes` harness PASS (probes 1.5e-5, Ef/Hf 1.2e-5, H 3e-5) | Verified |
-| RM-141 | P0 | Python `AddMSLPort` excited-port current probes (`port_it_1*`) are all zero | RM-087,RM-117 | M | The Rust `port_it_1*` probes are a y-only line at z = 254 um; the native current probe is a y-z surface (y +-0.3746 mm, z 0..254 um), so the Python `MSLPort` current-probe geometry differs | Not Started |
+| RM-141 | P0 | Python `AddMSLPort` excited-port current probes (`port_it_1*`) are all zero | RM-087,RM-117 | M | Native `ProcessCurrent::DefineStartStopCoord` grows every tangential axis requested with zero extent by one dual line (the probe is a closed surface); Rust snapped the box but never grew it, so the +y and -y faces of the y-line probe sat on the same z line and cancelled exactly (hard zero). After the fix `port_it_1A/1B` match to 1.5e-6 / 1.9e-6 and all 12 MSL checks pass | Verified |
 | RM-142 | P0 | Incident field in the 1 mm PEC x / PMC y channel differs from native (peak amplitude and arrival time) | RM-065,RM-117 | M | Rust `apply_magnetic_bc` only cleared the tangential current components, so in the 1 mm PEC/PMC channel the normal H survived on the boundary lines and the TEM mode became a non-uniform 3-D field (0.69 c, 1.42x amplitude). Reimplemented native `ApplyMagneticBC` (all three components on a low PMC face, tangential at `numLines - 2` on a high face, outermost line always). Incident probe now matches the reference exactly (ratio 1.00000, 0.0 ps at z = 20..120 mm) | Verified |
 ---
 
@@ -509,3 +509,4 @@ in the task's acceptance column.
 | 2026-10-26 | RM-135, RM-140 | Verified | The reference harness closed the FD dump gap: the DFT interval now follows native `Processing::AddFrequency` (`min(global Nyquist, freq Nyquist)`, integer division by the oversampling), probes default to FD oversampling 1, FD VTK dumps write rectilinear `.vtr` files with the real mesh, and cropped dumps apply native `SnapBox2Mesh` `SnapMethod = 1`. `fieldprobes` now PASSES in the harness (22 probe files 1.5e-5, Ef/Hf 1.2e-5, H TD 3e-5) and the unmodified source test passes. RM-135's D/B units are corrected to `eps0*eps_r*E` / `mue0*mue_r*H` |
 | 2026-10-26 | RM-139, RM-141, RM-142 | Not Started | The remaining harness failures are localised: the conducting-sheet coefficients match native to the last digit but the *incident* field in the 1 mm PEC/PMC channel already differs (probe peak 0.859 vs 0.597 at 0.748 vs 0.613 ns), tracked as RM-142; the sheet case (RM-139) is gated by it. The MSL excited-port current probes are a y-only line in the Rust run while native samples a y-z surface, tracked as RM-141 |
 | 2026-10-26 | RM-139, RM-142 | Verified | The conducting-sheet failure was never in the sheet model: `apply_magnetic_bc` only cleared the tangential current components, whereas native `Operator::ApplyMagneticBC` clears all three on a low PMC face, the tangential ones at `numLines - 2` on a high PMC face, and the outermost line of every axis. In the 1 mm PEC/PMC channel the surviving normal H turned the single-row TEM mode into a non-uniform 3-D field that propagated at 0.69 c with a 1.42x amplitude. After reproducing the native rules the incident probe matches the reference exactly (amplitude ratio 1.00000, 0.0 ps delay at z = 20..120 mm, v = c) and the harness passes at 0.036-0.073 dB / 0.18-0.20 deg. Rust 229+2, Python 298+150, Octave 10/10 |
+| 2026-10-26 | RM-118, RM-141 | Verified | The last failing case was the MSL excited-port current probe: native `ProcessCurrent::DefineStartStopCoord` grows a zero-extent tangential axis by one dual line so the probe is a closed surface, while Rust left the y-line flat and the +y/-y terms cancelled exactly. With the expansion `port_it_1A/1B` match to 1.5e-6/1.9e-6. All four reference cases now pass the harness, so RM-118 is verified. Rust 230+2, Python 298+150, Octave 10/10, harness 4/4 |

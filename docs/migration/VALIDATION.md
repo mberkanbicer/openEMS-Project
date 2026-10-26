@@ -1577,7 +1577,7 @@ justification are in `REFERENCE_TOLERANCES.md`.
 | conducting sheet | phase | 0.178-0.199 deg vs native | PASS |
 | fieldprobes | all probe/dump checks | probes 1.5e-5, Ef/Hf 1.2e-5, H TD 3e-5 | PASS |
 | msl-notchfilter | `et`/`ht`, `port_ut_*`, `port_it_2*` | 1.4e-8 .. 6.0e-6 | PASS |
-| msl-notchfilter | `port_it_1A/1B` (excited port) | Rust probe is a y-only line, native is a y-z surface | **FAIL** (RM-141) |
+| msl-notchfilter | `port_it_1A/1B` (excited port) | 1.5e-6 .. 1.9e-6 | PASS |
 
 The harness found and localised three real defects. The D/B one is fixed:
 
@@ -1610,6 +1610,11 @@ amplitude. With the native clearing rules the incident probe matches the
 reference exactly (amplitude ratio 1.00000, 0.0 ps delay at z = 20..120 mm,
 v = c) and all three sheet cases pass the differential bounds.
 
-The excited-port gap (`port_it_1A/1B`) stays open and is *not* tolerated away:
-its bound is recorded, the case reports FAIL, and RM-118/RM-125 remain open
-until it is fixed.
+The excited-port gap is closed as well. Native `ProcessCurrent` treats a
+current probe as a closed surface: every tangential axis requested with zero
+extent is grown by one dual line. Rust snapped the box but kept the line flat,
+so the two opposite faces of the probe were evaluated on the same line and the
++y/-y terms cancelled exactly (a hard zero where native reads 9.6e-8). With the
+expansion `port_it_1A/1B` match to 1.5e-6/1.9e-6. All four reference cases pass,
+which closes RM-118; the remaining step (RM-119) is owner approval of the
+recorded bounds.

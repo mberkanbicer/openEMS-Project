@@ -9,7 +9,7 @@ pass, including analytic propagation, UPML absorption, CFL, quarter-cell
 material averaging and native-HDF5 dump reading.
 
 Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
-(51 `Verified`, 43 `Implemented`, 46 `Not Started`, 2 `Blocked` at the last
+(53 `Verified`, 43 `Implemented`, 44 `Not Started`, 2 `Blocked` at the last
 update; see the snapshot there for the live count). The largest open areas are the extension
 framework and remaining physics extensions, NF2FF/SAR, the native CLI and
 scripting interfaces, the GUI feature surface, and the differential harness over
@@ -632,8 +632,8 @@ list below is the current execution plan.
 
 | Task | Work | Why it is first |
 | --- | --- | --- |
-| RM-141 | Python `MSLPort` excited-port current probes | The last failing reference case (`msl-notchfilter`) |
-| RM-118 | Execute every reference case through the harness | Needs RM-141 to close the last case |
+| RM-119 | Owner approval of the recorded differential bounds | Every harness case passes; only the approval step is left |
+| RM-123 | Regression CI gate for the unit and reference suites | Makes the passing suites enforceable on PRs |
 
 ### 2. Engine and dump completeness (open, in order)
 

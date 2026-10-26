@@ -37,17 +37,20 @@ capture under `docs/migration/reference-data/`.
 | fieldprobes | all checks | probes 1.5e-5, Ef/Hf 1.2e-5, H TD 3e-5 | PASS |
 | msl-notchfilter | `et` / `ht` | 2.1e-6 relative | PASS (after the fix) |
 | msl-notchfilter | `port_ut_*`, `port_it_2*` | 1.4e-8 .. 6.0e-6 | PASS |
-| msl-notchfilter | `port_it_1A/1B` (excited port) | Rust probe is a y-only line, native is a y-z surface (all-zero current) | **FAIL** (RM-141) |
+| msl-notchfilter | `port_it_1A/1B` (excited port) | 1.5e-6 .. 1.9e-6 | PASS |
 
 The conducting-sheet gap was the incident field, not the sheet model:
 Rust cleared only the tangential current components on PMC faces while native
 also clears the normal one on the low face and the outermost line of every
 axis, which made the 1 mm PEC/PMC channel propagate at 0.69 c. With the native
-rules the incident probe matches exactly and all three sheet cases pass. The
-remaining MSL failure (`port_it_1A/1B`) is the Python `MSLPort` current-probe
-geometry, tracked as RM-141. HDF5 snapshots are normalised by the peak of the
-whole file, not per timestep, so late near-zero snapshots are compared against
-a meaningful scale.
+rules the incident probe matches exactly and all three sheet cases pass.
+
+The MSL gap was the current-probe geometry: native `ProcessCurrent` grows a
+zero-extent tangential axis by one dual line, so the probe is a closed surface;
+Rust left the requested line flat and the two opposite faces cancelled exactly.
+All four cases now pass. HDF5 snapshots are normalised by the peak of the whole
+file, not per timestep, so late near-zero snapshots are compared against a
+meaningful scale.
 
 ## Rule
 
