@@ -1507,3 +1507,17 @@ present), 70/70 openEMS public M-files resolve
 
 Python interface regression: `scripts/ci/run_rust_python_tests_wsl.sh` reports
 openEMS 298 tests OK and CSXCAD 150 tests OK on CPython 3.14.
+
+## SAR raw dump and `sar_calc` (RM-073 integration)
+
+Command: `scripts/ci/run_sar_dump_check_wsl.sh` (Octave writes a `DumpType` 29
+raw dump of a lossy box, `sar_calc` processes it).
+
+| Check | Result |
+| --- | --- |
+| raw layout | `/Mesh`, `/CellWidth`, `/CellData/{Conductivity,Density,Volume}`, `/FieldData/FD/f0` (complex, `NXYZ`) and the frequency attribute |
+| material data | 512 of 1331 cells with density 1000 kg/m^3 and kappa 0.5 S/m (the material box) |
+| local SAR | peak 6.509386e-22 W/kg, relative deviation 7.8e-8 from sigma|E|^2/(2 rho) |
+| result file | `maxSAR` attribute and the dataset agree to float precision |
+
+Direct SAR result dumps (`DumpType` 20..22) are tracked separately as RM-136.
