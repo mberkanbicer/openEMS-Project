@@ -9,7 +9,7 @@ pass, including analytic propagation, UPML absorption, CFL, quarter-cell
 material averaging and native-HDF5 dump reading.
 
 Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
-(56 `Verified`, 43 `Implemented`, 43 `Not Started`, 2 `Blocked` at the last
+(57 `Verified`, 43 `Implemented`, 43 `Not Started`, 3 `Blocked` at the last
 update; see the snapshot there for the live count). The largest open areas are the extension
 framework and remaining physics extensions, NF2FF/SAR, the native CLI and
 scripting interfaces, the GUI feature surface, and the differential harness over
@@ -123,8 +123,9 @@ relative, homogeneous interior bit-identical).
 
 Known gaps tracked separately: cylindrical multi-grid
 (`Engine_Ext_CylinderMultiGrid`, radii stored but the hierarchy is not ported),
-SAR on cylindrical meshes (RM-143) and cylindrical port/line snapping
-(RM-144).
+the SAR 1 g/10 g averaging-cube search (RM-145), the end-criteria stop time
+(RM-146) and cylindrical port/line snapping plus `--nativeFieldDumps`
+(RM-144, blocked on the wire-excitation and CLI waves).
 
 ## Verified progress
 
@@ -647,6 +648,7 @@ list below is the current execution plan.
 | RM-139 | Conducting-sheet transmission | **Verified** on 2026-10-26 (0.036-0.073 dB, 0.18-0.20 deg) |
 | RM-137 | `rho = 0` axis in cylindrical meshes | **Verified** on 2026-10-26 (TM010/TM110 vs analytic, probe 4.2e-5 vs native) |
 | RM-138 | Cylindrical field dumps (`/Mesh/{rho,alpha,z}` plus metric-aware values) | **Verified** on 2026-10-26 (HDF5 mesh bit-identical, field 5.2e-6, profile 3e-4) |
+| RM-143 | SAR on cylindrical meshes (metric volumes + native dump layout) | **Verified** on 2026-10-27 (cell data exact, E-field 1.195e-3, 1 g peak +0.32 %) |
 
 ### 3. Verification infrastructure
 

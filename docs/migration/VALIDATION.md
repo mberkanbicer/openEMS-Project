@@ -1522,6 +1522,39 @@ raw dump of a lossy box, `sar_calc` processes it).
 
 Direct SAR result dumps (`DumpType` 20..22) are tracked separately as RM-136.
 
+## Cylindrical SAR (RM-143)
+
+`scripts/ci/run_cylindrical_sar_check_wsl.sh` runs a lossy muscle-like shell
+(eps_r = 80, kappa = 1 S/m, density 1000 kg/m^3, 16 sectors, rho = 0 axis) with
+a raw SAR dump (`DumpType` 29) and a 1 g result dump (`DumpType` 21), driven by
+the same `input.xml` through the Rust and native solvers:
+
+| Check | Measured | Bound | Verdict |
+| --- | --- | --- | --- |
+| `/Mesh` layout (`rho`,`alpha`,`z`, `mesh_type=1`, `mesh_scaling=1e-3`) | identical | - | PASS |
+| `/CellData/Volume` vs native and vs `dA/2 (r2^2 - r1^2) dz` | 0.0 difference, 3.5e-8 vs analytic | 1e-6 | PASS |
+| `/CellData/Density`, `/CellData/Conductivity` | 0.0 difference | 1e-6 | PASS |
+| raw E-field DFT (`f0`) vs native | 1.195e-3 | 1e-2 | PASS |
+| 1 g SAR peak vs native | +0.32 % | 1 % | PASS |
+| 1 g SAR per cell vs native | 6.4e-1 of the peak (1534 of 1936 cells above 1 %) | not gated | FAIL (RM-145) |
+| probe cadence / stop time | 251 vs 1001 samples | not gated | FAIL (RM-146) |
+
+Two engine bugs were found by this case and fixed with unit coverage:
+
+* `AverageMatQuarterCell` weights the quarter cells by `GetNodeArea`, not by the
+  rho-face `GetEdgeArea`; the latter applies the primary rho factor and
+  vanishes on the `rho = 0` axis, so every axis E_rho cell fell back to the
+  background material. Dielectric cylindrical meshes therefore took a vacuum
+  timestep (9.089e-13 s instead of the native 8.12933e-12 s, a factor
+  `sqrt(eps_r)`) and used wrong EC values on the rho = 0 sheet. The new test
+  `cylindrical_r0_timestep_includes_the_dielectric` pins the native value.
+* Closed-azimuth seam/padding samples must wrap into `[alpha0, alpha0 + 2*pi)`
+  like native `GetYeeCoords`, otherwise those cells resolve the background.
+
+The remaining per-cell 1 g differences come from the mass-averaging cube search
+(RM-145) and the stop-time difference from the end-criteria evaluation (RM-146);
+both are reported by the check and tracked as their own tasks.
+
 ## Cylindrical field dumps (RM-138)
 
 `scripts/ci/run_cylindrical_dump_check_wsl.sh` mirrors the plain half of the
