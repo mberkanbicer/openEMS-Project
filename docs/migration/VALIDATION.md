@@ -1479,3 +1479,31 @@ openems_py: /home/.../rustpy-venv/lib/python3.14/site-packages/openems_py/__init
 Both modules import successfully under CPython 3.14 with numpy 2.3.5 and h5py
 3.15.1. This unblocks the native Python suite runs (`RM-095`); the class
 surface itself is still the open part of `RM-085`..`RM-090`.
+
+## Octave/MATLAB interface (RM-091, RM-092, RM-093, RM-096)
+
+Command: `scripts/ci/run_octave_testsuite_wsl.sh` (native testsuite, unchanged;
+Rust `openEMS`, `nf2ff` and `sar_calc` binaries linked under their native names).
+
+| Case | Result | Reference evidence |
+| --- | --- | --- |
+| `unittests/port_setup` | PASS (11 checks) | port geometry/weights/mode profiles |
+| `unittests/transforms` | PASS (7 checks) | DFT/FFT round trips vs analytic pulses |
+| `probes/fieldprobes` | PASS (8 checks) | E/H probe vs dump amplitude 5.9e-8 / 5.7e-8, time base 1e-16 s |
+| `combinedtests/Coax` | PASS | Z = 50.09..51.12 Ohm (native 50.49..51.10, analytic 49.94) |
+| `combinedtests/cavity` | PASS | TE/TM resonance spectrum and spurious-response limits |
+| `combinedtests/msl_port` | PASS | beta = k0 (0.32%), ZL 72.7..73.4 Ohm, S11 -54 dB |
+| `combinedtests/nf2ff_dipole` | PASS | Dmax 1.5 (1.35%), sin(theta) pattern (2.97%), cross-pol 0.93% |
+| `combinedtests/rect_waveguide` | PASS | S11 -33.6 dB, S21 -0.03..0.01 dB, dispersion 0.07% |
+| `enginetests/engine_compare` | PASS | sse/sse-compressed/multithreaded dumps bit-identical to basic |
+| `combinedtests/coax_cylindrical` | ERROR | cylindrical engine deferred (D-02, RM-134) |
+
+Smoke tests: `.github/smoketests/octave/MSL_NotchFilter.m` and
+`.github/smoketests/python/MSL_NotchFilter.py` complete unchanged.
+
+M-file surface: 58/58 CSXCAD public M-files resolve (12 private helpers
+present), 70/70 openEMS public M-files resolve
+(`scripts/ci/check_octave_mfiles_wsl.sh`).
+
+Python interface regression: `scripts/ci/run_rust_python_tests_wsl.sh` reports
+openEMS 298 tests OK and CSXCAD 150 tests OK on CPython 3.14.

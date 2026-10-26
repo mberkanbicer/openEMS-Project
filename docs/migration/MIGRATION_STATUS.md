@@ -9,8 +9,8 @@ pass, including analytic propagation, UPML absorption, CFL, quarter-cell
 material averaging and native-HDF5 dump reading.
 
 Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
-(1 `Verified`, 30 `Implemented`, 104 `Not Started` at the last update; see the
-snapshot there for the live count). The largest open areas are the extension
+(43 `Verified`, 43 `Implemented`, 47 `Not Started`, 2 `Blocked` at the last
+update; see the snapshot there for the live count). The largest open areas are the extension
 framework and remaining physics extensions, NF2FF/SAR, the native CLI and
 scripting interfaces, the GUI feature surface, and the differential harness over
 `reference-data/`.
@@ -64,25 +64,56 @@ A converged 3D coaxial-line reference now adds analytic port and impedance
 checks on a 715,084-cell mesh; two runs matched all saved numeric port arrays
 bitwise. Its solver timings are characterization only.
 
-## Wave C status (2026-10-25)
+## Wave C status (2026-10-26)
 
-The scripting wave is verified for the Python interfaces: the **unmodified**
-native CSXCAD suite (150 tests) and the **unmodified** native openEMS Python
-suite (298 tests) pass against the Rust core (`scripts/ci/run_rust_python_tests_wsl.sh`),
-covering the geometry API, the controller, all port classes, the XML round-trip,
-NF2FF results, SAR and the HDF5 dump readers.
+The scripting wave is verified for the Python **and** the Octave/MATLAB
+interfaces.
 
-The Octave/MATLAB interface loads and runs through the Rust CLI
-(`scripts/ci/install_openems_cli_wsl.sh` links the CLI as `openEMS/openEMS`, so
-`openEMS.sh` and the M-files find it). `unittests/transforms` passes and the
-`combinedtests/Coax` case runs the solver and produces `ut1`/`it1`, but the
-port amplitudes still disagree with the native reference (`ut1` ~168x high,
-`it1` far too small). Root cause identified: the excitation path evaluates the
-excitation weight function without vertex coordinates (`operator.rs`, so the
-weight silently becomes 1.0), and the probe amplitude/snapping is not yet the
-native `GetWeightedExcitation` * `GetEdgeLength` (drawing units) with the native
-dual-mesh snap rule. Fixing that, plus the dump-box probing, the mode-match
-wiring and the `nf2ff`/`sar` CLIs, is what remains for RM-091..RM-096.
+Python: the unmodified native CSXCAD suite (150 tests) and the unmodified native
+openEMS Python suite (298 tests) pass against the Rust core
+(`scripts/ci/run_rust_python_tests_wsl.sh`), including the controller, every port
+class, XML round-trips, NF2FF results, SAR and the HDF5 readers.
+
+Octave/MATLAB: the unmodified native testsuite runs through the Rust binaries
+(`scripts/ci/run_octave_testsuite_wsl.sh`):
+
+```
+PASS unittests/port_setup, unittests/transforms, probes/fieldprobes,
+     combinedtests/Coax, combinedtests/cavity, combinedtests/msl_port,
+     combinedtests/nf2ff_dipole, combinedtests/rect_waveguide,
+     enginetests/engine_compare
+ERROR combinedtests/coax_cylindrical   (D-02 deferral, RM-134)
+9 passed, 0 failed, 1 error in 598 s
+```
+
+`combinedtests/Coax` now reports Z = 50.09..51.12 Ohm against the native
+reference 50.49..51.10 Ohm and the analytic 49.94 Ohm. The MSL smoke tests
+(`.github/smoketests/{octave,python}/MSL_NotchFilter`) complete unchanged.
+
+What made the interface work, in order of impact:
+
+1. `setup_fdtd` now applies the `<Excitation>` and `<BoundaryCond>` children of
+   `<FDTD>`; previously only the Python controller supplied them, so a plain
+   `openEMS file.xml` run excited a default 1 GHz/500 MHz pulse and had no PML
+   (the domain rang as a lossless cavity).
+2. The default timestep method is the native Rennings_2 (3), restoring the
+   native 9.629 ps step on the Coax mesh.
+3. The excitation weight function is evaluated at the Yee vertex in metres
+   (`GetWeightedExcitation`), fixing the TEM port amplitude.
+4. Probe and dump snapping use the native `SnapToMeshLine` floor rule, field
+   probes return physical E/H (`GetRawField`), and processed samples are written
+   with the native `setprecision(12)` general format (the previous fixed-point
+   time column quantised 1.44e-10 s to 1 ps and corrupted the Octave FFT).
+5. CSX `DumpBox` properties drive real time-domain dumps (cropped, physical
+   units, native `DumpMode` 0/1/2 interpolation, dual mesh/time for H/B,
+   `NXYZ` or legacy `NZYX` layout), which is what `probes/fieldprobes` and the
+   NF2FF box faces need.
+6. New Rust binaries `nf2ff` (native `<nf2ff>` XML contract) and `sar_calc`
+   (native option set) are linked under the native names.
+
+Known gaps tracked separately: cylindrical coordinates
+(`combinedtests/coax_cylindrical`, D-02 deferral, RM-134), J/D/B dump
+conversions (RM-135) and the CSX wiring of frequency-domain dumps (RM-072).
 
 ## Verified progress
 

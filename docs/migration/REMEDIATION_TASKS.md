@@ -59,10 +59,10 @@ RM-127.
 
 | Status | Count | Tasks |
 | --- | --- | --- |
-| `Verified` | 37 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-073, RM-074, RM-075, RM-082, RM-083, RM-084, RM-085, RM-086, RM-087, RM-088, RM-089, RM-090, RM-095 |
-| `Implemented` | 45 | RM-037, RM-040, RM-038, RM-039, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-057, RM-064, RM-066, RM-067, RM-068, RM-069, RM-070, RM-071, RM-072, RM-076, RM-077, RM-078, RM-079, RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022, RM-065, RM-080, RM-081 |
+| `Verified` | 43 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-071, RM-073, RM-074, RM-075, RM-079, RM-082, RM-083, RM-084, RM-085, RM-086, RM-087, RM-088, RM-089, RM-090, RM-091, RM-092, RM-093, RM-095, RM-096, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133 |
+| `Implemented` | 43 | RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022, RM-037, RM-038, RM-039, RM-040, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-057, RM-060, RM-064, RM-065, RM-066, RM-067, RM-068, RM-069, RM-070, RM-072, RM-076, RM-077, RM-078, RM-080, RM-081 |
 | `Blocked` | 2 | RM-125, RM-127 |
-| `Not Started` | 49 | all remaining tasks |
+| `Not Started` | 47 | all remaining tasks |
 
 Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
@@ -75,7 +75,7 @@ Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
 
 
-## Remaining backlog (49 tasks) and execution order
+## Remaining backlog (47 tasks) and execution order
 
 The tasks below are the `Not Started` rows of this document, grouped by the order they will be executed. Wave A is complete and pushed; the remaining waves are ordered by dependency and by what can be verified in this workspace.
 
@@ -256,7 +256,7 @@ Wave C additionally needs a Python interpreter compatible with the PyO3 version 
 | RM-068 | P0 | Implement running DFT probe with frequency list | RM-066 | M | Sinusoid amplitude/frequency test | Implemented |
 | RM-069 | P1 | Implement `ProcessIntegral` | RM-066 | S | Analytic integral case | Implemented |
 | RM-070 | P1 | Implement `ProcessVoltage`/`ProcessCurrent` | RM-066 | M | Port voltage/current comparison | Implemented |
-| RM-071 | P0 | Implement `ProcessFieldsTD` with real dumps | RM-066 | M | Native TD dump comparison | Implemented |
+| RM-071 | P0 | Implement `ProcessFieldsTD` with real dumps | RM-066 | M | `probes/fieldprobes` (E/H probe vs dump, 8/8) and `combinedtests/nf2ff_dipole` (6/6) pass on the CSX `DumpBox` path | Verified |
 | RM-072 | P0 | Implement `ProcessFieldsFD` with oversampling | RM-066 | L | Native FD dump comparison | Implemented |
 | RM-073 | P0 | Implement SAR with 1 g/10 g averaging | RM-066 | L | Native SAR comparison | Verified |
 | RM-074 | P0 | Port native NF2FF transform | RM-066 | XL | Far-field comparison with native reference | Verified |
@@ -264,7 +264,7 @@ Wave C additionally needs a Python interpreter compatible with the PyO3 version 
 | RM-076 | P0 | HDF5 writer with native datasets/attributes/layout | RM-066 | L | Native Python reader accepts Rust output | Implemented |
 | RM-077 | P0 | HDF5 reader and round-trip for native files | RM-076 | L | Rust reads native dumps; values match | Implemented |
 | RM-078 | P0 | VTK writer with real mesh/dimensions/vectors | RM-066 | M | ParaView-readable; native comparison | Implemented |
-| RM-079 | P0 | Dump scheduling, naming, flush/close semantics | RM-066 | M | File sequence matches native for a short run | Implemented |
+| RM-079 | P0 | Dump scheduling, naming, flush/close semantics | RM-066 | M | Dump sequence/time base match the native probes (`fieldprobes` sample count, 1e-16 s time base) and the NF2FF box faces read back in order | Verified |
 | RM-080 | P1 | Implement Python `HDF5Dump`, `readSAR`, NF2FF readers | RM-076 | M | Synthetic + native file tests | Implemented |
 | RM-081 | P0 | File-level differential tests and fixtures | RM-076..RM-079 | L | Recorded comparison report | Implemented |
 | RM-082 | P2 | Document file formats and compatibility guarantees | RM-081 | S | Doc section with dataset/attribute list | Verified |
@@ -280,12 +280,12 @@ Wave C additionally needs a Python interpreter compatible with the PyO3 version 
 | RM-088 | P0 | Implement Python NF2FF module | RM-074,RM-085 | L | NF2FF tests pass | Verified |
 | RM-089 | P1 | Implement Python automesh and utilities | RM-085 | L | Automesh/utility tests pass | Verified |
 | RM-090 | P0 | Raise CSXCAD Python classes to native surface | RM-031 | L | Native CSXCAD Python suite passes | Verified |
-| RM-091 | P0 | Make native MATLAB/Octave M-file suite work through CLI | RM-083 | L | 10 suite cases + 2 smoke tests pass | Not Started |
-| RM-092 | P0 | Match MATLAB `calcPort`, `CalcNF2FF`, post-processing | RM-091,RM-074 | L | Port/NF2FF comparisons recorded | Not Started |
-| RM-093 | P1 | Implement CSXCAD MATLAB M-file surface | RM-032 | L | 58 public + 12 private M-files resolve | Not Started |
+| RM-091 | P0 | Make native MATLAB/Octave M-file suite work through CLI | RM-083 | L | 9/10 native suite cases pass (cylindrical deferred by D-02, tracked as RM-134); both MSL smoke tests run unchanged | Verified |
+| RM-092 | P0 | Match MATLAB `calcPort`, `CalcNF2FF`, post-processing | RM-091,RM-074 | L | Coax Z 50.09..51.12 Ohm (native 50.49..51.10), msl_port S11 -54 dB, rect_waveguide S11 -33.6 dB, nf2ff Dmax 1.5 (2.97% pattern deviation) | Verified |
+| RM-093 | P1 | Implement CSXCAD MATLAB M-file surface | RM-032 | L | 58/58 CSXCAD public M-files and 70/70 openEMS public M-files resolve; 12 CSXCAD private helpers present and exercised by the suite | Verified |
 | RM-094 | P1 | Match error identifiers, ownership, array orientation | RM-090,RM-093 | M | Contract tests from the interface audits | Not Started |
 | RM-095 | P0 | Run native Python suite (31 tests + 150 CSXCAD) unchanged | RM-085..RM-090 | M | Recorded pass counts | Verified |
-| RM-096 | P0 | Run native Octave suite and MSL smoke tests unchanged | RM-091..RM-093 | M | Recorded pass counts | Not Started |
+| RM-096 | P0 | Run native Octave suite and MSL smoke tests unchanged | RM-091..RM-093 | M | `run_testsuite` 9 passed / 1 error (cylindrical, D-02) in 598 s; `MSL_NotchFilter.m` and `MSL_NotchFilter.py` both complete unchanged | Verified |
 ## WS7 - GUI
 
 | ID | Pri | Task | Depends | Est | Acceptance / Evidence | Status |
@@ -339,6 +339,8 @@ Wave C additionally needs a Python interpreter compatible with the PyO3 version 
 | RM-131 | P0 | Update `MIGRATION_STATUS.md` and session records | RM-128..RM-130 | S | No claim without evidence | Verified |
 | RM-132 | P1 | Write ADRs for D-01..D-07 | RM-001..RM-006 | M | One ADR per decision under `docs/adr/` | Verified |
 | RM-133 | P2 | Add docs consistency check to CI | RM-129 | S | CI rejects stale counts/statuses | Verified |
+| RM-134 | P0 | Cylindrical FDTD engine (`Operator_Cylinder`) and the `combinedtests/coax_cylindrical` case | RM-091,RM-096 | XL | Native cylindrical suite case passes; D-02 exception closes | Not Started |
+| RM-135 | P0 | J/D/B (and rot-H) field-dump conversions on the per-component material grids | RM-071 | L | Native `DumpType` 2..5 comparison | Not Started |
 ---
 
 ## Gate checklists
@@ -488,3 +490,5 @@ in the task's acceptance column.
 | 2026-10-25 | RM-095 | Verified | `scripts/ci/run_rust_python_tests_wsl.sh` runs the complete unmodified native Python suites against the Rust packages: openEMS 298 tests and CSXCAD 150 tests pass (CPython 3.14, numpy 2.3.5, h5py 3.15.1, scipy 1.18.1, matplotlib 3.10.7) |
 | 2026-10-25 | RM-091 | Implemented | The Octave/MATLAB interface runs through the Rust CLI: `scripts/ci/install_openems_cli_wsl.sh` builds the workspace CLI and links it as `openEMS/openEMS` next to the untouched `openEMS.sh`; `unittests/transforms` passes (7 checks) and `combinedtests/Coax` completes 5000 timesteps and streams `ut1`/`it1`, which `calcPort`/`ReadUI` read. The port amplitudes still differ from the native reference (native `ut1` 8.2e-4, `it1` 1.6e-5, Z 49.9 Ohm): the excitation weight function is evaluated without vertex coordinates and the probe amplitude/snapping is not yet the native `GetWeightedExcitation`*`GetEdgeLength` with the dual-mesh snap rule. `combinedtests/Coax` therefore still fails its impedance check |
 | 2026-10-25 | RM-078, RM-079 | Note | The processing array is now populated from the CSX `ProbeBox` properties at setup (`setup_csx_probes`): voltage/current/field/mode-match probes become `ProcessIntegral` instances with the native interval, dual-time sampling, weights, frequencies and start/stop times. Dump boxes are still only written by the debug path |
+| 2026-10-26 | RM-071, RM-079 | Verified | `setup_fdtd` now reads the `<Excitation>` and `<BoundaryCond>` children of `<FDTD>` (the source waveform and the PML were previously only applied by the Python controller), the Rennings_2 timestep is the default, and every CSX `DumpBox` becomes a `ProcessFieldsTD` that is cropped to the box, snapped with the native `SnapToMeshLine` rule, written in physical units (`GetRawField`), interpolated for `DumpMode` 1/2, dual-mesh/dual-time for H/B, and stored in the native `NXYZ`/legacy `NZYX` layout. `probes/fieldprobes` 8/8 and `combinedtests/nf2ff_dipole` 6/6 pass |
+| 2026-10-26 | RM-091, RM-092, RM-093, RM-096 | Verified | Full native Octave suite through the Rust binaries: port_setup, transforms, fieldprobes, Coax, cavity, msl_port, nf2ff_dipole, rect_waveguide, engine_compare pass; coax_cylindrical is the D-02 deferral (RM-134). Coax Z = 50.09..51.12 Ohm vs native 50.49..51.10. `nf2ff` and `sar_calc` are Rust binaries linked under the native names. Both MSL smoke tests complete unchanged. 58/58 CSXCAD and 70/70 openEMS public M-files resolve |

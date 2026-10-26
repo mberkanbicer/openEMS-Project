@@ -5,3 +5,5 @@
 QCSXCAD/rust-egui/src/renderer.rs:300: RM-105 (PNG capture from the wgpu frame) is open; the renderer reports it instead of writing a fake image
 AppCSXCAD/rust/src/app.rs:166: RM-097 (render every primitive type) owns the real structure tree/central panel content
 AppCSXCAD/rust/src/app.rs:307: RM-104 (real POV/X3D exports) owns the real scene export
+openEMS/rust/src/openems.rs:1049: RM-135 (J/D/B field-dump conversions) is open; the setup reports the unsupported dump type instead of writing a wrong field
+openEMS/rust/src/openems.rs:1088: RM-072 (frequency-domain dump wiring from CSX DumpBox) is open; the setup reports it instead of writing a partially wired dump

@@ -31,3 +31,7 @@ diff.txt
 build-*/
 build-wheels/
 build-venv/
+
+# Auxiliary Rust tools linked as native binaries
+/bin/
+
