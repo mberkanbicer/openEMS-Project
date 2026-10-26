@@ -1557,3 +1557,43 @@ result on the same lossy box).
 
 Rust unit coverage: `sar_hdf5::tests::direct_result_dump_matches_the_local_sar_formula`
 (0.5*|E|*|J|/rho = 1 W/kg) and the existing `sar` averaging tests.
+
+## Differential reference harness (RM-117)
+
+Command: `scripts/ci/run_reference_harness_wsl.sh [--case <name>]`. The harness
+runs the unmodified pinned Python sources against the Rust core, keeps the
+solver output (including `input.xml`) and compares the derived quantities with
+the native captures in `docs/migration/reference-data/`. Bounds and their
+justification are in `REFERENCE_TOLERANCES.md`.
+
+| Case | Check | Measured | Verdict |
+| --- | --- | --- | --- |
+| coax 3-D (715 k cells) | `Z_ref` real | 7.5e-5 relative | PASS |
+| coax 3-D | `S21` | 1.9e-4 dB | PASS |
+| coax 3-D | `S11` worst in band | -50.83 dB vs -50.88 dB | PASS |
+| conducting sheet (resistive film) | `|T|` | 3.07 dB | **FAIL** (RM-139) |
+| conducting sheet | phase | 6.0-12.9 deg | **FAIL** (RM-139) |
+| fieldprobes | D = eps0 E, B = mue0 H | passes after the EPS0/MU0 fix | PASS |
+| fieldprobes | FD dump vs FD probe | ~1.0 relative | **FAIL** (RM-140) |
+| msl-notchfilter | `et`/`ht`, `port_ut_*`, `port_it_2*` | 1.4e-8 .. 6.0e-6 | PASS |
+| msl-notchfilter | `port_it_1A/1B` (excited port) | Rust all-zero, native peak 9.6e-8 | **FAIL** (RM-141) |
+
+The harness found and localised three real defects. The D/B one is fixed:
+
+* native `m_epsR`/`m_mueR` store the **absolute** permittivity/permeability
+  (`Operator::DumpMaterial2File` divides them by `EPS0`/`MUE0`), so the D and B
+  dumps are `eps0*eps_r*E` and `mue0*mue_r*H`. The Rust conversion multiplied by
+  the relative values only, which the FieldProbes source test caught as a
+  `1/eps0` relative error. Fixed in `processing.rs`, with the unit test updated
+  to the absolute values.
+
+The same run showed that the `et`/`ht` excitation waveforms were missing from
+the solver output; they are now written before the time loop and match the
+native MSL reference to 2.1e-6. The MSL reference then exposes one more gap:
+the Python `AddMSLPort` current probes of the *excited* port are all zero
+(RM-141), while the voltage probes and port-2 currents match.
+
+The conducting-sheet, FD-dump and excited-port gaps stay open and are *not*
+tolerated away:
+their bounds are recorded, the cases report FAIL, and RM-118/RM-125 remain
+open until they are fixed.

@@ -9,7 +9,7 @@ pass, including analytic propagation, UPML absorption, CFL, quarter-cell
 material averaging and native-HDF5 dump reading.
 
 Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
-(47 `Verified`, 42 `Implemented`, 47 `Not Started`, 2 `Blocked` at the last
+(47 `Verified`, 44 `Implemented`, 48 `Not Started`, 2 `Blocked` at the last
 update; see the snapshot there for the live count). The largest open areas are the extension
 framework and remaining physics extensions, NF2FF/SAR, the native CLI and
 scripting interfaces, the GUI feature surface, and the differential harness over
@@ -628,15 +628,23 @@ Wave C (CLI, Python, Octave/MATLAB, dumps, SAR, NF2FF) is closed and verified.
 The remaining work is tracked per task in `REMEDIATION_TASKS.md`; the ordered
 list below is the current execution plan.
 
-### 1. Engine and dump completeness (open, in order)
+### 1. Differential gaps found by the harness (RM-117 evidence)
+
+| Task | Work | Why it is first |
+| --- | --- | --- |
+| RM-140 | FD dump (`DumpType` 10..15) vs FD probe: ~1.0 relative | Blocks `fieldprobes` and the FD dump verification |
+| RM-139 | Conducting-sheet transmission: 3.07 dB / 12.9 deg off | Blocks `conducting-sheet` and RM-118 |
+
+### 2. Engine and dump completeness (open, in order)
 
 | Task | Work | Why it is next |
 | --- | --- | --- |
 | RM-136 | Direct SAR result dumps (`DumpType` 20..22) | **Verified** on 2026-10-26: the in-solver `SAR_Calculation` writes local and 1 g results |
+| RM-139/RM-140/RM-141 | Conducting-sheet, FD-dump and excited-port current gaps found by the harness | Block the reference-run chain until fixed |
 | RM-137 | `rho = 0` axis in cylindrical meshes | Rejected loudly today; needed for the native cylindrical-wave tutorials |
 | RM-138 | Cylindrical field dumps (`/Mesh/{rho,alpha,z}` plus metric-aware values) | The engine runs, but dumps still assume Cartesian axes |
 
-### 2. Verification infrastructure
+### 3. Verification infrastructure
 
 | Task | Work |
 | --- | --- |
@@ -646,19 +654,19 @@ list below is the current execution plan.
 | RM-123/RM-124 | Regression CI gate and nightly reference run |
 | RM-120..RM-122 | Cross-platform runtime CI, performance and memory baselines |
 
-### 3. GUI wave (QCSXCAD / AppCSXCAD)
+### 4. GUI wave (QCSXCAD / AppCSXCAD)
 
 RM-097..RM-106 and RM-015: primitive/property rendering, structure tree,
 editors, editing operations, mesh/parameter editing, undo/redo, file I/O and
 CLI parity, real exports, PNG capture, and the manual QA checklist.
 
-### 4. hyp2mat and CTB waves
+### 5. hyp2mat and CTB waves
 
 RM-107..RM-116: `.hyp` fixtures, polygon booleans, CSXCAD XML output,
 QucsStudio/PDF output, CLI parity, CTB impedance/transform/Touchstone/network
 delivery parity.
 
-### 5. Compatibility and final acceptance
+### 6. Compatibility and final acceptance
 
 RM-013/RM-023..RM-036/RM-094 (naming, optimizer rules, numeric backends,
 CSXCAD expression integration, XML fixtures, Python/MATLAB surface parity,

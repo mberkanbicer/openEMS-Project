@@ -59,10 +59,10 @@ RM-127.
 
 | Status | Count | Tasks |
 | --- | --- | --- |
-| `Verified` | 47 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-071, RM-072, RM-073, RM-074, RM-075, RM-079, RM-082, RM-083, RM-084, RM-085, RM-086, RM-087, RM-088, RM-089, RM-090, RM-091, RM-092, RM-093, RM-095, RM-096, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133, RM-134, RM-135, RM-136 |
-| `Implemented` | 42 | RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022, RM-037, RM-038, RM-039, RM-040, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-057, RM-060, RM-064, RM-065, RM-066, RM-067, RM-068, RM-069, RM-070, RM-076, RM-077, RM-078, RM-080, RM-081 |
+| `Verified` | 47 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-071, RM-072, RM-073, RM-074, RM-075, RM-079, RM-082, RM-083, RM-084, RM-085, RM-086, RM-087, RM-088, RM-089, RM-090, RM-091, RM-092, RM-093, RM-095, RM-096, RM-117, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133, RM-134, RM-136 |
+| `Implemented` | 44 | RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022, RM-037, RM-038, RM-039, RM-040, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-057, RM-060, RM-064, RM-065, RM-066, RM-067, RM-068, RM-069, RM-070, RM-076, RM-077, RM-078, RM-080, RM-081, RM-119, RM-135 |
 | `Blocked` | 2 | RM-125, RM-127 |
-| `Not Started` | 47 | all remaining tasks |
+| `Not Started` | 48 | all remaining tasks |
 
 Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
@@ -75,7 +75,7 @@ Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
 
 
-## Remaining backlog (47 tasks) and execution order
+## Remaining backlog (48 tasks) and execution order
 
 The tasks below are the `Not Started` rows of this document, grouped by the order they will be executed. Wave A is complete and pushed; the remaining waves are ordered by dependency and by what can be verified in this workspace.
 
@@ -318,9 +318,9 @@ Wave C additionally needs a Python interpreter compatible with the PyO3 version 
 
 | ID | Pri | Task | Depends | Est | Acceptance / Evidence | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| RM-117 | P0 | Build differential harness over `reference-data/` | RM-065 | L | Harness runs and reports per-case deltas | Not Started |
+| RM-117 | P0 | Build differential harness over `reference-data/` | RM-065 | L | `scripts/ci/reference_harness.py` runs the unmodified pinned sources, keeps the solver output and `input.xml`, and compares the derived quantities against `reference-data/`; coax PASS (Z 7.5e-5 rel., S21 1.9e-4 dB, S11 0.05 dB) | Verified |
 | RM-118 | P0 | Execute all reference cases through the harness | RM-117,RM-066 | M | Result table with pass/fail | Not Started |
-| RM-119 | P0 | Approve and record tolerances | RM-118 | S | Tolerance table with justification | Not Started |
+| RM-119 | P0 | Approve and record tolerances | RM-118 | S | `REFERENCE_TOLERANCES.md` records the proposed differential bounds with justification and the measured values; owner approval is pending (two harness cases still fail on open defects) | Implemented |
 | RM-120 | P1 | Cross-platform runtime CI (Linux/Windows/macOS/FreeBSD) | RM-017,RM-117 | L | Platform result matrix | Not Started |
 | RM-121 | P2 | Performance baseline vs native | RM-065 | M | Solver time/throughput table | Not Started |
 | RM-122 | P2 | Memory baseline vs native | RM-065 | M | Peak RSS table | Not Started |
@@ -340,10 +340,13 @@ Wave C additionally needs a Python interpreter compatible with the PyO3 version 
 | RM-132 | P1 | Write ADRs for D-01..D-07 | RM-001..RM-006 | M | One ADR per decision under `docs/adr/` | Verified |
 | RM-133 | P2 | Add docs consistency check to CI | RM-129 | S | CI rejects stale counts/statuses | Verified |
 | RM-134 | P0 | Cylindrical FDTD engine (`Operator_Cylinder`) and the `combinedtests/coax_cylindrical` case | RM-091,RM-096 | XL | Cylindrical `(rho, alpha, z)` operator: native edge/face metric (`rho`-scaled alpha edges, annulus z faces), closed-2*pi seam extension and padding line, `1/rho` excitation weight, PML in the cylindrical metric; `combinedtests/coax_cylindrical` PASS (beta 0.20%, profile 0.013%, symmetry 7.6e-17), full native suite 10/10 | Verified |
-| RM-135 | P0 | J/D/B (and rot-H) field-dump conversions on the per-component material grids | RM-071 | L | J=kappa*E, D=eps_r*E, B=mue_r*H and the rot(H) curl use the per-component material grid; `material_field_conversions_match_the_native_formulas` checks every formula | Verified |
+| RM-135 | P0 | J/D/B (and rot-H) field-dump conversions on the per-component material grids | RM-071 | L | D/B now carry the absolute units (`EPS0*eps_r`, `MU0*mue_r`) that native `m_epsR`/`m_mueR` store; the FieldProbes D/B assertions pass. Re-verification waits for the FD probe/dump defect (RM-140) | Implemented |
 | RM-136 | P1 | Direct SAR result dumps (`DumpType` 20..22) without an external sar_calc run | RM-073,RM-072 | M | `DumpType` 20/21/22 accumulate the E and J DFTs in the solver and run the shared `SAR_Calculation`; local peak matches raw+sar_calc to 6.5e-9 relative, homogeneous interior exactly, 1 g dump writes a finite maxSAR; `run_sar_dump_check_wsl.sh` | Verified |
 | RM-137 | P1 | Cylindrical mesh that includes the `rho = 0` axis (`Operator_Ext_Cylinder` axis update) | RM-134 | M | Native cylindrical-wave tutorial comparison | Not Started |
 | RM-138 | P1 | Cylindrical field dumps: `/Mesh/{rho,alpha,z}` layout and metric-aware dump values | RM-134,RM-071 | M | Native cylindrical dump comparison | Not Started |
+| RM-139 | P0 | Conducting-sheet transmission differs from the native reference by 3.07 dB / 12.9 deg | RM-057,RM-117 | M | `conducting-sheet` harness case passes with the approved bounds | Not Started |
+| RM-140 | P0 | Frequency-domain dump (`DumpType` 10..15) disagrees with the FD field probe by ~1.0 relative | RM-072,RM-117 | M | `fieldprobes` harness case passes; FD dump = FD probe | Not Started |
+| RM-141 | P0 | Python `AddMSLPort` excited-port current probes (`port_it_1*`) are all zero | RM-087,RM-117 | M | `msl-notchfilter` current probes match the native reference | Not Started |
 ---
 
 ## Gate checklists
@@ -499,3 +502,6 @@ in the task's acceptance column.
 | 2026-10-26 | RM-073 (integration) | Verified | The raw SAR dump (`DumpType` 29) is written from the solver: cell-centred E DFT, `/Mesh`, `/CellWidth`, `/CellData/{Conductivity,Density,Volume}` and the native frequency attribute; `sar_calc` reads it and the local SAR matches sigma|E|^2/(2 rho) to 7.8e-8 relative (`scripts/ci/run_sar_dump_check_wsl.sh`). Direct result dumps (20..22) stay tracked as RM-136 |
 | 2026-10-26 | RM-134 | Verified | The cylindrical operator is ported: `MeshType`/`MeshMetric` reproduce the native `GetEdgeLength`/`GetNodeArea`/`GetEdgeArea`/`GetCellVolume` overrides (`rho`-scaled alpha edges, annulus z faces), `load_csx` accepts `CoordSystem=1`, closes a full `2*pi` azimuth (pinned seam plus one padding line) and rejects negative rho loudly, `EngineExtCylinder` copies the tangential fields across the seam, the `1/rho` excitation weight is evaluated in `(rho, alpha, z)`, and the UPML grading uses the cylindrical metric. `combinedtests/coax_cylindrical` PASS: beta = k0 within 0.20 %, radial profile within 0.013 %, rotational symmetry 7.6e-17. The unmodified native suite is now 10 passed, 0 failed, 0 errors in 334 s. `rho = 0` meshes (RM-137) and cylindrical dumps (RM-138) are tracked open and rejected/extended explicitly |
 | 2026-10-26 | RM-136 | Verified | `ProcessFieldsSAR` now covers the native result dumps as well as the raw dump: `DumpType` 20/21/22 additionally accumulate the current-density DFT (native `J_FIELD_DUMP` + `AddEFieldAndJField`) and call the shared `SAR_Calculation` through `SarRunner::calc_from_fields`. `scripts/ci/run_sar_dump_check_wsl.sh` runs a type 29 and a type 20 dump in the same simulation: the peak matches raw+sar_calc to 6.5e-9 relative, the homogeneous interior is bit-identical, and the boundary layer differs by 0.62 % exactly like the native J-vs-cell-conductivity distinction. A type 21 (1 g) dump writes a finite averaged maxSAR. Unit test: `sar_hdf5::tests::direct_result_dump_matches_the_local_sar_formula` |
+| 2026-10-26 | RM-117 | Verified | The differential harness over `reference-data/` is in place (`scripts/ci/reference_harness.py`, wrapper `scripts/ci/run_reference_harness_wsl.sh`). It patches `tempfile` and `openEMS.Run` to keep the unmodified pinned source output, writes the exact `input.xml`, and compares derived quantities. Coax 3-D: `Z_ref` 7.5e-5 relative, `S21` 1.9e-4 dB, `S11` -50.83 dB vs -50.88 dB. The tool immediately exposed three real gaps (D/B units, conducting sheet, FD dump/probe) which are tracked as RM-135/RM-139/RM-140 |
+| 2026-10-26 | RM-135, RM-139, RM-140 | Implemented / Not Started | The harness showed that the D and B dumps were missing the absolute units: native `m_epsR`/`m_mueR` store `eps0*eps_r` / `mue0*mue_r` (`operator.cpp` `DumpMaterial2File` divides by `EPS0`/`MUE0`), so `D = eps0*eps_r*E` and `B = mue0*mue_r*H`. Both conversions and the unit test are fixed; the FieldProbes D/B assertions now pass. The same case still fails on the FD dump vs FD probe check (~1.0 relative, RM-140), and the conducting-sheet transmission is 3.07 dB / 12.9 deg off (RM-139). Neither is hidden or tolerated away |
+| 2026-10-26 | RM-117 (continuation), RM-141 | Verified / Not Started | The harness also showed that the `et`/`ht` excitation waveforms were never written; they are now emitted before the time loop (native `Excitation::DumpVoltageExcite`/`DumpCurrentExcite`) and match the native MSL reference to 2.1e-6. The MSL port comparison is then 8/10: `ut_*` (3.9e-6..6.0e-6), `it_2*` (1.4e-8) and `et`/`ht` pass, while the **excited** port current probes `port_it_1A/B` are all zero in the Rust run (native peaks 9.6e-8 / 8.4e-8). Tracked as RM-141; the Octave `msl_port` case passes, so the defect is in the Python MSL port probe path |
