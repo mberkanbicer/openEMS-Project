@@ -1,0 +1,64 @@
+name: Reference
+
+# RM-123: differential regression gate.
+#
+# Runs the native unit/integration suites and the differential reference
+# harness (`scripts/ci/reference_harness.py`) against the checked-in native
+# captures in `docs/migration/reference-data/`. Every case must pass; the
+# bounds live in `docs/migration/REFERENCE_TOLERANCES.md`.
+
+on:
+  push:
+    branches:
+      - master
+      - "mberkanbicer-**"
+    paths:
+      - "**/*.rs"
+      - "**/Cargo.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "**/*.py"
+      - "scripts/ci/**"
+      - "docs/migration/reference-data/**"
+      - ".github/workflows/reference.yml"
+  pull_request:
+    paths:
+      - "**/*.rs"
+      - "**/Cargo.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "**/*.py"
+      - "scripts/ci/**"
+      - "docs/migration/reference-data/**"
+      - ".github/workflows/reference.yml"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  reference:
+    name: Linux (unit + differential reference suites)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Install Python, matplotlib and HDF5 dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libhdf5-dev pkg-config python3-venv python3-numpy python3-scipy \
+            python3-h5py python3-matplotlib
+      - name: Build the Rust Python extensions
+        run: bash scripts/ci/build_rust_python_wsl.sh --release
+      - name: Numerical core tests
+        run: |
+          cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs
+          cargo test -p openems-core --features hdf5
+      - name: Native Python suites against the Rust core
+        run: bash scripts/ci/run_rust_python_tests_wsl.sh
+      - name: Differential reference harness
+        run: bash scripts/ci/run_reference_harness_wsl.sh

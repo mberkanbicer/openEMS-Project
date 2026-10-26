@@ -9,7 +9,7 @@ pass, including analytic propagation, UPML absorption, CFL, quarter-cell
 material averaging and native-HDF5 dump reading.
 
 Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
-(53 `Verified`, 43 `Implemented`, 44 `Not Started`, 2 `Blocked` at the last
+(53 `Verified`, 44 `Implemented`, 43 `Not Started`, 2 `Blocked` at the last
 update; see the snapshot there for the live count). The largest open areas are the extension
 framework and remaining physics extensions, NF2FF/SAR, the native CLI and
 scripting interfaces, the GUI feature surface, and the differential harness over
@@ -633,7 +633,7 @@ list below is the current execution plan.
 | Task | Work | Why it is first |
 | --- | --- | --- |
 | RM-119 | Owner approval of the recorded differential bounds | Every harness case passes; only the approval step is left |
-| RM-123 | Regression CI gate for the unit and reference suites | Makes the passing suites enforceable on PRs |
+| RM-123 | Regression CI gate (`.github/workflows/reference.yml`) | Implemented; the first GitHub Actions run must confirm the runner plumbing |
 
 ### 2. Engine and dump completeness (open, in order)
 
