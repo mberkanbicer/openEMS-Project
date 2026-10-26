@@ -1182,7 +1182,7 @@ cargo test -p openems-core --features hdf5
 
 `cargo check -p openems-cli -p openems-matlab` passes. `cargo check --workspace`
 fails in `pyo3-ffi` because the local Python is 3.14, which pyo3 0.23 does not
-support; this is an environment issue unrelated to the migration.
+support; this is an environment issue unrelated to the migration.
 
 ### Analytic propagation suite (RM-065, partial)
 
@@ -1218,7 +1218,7 @@ cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs
   openems    153 + 2 integration
   hyp2mat     14
   total      369 passed, 0 failed
-```
+```
 
 ### Dump scheduling and file sequence (RM-079)
 
@@ -1229,7 +1229,7 @@ cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs
   honour the direction argument (`-1` = all axes) and reduce the written grid
   like `ProcessFields::CalcMeshPos`. The reduced coordinates and `/Mesh`
   datasets are written, not the full mesh.
-- Each dump opens and closes its file, so every file is flushed on return.
+- Each dump opens and closes its file, so every file is flushed on return.
 
 ---
 
@@ -1294,7 +1294,7 @@ cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs
   total 375 passed, 0 failed
 cargo test -p openems-core --features hdf5   -> 162 + 2 passed
 cargo check --workspace                      -> ok (PyO3 0.30, CPython 3.14)
-```
+```
 
 ## Steady-state detection and end criteria (RM-060, 2026-10-25)
 
@@ -1337,7 +1337,7 @@ Tests: `steady_state_extension_uses_the_native_probe_layout`,
 `periodic_excitation_registers_steady_state_detection`,
 `steady_state_end_criteria_stops_a_periodic_run_early`,
 `aperiodic_excitation_uses_the_energy_end_criteria`,
-`periodic_sources_repeat_every_period`, `excitation_delay_skips_earlier_steps`.
+`periodic_sources_repeat_every_period`, `excitation_delay_skips_earlier_steps`.
 
 ## Conducting sheet and the Yee geometry convention (2026-10-25)
 
@@ -1376,7 +1376,7 @@ and steady-state source boxes) were corrected to span the edge properly.
 
 Tests: `two_dimensional_sheet_gets_the_ade_model` (tangential `vv < 1`, normal
 edge untouched, finite ADE coefficients), `volume_primitive_falls_back_to_pec_and_is_not_registered`,
-`boundary_layer_edges_fall_back_to_pec`, and coefficient sanity/finiteness.
+`boundary_layer_edges_fall_back_to_pec`, and coefficient sanity/finiteness.
 
 ## Wave B physics and processing evidence (2026-10-25)
 
@@ -1444,7 +1444,7 @@ The following cases did not produce a trustworthy reference in this session
 and are **not** claimed as verified: 1-D Fresnel slab, anisotropic guide
 birefringence, graded-mesh dispersion (`RM-065`), a byte-level native-vs-Rust
 HDF5 comparison (`RM-081`) and the blocked native differential runs that need
-the pinned WSL toolchain to be driven from this session.
+the pinned WSL toolchain to be driven from this session.
 
 ## Native CLI contract evidence (2026-10-25)
 
@@ -1462,7 +1462,7 @@ the installed `openEMS` entry point:
 - an unknown option exits 1.
 
 The Python and MATLAB/Octave layers are not part of this evidence; they remain
-open under Wave C (`RM-013`, `RM-080`, `RM-085`..`RM-096`).
+open under Wave C (`RM-013`, `RM-080`, `RM-085`..`RM-096`).
 
 ## Rust Python extension build under WSL (2026-10-25)
 
@@ -1478,46 +1478,65 @@ openems_py: /home/.../rustpy-venv/lib/python3.14/site-packages/openems_py/__init
 
 Both modules import successfully under CPython 3.14 with numpy 2.3.5 and h5py
 3.15.1. This unblocks the native Python suite runs (`RM-095`); the class
-surface itself is still the open part of `RM-085`..`RM-090`.
-
-## Octave/MATLAB interface (RM-091, RM-092, RM-093, RM-096)
-
-Command: `scripts/ci/run_octave_testsuite_wsl.sh` (native testsuite, unchanged;
-Rust `openEMS`, `nf2ff` and `sar_calc` binaries linked under their native names).
-
-| Case | Result | Reference evidence |
-| --- | --- | --- |
-| `unittests/port_setup` | PASS (11 checks) | port geometry/weights/mode profiles |
-| `unittests/transforms` | PASS (7 checks) | DFT/FFT round trips vs analytic pulses |
-| `probes/fieldprobes` | PASS (8 checks) | E/H probe vs dump amplitude 5.9e-8 / 5.7e-8, time base 1e-16 s |
-| `combinedtests/Coax` | PASS | Z = 50.09..51.12 Ohm (native 50.49..51.10, analytic 49.94) |
-| `combinedtests/cavity` | PASS | TE/TM resonance spectrum and spurious-response limits |
-| `combinedtests/msl_port` | PASS | beta = k0 (0.32%), ZL 72.7..73.4 Ohm, S11 -54 dB |
-| `combinedtests/nf2ff_dipole` | PASS | Dmax 1.5 (1.35%), sin(theta) pattern (2.97%), cross-pol 0.93% |
-| `combinedtests/rect_waveguide` | PASS | S11 -33.6 dB, S21 -0.03..0.01 dB, dispersion 0.07% |
-| `enginetests/engine_compare` | PASS | sse/sse-compressed/multithreaded dumps bit-identical to basic |
-| `combinedtests/coax_cylindrical` | ERROR | cylindrical engine deferred (D-02, RM-134) |
-
-Smoke tests: `.github/smoketests/octave/MSL_NotchFilter.m` and
-`.github/smoketests/python/MSL_NotchFilter.py` complete unchanged.
-
-M-file surface: 58/58 CSXCAD public M-files resolve (12 private helpers
-present), 70/70 openEMS public M-files resolve
-(`scripts/ci/check_octave_mfiles_wsl.sh`).
-
-Python interface regression: `scripts/ci/run_rust_python_tests_wsl.sh` reports
-openEMS 298 tests OK and CSXCAD 150 tests OK on CPython 3.14.
-
-## SAR raw dump and `sar_calc` (RM-073 integration)
-
-Command: `scripts/ci/run_sar_dump_check_wsl.sh` (Octave writes a `DumpType` 29
-raw dump of a lossy box, `sar_calc` processes it).
-
-| Check | Result |
-| --- | --- |
-| raw layout | `/Mesh`, `/CellWidth`, `/CellData/{Conductivity,Density,Volume}`, `/FieldData/FD/f0` (complex, `NXYZ`) and the frequency attribute |
-| material data | 512 of 1331 cells with density 1000 kg/m^3 and kappa 0.5 S/m (the material box) |
-| local SAR | peak 6.509386e-22 W/kg, relative deviation 7.8e-8 from sigma|E|^2/(2 rho) |
-| result file | `maxSAR` attribute and the dataset agree to float precision |
-
-Direct SAR result dumps (`DumpType` 20..22) are tracked separately as RM-136.
+surface itself is still the open part of `RM-085`..`RM-090`.
+
+## Octave/MATLAB interface (RM-091, RM-092, RM-093, RM-096)
+
+Command: `scripts/ci/run_octave_testsuite_wsl.sh` (native testsuite, unchanged;
+Rust `openEMS`, `nf2ff` and `sar_calc` binaries linked under their native names).
+
+| Case | Result | Reference evidence |
+| --- | --- | --- |
+| `unittests/port_setup` | PASS (11 checks) | port geometry/weights/mode profiles |
+| `unittests/transforms` | PASS (7 checks) | DFT/FFT round trips vs analytic pulses |
+| `probes/fieldprobes` | PASS (8 checks) | E/H probe vs dump amplitude 5.9e-8 / 5.7e-8, time base 1e-16 s |
+| `combinedtests/Coax` | PASS | Z = 50.09..51.12 Ohm (native 50.49..51.10, analytic 49.94) |
+| `combinedtests/cavity` | PASS | TE/TM resonance spectrum and spurious-response limits |
+| `combinedtests/msl_port` | PASS | beta = k0 (0.32%), ZL 72.7..73.4 Ohm, S11 -54 dB |
+| `combinedtests/nf2ff_dipole` | PASS | Dmax 1.5 (1.35%), sin(theta) pattern (2.97%), cross-pol 0.93% |
+| `combinedtests/rect_waveguide` | PASS | S11 -33.6 dB, S21 -0.03..0.01 dB, dispersion 0.07% |
+| `enginetests/engine_compare` | PASS | sse/sse-compressed/multithreaded dumps bit-identical to basic |
+| `combinedtests/coax_cylindrical` | ERROR | cylindrical engine deferred (D-02, RM-134) |
+
+Smoke tests: `.github/smoketests/octave/MSL_NotchFilter.m` and
+`.github/smoketests/python/MSL_NotchFilter.py` complete unchanged.
+
+M-file surface: 58/58 CSXCAD public M-files resolve (12 private helpers
+present), 70/70 openEMS public M-files resolve
+(`scripts/ci/check_octave_mfiles_wsl.sh`).
+
+Python interface regression: `scripts/ci/run_rust_python_tests_wsl.sh` reports
+openEMS 298 tests OK and CSXCAD 150 tests OK on CPython 3.14.
+
+## SAR raw dump and `sar_calc` (RM-073 integration)
+
+Command: `scripts/ci/run_sar_dump_check_wsl.sh` (Octave writes a `DumpType` 29
+raw dump of a lossy box, `sar_calc` processes it).
+
+| Check | Result |
+| --- | --- |
+| raw layout | `/Mesh`, `/CellWidth`, `/CellData/{Conductivity,Density,Volume}`, `/FieldData/FD/f0` (complex, `NXYZ`) and the frequency attribute |
+| material data | 512 of 1331 cells with density 1000 kg/m^3 and kappa 0.5 S/m (the material box) |
+| local SAR | peak 6.509386e-22 W/kg, relative deviation 7.8e-8 from sigma|E|^2/(2 rho) |
+| result file | `maxSAR` attribute and the dataset agree to float precision |
+
+Direct SAR result dumps (`DumpType` 20..22) are tracked separately as RM-136.
+
+## Cylindrical operator (RM-134)
+
+Command: `scripts/ci/run_octave_testsuite_wsl.sh` (native testsuite, unchanged).
+
+| Case | Result | Reference evidence |
+| --- | --- | --- |
+| `combinedtests/coax_cylindrical` | PASS | beta = k0 within 0.20 % (limit 1 %), radial voltage profile within 0.013 % of `log(r_p/r_i)/log(r_o/r_i)` (limit 1 %), rotational symmetry 7.6e-17 (limit 1e-9) |
+| full suite | 10 passed / 0 failed / 0 errors in 333.8 s | all ten native cases, including the previously deferred cylindrical case |
+
+Rust unit coverage: `cylindrical_full_turn_is_accepted_and_padded`,
+`cylindrical_metric_uses_rho_and_annulus_areas`,
+`cylindrical_open_alpha_is_not_padded`,
+`cylindrical_negative_rho_and_open_axis_are_rejected`, plus the seam-copy
+assertions in `extensions::tests_cylinder`.
+
+Not yet covered and therefore open: a mesh that includes the `rho = 0` axis
+(rejected explicitly, RM-137) and cylindrical field dumps with the native
+`/Mesh/{rho,alpha,z}` layout (RM-138).

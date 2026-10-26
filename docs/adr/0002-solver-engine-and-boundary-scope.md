@@ -24,5 +24,12 @@ engine is verified.
 - UPML was validated on 2026-10-24 (pulse residual 1.4e-6 of the peak, -117 dB)
   and is now enabled, superseding the "defer UPML" part of this decision.
 - SSE and multi-threading remain open (RM-062).
-- Cylindrical and multi-grid operators must fail loudly until implemented
-  (RM-061); they must not silently fall back to Cartesian.
+- The cylindrical operator is implemented for the rectilinear
+  `(rho, alpha, z)` mesh in 2026-10-26 (RM-134): the native edge/face metric,
+  the closed-azimuth seam and the `1/rho` excitation weight are ported, and
+  `combinedtests/coax_cylindrical` passes (beta = k0 within 0.20 %, radial
+  profile within 0.013 %, exact rotational symmetry).
+- Still deferred, and rejected loudly instead of silently degrading:
+  a mesh that includes the `rho = 0` axis (RM-137) and cylindrical field
+  dumps with the native `/Mesh/{rho,alpha,z}` layout (RM-138). The
+  multi-grid variants remain out of scope.

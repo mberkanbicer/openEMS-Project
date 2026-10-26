@@ -9,7 +9,7 @@ pass, including analytic propagation, UPML absorption, CFL, quarter-cell
 material averaging and native-HDF5 dump reading.
 
 Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
-(43 `Verified`, 43 `Implemented`, 47 `Not Started`, 2 `Blocked` at the last
+(46 `Verified`, 42 `Implemented`, 48 `Not Started`, 2 `Blocked` at the last
 update; see the snapshot there for the live count). The largest open areas are the extension
 framework and remaining physics extensions, NF2FF/SAR, the native CLI and
 scripting interfaces, the GUI feature surface, and the differential harness over
@@ -82,8 +82,8 @@ PASS unittests/port_setup, unittests/transforms, probes/fieldprobes,
      combinedtests/Coax, combinedtests/cavity, combinedtests/msl_port,
      combinedtests/nf2ff_dipole, combinedtests/rect_waveguide,
      enginetests/engine_compare
-ERROR combinedtests/coax_cylindrical   (D-02 deferral, RM-134)
-9 passed, 0 failed, 1 error in 598 s
+PASS combinedtests/coax_cylindrical    (RM-134, cylindrical operator)
+10 passed, 0 failed, 0 errors in 334 s
 ```
 
 `combinedtests/Coax` now reports Z = 50.09..51.12 Ohm against the native
@@ -111,9 +111,15 @@ What made the interface work, in order of impact:
 6. New Rust binaries `nf2ff` (native `<nf2ff>` XML contract) and `sar_calc`
    (native option set) are linked under the native names.
 
-Known gaps tracked separately: cylindrical coordinates
-(`combinedtests/coax_cylindrical`, D-02 deferral, RM-134), J/D/B dump
-conversions (RM-135) and the CSX wiring of frequency-domain dumps (RM-072).
+The cylindrical operator closed the last deferred case (RM-134): the native
+`(rho, alpha, z)` metric, the closed-azimuth seam and the `1/rho` excitation
+weight are ported, and `combinedtests/coax_cylindrical` passes (beta = k0
+within 0.20 %, radial profile within 0.013 %, symmetry 7.6e-17).
+
+Known gaps tracked separately: a mesh that includes the `rho = 0` axis
+(RM-137, rejected loudly), cylindrical field dumps (RM-138), direct SAR result
+dumps (RM-136) and the CSX wiring of frequency-domain dumps (RM-072, now
+verified).
 
 ## Verified progress
 
@@ -615,16 +621,47 @@ conversions (RM-135) and the CSX wiring of frequency-domain dumps (RM-072).
 
 ## Next task
 
-Wave B is closed. The next dependency-ready work is Wave C:
+Wave C (CLI, Python, Octave/MATLAB, dumps, SAR, NF2FF) is closed and verified.
+The remaining work is tracked per task in `REMEDIATION_TASKS.md`; the ordered
+list below is the current execution plan.
 
-1. **RM-083/RM-084** - make the Rust CLI accept the native
-   `openEMS <xml> [options]` contract, options, exit codes and log files.
-2. **RM-085..RM-090** - build the native Python package layout and raise the
-   Controller/CSXCAD classes to the native surface.
-3. **RM-091..RM-096** - run the native MATLAB/Octave suite through the CLI.
-4. **RM-065/RM-081** - finish the deferred analytic cases (Fresnel slab,
-   anisotropic guide, graded-mesh dispersion) and the byte-level native dump
-   comparison; the pinned WSL toolchain is available for reference runs.
+### 1. Engine and dump completeness (open, in order)
+
+| Task | Work | Why it is next |
+| --- | --- | --- |
+| RM-136 | Direct SAR result dumps (`DumpType` 20..22) | The raw dump (29) + `sar_calc` path works; the in-solver result dumps are the last native dump type without a writer |
+| RM-137 | `rho = 0` axis in cylindrical meshes | Rejected loudly today; needed for the native cylindrical-wave tutorials |
+| RM-138 | Cylindrical field dumps (`/Mesh/{rho,alpha,z}` plus metric-aware values) | The engine runs, but dumps still assume Cartesian axes |
+
+### 2. Verification infrastructure
+
+| Task | Work |
+| --- | --- |
+| RM-117 | Differential harness over `reference-data/` |
+| RM-118 | Execute every reference case through the harness |
+| RM-119 | Approve and record tolerances |
+| RM-123/RM-124 | Regression CI gate and nightly reference run |
+| RM-120..RM-122 | Cross-platform runtime CI, performance and memory baselines |
+
+### 3. GUI wave (QCSXCAD / AppCSXCAD)
+
+RM-097..RM-106 and RM-015: primitive/property rendering, structure tree,
+editors, editing operations, mesh/parameter editing, undo/redo, file I/O and
+CLI parity, real exports, PNG capture, and the manual QA checklist.
+
+### 4. hyp2mat and CTB waves
+
+RM-107..RM-116: `.hyp` fixtures, polygon booleans, CSXCAD XML output,
+QucsStudio/PDF output, CLI parity, CTB impedance/transform/Touchstone/network
+delivery parity.
+
+### 5. Compatibility and final acceptance
+
+RM-013/RM-023..RM-036/RM-094 (naming, optimizer rules, numeric backends,
+CSXCAD expression integration, XML fixtures, Python/MATLAB surface parity,
+error contracts) followed by RM-125 (full-stack acceptance) and RM-127 (final
+audit against `AGENTS.md` Section 21). RM-125/RM-127 stay `Blocked` until the
+waves above close.
 
 ## Session record
 
@@ -647,6 +684,23 @@ Wave B is closed. The next dependency-ready work is Wave C:
 - **Unresolved:** Optional fparser backends and broader optimizer validation,
   cross-platform and interactive GUI testing, further reference diversity,
   final Rust tolerances, and component-specific compatibility decisions.
+
+## Session record 2026-10-26 (Wave C closure, cylindrical operator)
+
+- **Completed:** RM-134. The cylindrical `(rho, alpha, z)` operator reproduces
+  the native `GetEdgeLength`/`GetNodeArea`/`GetEdgeArea`/`GetCellVolume`
+  overrides, `load_csx` accepts `CoordSystem=1`, pins and pads a full `2*pi`
+  azimuth, rejects negative rho, and `EngineExtCylinder` closes the seam after
+  every voltage/current update. The `1/rho` excitation weight is evaluated in
+  cylindrical coordinates and the UPML grading uses the cylindrical metric.
+- **Validation:** `combinedtests/coax_cylindrical` PASS (beta 0.20 %, profile
+  0.013 %, symmetry 7.6e-17). The unmodified native suite is now **10 passed,
+  0 failed, 0 errors in 333.8 s**. Rust: 228 openEMS tests (hdf5 feature) plus
+  the cylindrical metric/snap unit tests.
+- **Records:** RM-134 Verified; RM-137 (`rho = 0` axis) and RM-138
+  (cylindrical dumps) added as open tasks; ADR 0002 updated.
+- **Next:** RM-136 (direct SAR result dumps), then RM-137/RM-138, then the
+  verification infrastructure (RM-117..RM-119).
 
 ## Session record 2026-10-25 (Wave B)
 
