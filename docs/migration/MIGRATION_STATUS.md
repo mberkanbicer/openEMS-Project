@@ -116,10 +116,13 @@ The cylindrical operator closed the last deferred case (RM-134): the native
 weight are ported, and `combinedtests/coax_cylindrical` passes (beta = k0
 within 0.20 %, radial profile within 0.013 %, symmetry 7.6e-17).
 
+Direct SAR result dumps (`DumpType` 20..22) are verified as well (RM-136):
+the in-solver `SAR_Calculation` writes local and 1 g results, and the test
+script compares them against the raw dump + `sar_calc` path (peak 6.5e-9
+relative, homogeneous interior bit-identical).
+
 Known gaps tracked separately: a mesh that includes the `rho = 0` axis
-(RM-137, rejected loudly), cylindrical field dumps (RM-138), direct SAR result
-dumps (RM-136) and the CSX wiring of frequency-domain dumps (RM-072, now
-verified).
+(RM-137, rejected loudly) and cylindrical field dumps (RM-138).
 
 ## Verified progress
 
@@ -699,8 +702,8 @@ waves above close.
   the cylindrical metric/snap unit tests.
 - **Records:** RM-134 Verified; RM-137 (`rho = 0` axis) and RM-138
   (cylindrical dumps) added as open tasks; ADR 0002 updated.
-- **Next:** RM-136 (direct SAR result dumps), then RM-137/RM-138, then the
-  verification infrastructure (RM-117..RM-119).
+- **Next:** RM-137/RM-138 (cylindrical completeness), then the verification
+  infrastructure (RM-117..RM-119) and the GUI/CTB waves.
 
 ## Session record 2026-10-25 (Wave B)
 
