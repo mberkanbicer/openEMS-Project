@@ -9,7 +9,7 @@ pass, including analytic propagation, UPML absorption, CFL, quarter-cell
 material averaging and native-HDF5 dump reading.
 
 Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
-(49 `Verified`, 43 `Implemented`, 48 `Not Started`, 2 `Blocked` at the last
+(51 `Verified`, 43 `Implemented`, 46 `Not Started`, 2 `Blocked` at the last
 update; see the snapshot there for the live count). The largest open areas are the extension
 framework and remaining physics extensions, NF2FF/SAR, the native CLI and
 scripting interfaces, the GUI feature surface, and the differential harness over
@@ -632,16 +632,17 @@ list below is the current execution plan.
 
 | Task | Work | Why it is first |
 | --- | --- | --- |
-| RM-140 | FD dump (`DumpType` 10..15) vs FD probe: ~1.0 relative | Blocks `fieldprobes` and the FD dump verification |
-| RM-139 | Conducting-sheet transmission: 3.07 dB / 12.9 deg off | Blocks `conducting-sheet` and RM-118 |
+| RM-141 | Python `MSLPort` excited-port current probes | The last failing reference case (`msl-notchfilter`) |
+| RM-118 | Execute every reference case through the harness | Needs RM-141 to close the last case |
 
 ### 2. Engine and dump completeness (open, in order)
 
 | Task | Work | Why it is next |
 | --- | --- | --- |
 | RM-136 | Direct SAR result dumps (`DumpType` 20..22) | **Verified** on 2026-10-26: the in-solver `SAR_Calculation` writes local and 1 g results |
-| RM-142 | Incident field in the 1 mm PEC/PMC channel differs from native | Gates RM-139 and `conducting-sheet` |
-| RM-139/RM-141 | Conducting-sheet and excited-port current gaps | Block the reference-run chain until fixed |
+| RM-140 | Native FD sampling cadence, `.vtr` dumps and dump cropping | **Verified** on 2026-10-26 (`fieldprobes` PASS) |
+| RM-142 | Incident field in the 1 mm PEC/PMC channel | **Verified** on 2026-10-26 (native `ApplyMagneticBC` clearing rules) |
+| RM-139 | Conducting-sheet transmission | **Verified** on 2026-10-26 (0.036-0.073 dB, 0.18-0.20 deg) |
 | RM-137 | `rho = 0` axis in cylindrical meshes | Rejected loudly today; needed for the native cylindrical-wave tutorials |
 | RM-138 | Cylindrical field dumps (`/Mesh/{rho,alpha,z}` plus metric-aware values) | The engine runs, but dumps still assume Cartesian axes |
 

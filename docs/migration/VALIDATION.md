@@ -1571,8 +1571,10 @@ justification are in `REFERENCE_TOLERANCES.md`.
 | coax 3-D (715 k cells) | `Z_ref` real | 7.5e-5 relative | PASS |
 | coax 3-D | `S21` | 1.9e-4 dB | PASS |
 | coax 3-D | `S11` worst in band | -50.83 dB vs -50.88 dB | PASS |
-| conducting sheet (resistive film) | `|T|` | 3.07 dB | **FAIL** (RM-139) |
-| conducting sheet | phase | 6.0-12.9 deg | **FAIL** (RM-139) |
+| conducting sheet (resistive film) | `|T|` | 0.036 dB vs native | PASS |
+| conducting sheet (thin copper) | `|T|` | 0.036 dB vs native | PASS |
+| conducting sheet (thick copper) | `|T|` | 0.073 dB vs native | PASS |
+| conducting sheet | phase | 0.178-0.199 deg vs native | PASS |
 | fieldprobes | all probe/dump checks | probes 1.5e-5, Ef/Hf 1.2e-5, H TD 3e-5 | PASS |
 | msl-notchfilter | `et`/`ht`, `port_ut_*`, `port_it_2*` | 1.4e-8 .. 6.0e-6 | PASS |
 | msl-notchfilter | `port_it_1A/1B` (excited port) | Rust probe is a y-only line, native is a y-z surface | **FAIL** (RM-141) |
@@ -1597,7 +1599,17 @@ The FD-dump gap is fixed: the DFT interval follows native
 write `.vtr` rectilinear grids with the real mesh, and cropped dumps apply
 `SnapMethod = 1`. `fieldprobes` now passes every harness check.
 
-The conducting-sheet and excited-port gaps stay open and are *not* tolerated
-away:
-their bounds are recorded, the cases report FAIL, and RM-118/RM-125 remain
-open until they are fixed.
+The conducting-sheet gap is closed. The root cause was the magnetic boundary
+condition: Rust `apply_magnetic_bc` cleared only the two tangential current
+components, while native `Operator::ApplyMagneticBC` also clears the normal one
+on a low PMC face, the tangential ones one line inside a high PMC face
+(`numLines - 2`), and the outermost line of every axis (outside the iterated
+domain). In the 1 mm PEC/PMC parallel-plate channel the surviving normal H
+destroyed the single-row TEM mode: the pulse propagated at 0.69 c with a 1.42x
+amplitude. With the native clearing rules the incident probe matches the
+reference exactly (amplitude ratio 1.00000, 0.0 ps delay at z = 20..120 mm,
+v = c) and all three sheet cases pass the differential bounds.
+
+The excited-port gap (`port_it_1A/1B`) stays open and is *not* tolerated away:
+its bound is recorded, the case reports FAIL, and RM-118/RM-125 remain open
+until it is fixed.
