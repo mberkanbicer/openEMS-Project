@@ -59,10 +59,10 @@ RM-127.
 
 | Status | Count | Tasks |
 | --- | --- | --- |
-| `Verified` | 43 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-071, RM-073, RM-074, RM-075, RM-079, RM-082, RM-083, RM-084, RM-085, RM-086, RM-087, RM-088, RM-089, RM-090, RM-091, RM-092, RM-093, RM-095, RM-096, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133 |
-| `Implemented` | 43 | RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022, RM-037, RM-038, RM-039, RM-040, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-057, RM-060, RM-064, RM-065, RM-066, RM-067, RM-068, RM-069, RM-070, RM-072, RM-076, RM-077, RM-078, RM-080, RM-081 |
+| `Verified` | 45 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-071, RM-072, RM-073, RM-074, RM-075, RM-079, RM-082, RM-083, RM-084, RM-085, RM-086, RM-087, RM-088, RM-089, RM-090, RM-091, RM-092, RM-093, RM-095, RM-096, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133, RM-135 |
+| `Implemented` | 42 | RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022, RM-037, RM-038, RM-039, RM-040, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-057, RM-060, RM-064, RM-065, RM-066, RM-067, RM-068, RM-069, RM-070, RM-076, RM-077, RM-078, RM-080, RM-081 |
 | `Blocked` | 2 | RM-125, RM-127 |
-| `Not Started` | 47 | all remaining tasks |
+| `Not Started` | 46 | all remaining tasks |
 
 Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
@@ -75,7 +75,7 @@ Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
 
 
-## Remaining backlog (47 tasks) and execution order
+## Remaining backlog (46 tasks) and execution order
 
 The tasks below are the `Not Started` rows of this document, grouped by the order they will be executed. Wave A is complete and pushed; the remaining waves are ordered by dependency and by what can be verified in this workspace.
 
@@ -257,7 +257,7 @@ Wave C additionally needs a Python interpreter compatible with the PyO3 version 
 | RM-069 | P1 | Implement `ProcessIntegral` | RM-066 | S | Analytic integral case | Implemented |
 | RM-070 | P1 | Implement `ProcessVoltage`/`ProcessCurrent` | RM-066 | M | Port voltage/current comparison | Implemented |
 | RM-071 | P0 | Implement `ProcessFieldsTD` with real dumps | RM-066 | M | `probes/fieldprobes` (E/H probe vs dump, 8/8) and `combinedtests/nf2ff_dipole` (6/6) pass on the CSX `DumpBox` path | Verified |
-| RM-072 | P0 | Implement `ProcessFieldsFD` with oversampling | RM-066 | L | Native FD dump comparison | Implemented |
+| RM-072 | P0 | Implement `ProcessFieldsFD` with oversampling | RM-066 | L | CSX DumpBox types 10..15 are wired: cropped physical DFT dumps with native DumpMode interpolation, FD oversampling, `<FD_Samples>`, NXYZ/legacy layout; unit tests + end-to-end Octave `fd_E.h5`/`fd_H.h5` | Verified |
 | RM-073 | P0 | Implement SAR with 1 g/10 g averaging | RM-066 | L | Native SAR comparison | Verified |
 | RM-074 | P0 | Port native NF2FF transform | RM-066 | XL | Far-field comparison with native reference | Verified |
 | RM-075 | P1 | Implement `ProcessModeMatch` | RM-066 | L | Waveguide mode case | Verified |
@@ -340,7 +340,7 @@ Wave C additionally needs a Python interpreter compatible with the PyO3 version 
 | RM-132 | P1 | Write ADRs for D-01..D-07 | RM-001..RM-006 | M | One ADR per decision under `docs/adr/` | Verified |
 | RM-133 | P2 | Add docs consistency check to CI | RM-129 | S | CI rejects stale counts/statuses | Verified |
 | RM-134 | P0 | Cylindrical FDTD engine (`Operator_Cylinder`) and the `combinedtests/coax_cylindrical` case | RM-091,RM-096 | XL | Native cylindrical suite case passes; D-02 exception closes | Not Started |
-| RM-135 | P0 | J/D/B (and rot-H) field-dump conversions on the per-component material grids | RM-071 | L | Native `DumpType` 2..5 comparison | Not Started |
+| RM-135 | P0 | J/D/B (and rot-H) field-dump conversions on the per-component material grids | RM-071 | L | J=kappa*E, D=eps_r*E, B=mue_r*H and the rot(H) curl use the per-component material grid; `material_field_conversions_match_the_native_formulas` checks every formula | Verified |
 ---
 
 ## Gate checklists
@@ -492,3 +492,4 @@ in the task's acceptance column.
 | 2026-10-25 | RM-078, RM-079 | Note | The processing array is now populated from the CSX `ProbeBox` properties at setup (`setup_csx_probes`): voltage/current/field/mode-match probes become `ProcessIntegral` instances with the native interval, dual-time sampling, weights, frequencies and start/stop times. Dump boxes are still only written by the debug path |
 | 2026-10-26 | RM-071, RM-079 | Verified | `setup_fdtd` now reads the `<Excitation>` and `<BoundaryCond>` children of `<FDTD>` (the source waveform and the PML were previously only applied by the Python controller), the Rennings_2 timestep is the default, and every CSX `DumpBox` becomes a `ProcessFieldsTD` that is cropped to the box, snapped with the native `SnapToMeshLine` rule, written in physical units (`GetRawField`), interpolated for `DumpMode` 1/2, dual-mesh/dual-time for H/B, and stored in the native `NXYZ`/legacy `NZYX` layout. `probes/fieldprobes` 8/8 and `combinedtests/nf2ff_dipole` 6/6 pass |
 | 2026-10-26 | RM-091, RM-092, RM-093, RM-096 | Verified | Full native Octave suite through the Rust binaries: port_setup, transforms, fieldprobes, Coax, cavity, msl_port, nf2ff_dipole, rect_waveguide, engine_compare pass; coax_cylindrical is the D-02 deferral (RM-134). Coax Z = 50.09..51.12 Ohm vs native 50.49..51.10. `nf2ff` and `sar_calc` are Rust binaries linked under the native names. Both MSL smoke tests complete unchanged. 58/58 CSXCAD and 70/70 openEMS public M-files resolve |
+| 2026-10-26 | RM-072, RM-135 | Verified | Frequency-domain dumps are driven by the CSX `DumpBox` (`DumpType` 10..15): the box is cropped with the native snap, the DFT accumulates physical fields with the native `DumpMode` interpolation and the dual mesh/time for H/B, the sampling rate follows the FD oversampling, and the file uses the `FD_Samples` frequency list with the `NXYZ` or legacy `NZYX` layout. `DumpType` 2..5 (J, rot-H, D, B) convert the EC fields through the per-component material grid exactly like the native `GetRawField`. Tests: `material_field_conversions_match_the_native_formulas`, `frequency_domain_dump_crops_to_the_box`, `frequency_domain_dump_writes_native_hdf5_layout`, `frequency_domain_accumulates_a_known_tone`, plus an end-to-end Octave run writing `fd_E.h5` (two frequencies, legacy layout) and `fd_H.h5` |
