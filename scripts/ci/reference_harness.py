@@ -113,6 +113,18 @@ def _compare_hdf5(actual_path: str, expected_path: str, label: str) -> tuple[boo
     worst = 0.0
     worst_name = ""
     with h5py.File(actual_path, "r") as actual, h5py.File(expected_path, "r") as expected:
+        # A multi-timestep dump has near-zero late snapshots; normalising per
+        # dataset would turn float noise into a "difference". Compare against
+        # the peak of the whole file instead.
+        global_scale = 0.0
+
+        def collect(name, node):
+            nonlocal global_scale
+            if isinstance(node, h5py.Dataset) and np.issubdtype(node.dtype, np.number):
+                global_scale = max(global_scale, float(np.max(np.abs(node[()]))))
+
+        expected.visititems(collect)
+        global_scale = max(global_scale, 1.0e-30)
 
         def visit(name, node):
             nonlocal worst, worst_name
@@ -129,8 +141,7 @@ def _compare_hdf5(actual_path: str, expected_path: str, label: str) -> tuple[boo
                 return
             left = np.asarray(node[()], dtype=np.float64)
             right = np.asarray(reference, dtype=np.float64)
-            scale = max(float(np.max(np.abs(right))), 1.0e-30)
-            difference = float(np.max(np.abs(left - right))) / scale
+            difference = float(np.max(np.abs(left - right))) / global_scale
             if difference > worst:
                 worst = difference
                 worst_name = name
@@ -237,16 +248,17 @@ def case_fieldprobes(capture_root: str) -> list[tuple[bool, str]]:
         _extract_tarball(_reference("fieldprobes-wsl", "fieldprobes-selected.tar.gz"), extracted)
 
     results = []
-    for name in sorted(os.listdir(extracted)):
-        expected_path = os.path.join(extracted, name)
-        actual_path = os.path.join(simulation_path, name)
-        if not os.path.isfile(actual_path):
-            results.append((False, f"{name}: missing from the Rust run"))
-            continue
-        if name.endswith(".h5"):
-            results.append(_compare_hdf5(actual_path, expected_path, name))
-        else:
-            results.append(_compare_text(actual_path, expected_path, name))
+    for root, _dirs, files in os.walk(extracted):
+        for name in sorted(files):
+            expected_path = os.path.join(root, name)
+            actual_path = os.path.join(simulation_path, name)
+            if not os.path.isfile(actual_path):
+                results.append((False, f"{name}: missing from the Rust run"))
+                continue
+            if name.endswith(".h5"):
+                results.append(_compare_hdf5(actual_path, expected_path, name))
+            else:
+                results.append(_compare_text(actual_path, expected_path, name))
     return results
 
 

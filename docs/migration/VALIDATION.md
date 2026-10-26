@@ -1573,10 +1573,9 @@ justification are in `REFERENCE_TOLERANCES.md`.
 | coax 3-D | `S11` worst in band | -50.83 dB vs -50.88 dB | PASS |
 | conducting sheet (resistive film) | `|T|` | 3.07 dB | **FAIL** (RM-139) |
 | conducting sheet | phase | 6.0-12.9 deg | **FAIL** (RM-139) |
-| fieldprobes | D = eps0 E, B = mue0 H | passes after the EPS0/MU0 fix | PASS |
-| fieldprobes | FD dump vs FD probe | ~1.0 relative | **FAIL** (RM-140) |
+| fieldprobes | all probe/dump checks | probes 1.5e-5, Ef/Hf 1.2e-5, H TD 3e-5 | PASS |
 | msl-notchfilter | `et`/`ht`, `port_ut_*`, `port_it_2*` | 1.4e-8 .. 6.0e-6 | PASS |
-| msl-notchfilter | `port_it_1A/1B` (excited port) | Rust all-zero, native peak 9.6e-8 | **FAIL** (RM-141) |
+| msl-notchfilter | `port_it_1A/1B` (excited port) | Rust probe is a y-only line, native is a y-z surface | **FAIL** (RM-141) |
 
 The harness found and localised three real defects. The D/B one is fixed:
 
@@ -1593,7 +1592,12 @@ native MSL reference to 2.1e-6. The MSL reference then exposes one more gap:
 the Python `AddMSLPort` current probes of the *excited* port are all zero
 (RM-141), while the voltage probes and port-2 currents match.
 
-The conducting-sheet, FD-dump and excited-port gaps stay open and are *not*
-tolerated away:
+The FD-dump gap is fixed: the DFT interval follows native
+`min(global Nyquist, freq)`, probes default to FD oversampling 1, FD VTK dumps
+write `.vtr` rectilinear grids with the real mesh, and cropped dumps apply
+`SnapMethod = 1`. `fieldprobes` now passes every harness check.
+
+The conducting-sheet and excited-port gaps stay open and are *not* tolerated
+away:
 their bounds are recorded, the cases report FAIL, and RM-118/RM-125 remain
 open until they are fixed.

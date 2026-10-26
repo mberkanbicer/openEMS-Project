@@ -30,17 +30,18 @@ capture under `docs/migration/reference-data/`.
 | coax (3-D, 715 k cells) | `Z_ref` real | 7.5e-5 relative | PASS |
 | coax | `S21` | 1.9e-4 dB | PASS |
 | coax | `S11` worst | -50.83 dB vs -50.88 dB (0.05 dB) | PASS |
-| conducting sheet (resistive film) | `|T|` | 3.07 dB | **FAIL** (RM-139) |
+| conducting sheet (resistive film) | `|T|` | 3.07 dB; the incident run already differs (RM-142) | **FAIL** (RM-139) |
 | conducting sheet | phase | 6.0-12.9 deg | **FAIL** (RM-139) |
-| fieldprobes | D = eps0 E | passes after the EPS0 fix | PASS |
-| fieldprobes | FD dump vs FD probe | ~1.0 relative | **FAIL** (RM-140) |
+| fieldprobes | all checks | probes 1.5e-5, Ef/Hf 1.2e-5, H TD 3e-5 | PASS |
 | msl-notchfilter | `et` / `ht` | 2.1e-6 relative | PASS (after the fix) |
 | msl-notchfilter | `port_ut_*`, `port_it_2*` | 1.4e-8 .. 6.0e-6 | PASS |
-| msl-notchfilter | `port_it_1A/1B` (excited port) | Rust output is all zeros (native peak 9.6e-8 / 8.4e-8) | **FAIL** (RM-141) |
+| msl-notchfilter | `port_it_1A/1B` (excited port) | Rust probe is a y-only line, native is a y-z surface (all-zero current) | **FAIL** (RM-141) |
 
-The conducting-sheet and fieldprobes failures are real findings, not tolerance
+The conducting-sheet and MSL failures are real findings, not tolerance
 problems: the harness compares the same physical case, and the gaps are
-explained by open defects (`REMEDIATION_TASKS.md` RM-139, RM-140).
+explained by open defects (`REMEDIATION_TASKS.md` RM-139, RM-141, RM-142).
+HDF5 snapshots are normalised by the peak of the whole file, not per timestep,
+so late near-zero snapshots are compared against a meaningful scale.
 
 ## Rule
 

@@ -9,7 +9,7 @@ pass, including analytic propagation, UPML absorption, CFL, quarter-cell
 material averaging and native-HDF5 dump reading.
 
 Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
-(47 `Verified`, 44 `Implemented`, 48 `Not Started`, 2 `Blocked` at the last
+(49 `Verified`, 43 `Implemented`, 48 `Not Started`, 2 `Blocked` at the last
 update; see the snapshot there for the live count). The largest open areas are the extension
 framework and remaining physics extensions, NF2FF/SAR, the native CLI and
 scripting interfaces, the GUI feature surface, and the differential harness over
@@ -640,7 +640,8 @@ list below is the current execution plan.
 | Task | Work | Why it is next |
 | --- | --- | --- |
 | RM-136 | Direct SAR result dumps (`DumpType` 20..22) | **Verified** on 2026-10-26: the in-solver `SAR_Calculation` writes local and 1 g results |
-| RM-139/RM-140/RM-141 | Conducting-sheet, FD-dump and excited-port current gaps found by the harness | Block the reference-run chain until fixed |
+| RM-142 | Incident field in the 1 mm PEC/PMC channel differs from native | Gates RM-139 and `conducting-sheet` |
+| RM-139/RM-141 | Conducting-sheet and excited-port current gaps | Block the reference-run chain until fixed |
 | RM-137 | `rho = 0` axis in cylindrical meshes | Rejected loudly today; needed for the native cylindrical-wave tutorials |
 | RM-138 | Cylindrical field dumps (`/Mesh/{rho,alpha,z}` plus metric-aware values) | The engine runs, but dumps still assume Cartesian axes |
 
