@@ -696,6 +696,29 @@ waves above close.
   cross-platform and interactive GUI testing, further reference diversity,
   final Rust tolerances, and component-specific compatibility decisions.
 
+## Session record 2026-10-26 (differential reference harness)
+
+- **Completed:** RM-117. `scripts/ci/reference_harness.py` runs the unmodified
+  pinned Python sources against the Rust core, keeps the solver output and the
+  exact `input.xml`, and compares the derived quantities with the native
+  captures. `REFERENCE_TOLERANCES.md` records the proposed bounds and the
+  measured values (RM-119, pending approval).
+- **Found and fixed:** the D and B dumps were missing the absolute
+  `EPS0`/`MU0` factor (native `m_epsR`/`m_mueR` store absolute values); the
+  `et`/`ht` excitation waveforms were never written. Both are fixed in the
+  submodule and covered by the source test / the MSL reference.
+- **Found and tracked (not hidden):** conducting-sheet transmission is
+  3.07 dB (RM-139), the FD dump disagrees with the FD probe by ~1.0 relative
+  (RM-140), and the Python `AddMSLPort` excited-port current probes are all
+  zero (RM-141). RM-135 returns to `Implemented` until RM-140 is fixed.
+- **Validation:** Rust 229 openEMS (hdf5) + 2 CLI, Python 298 + 150, and the
+  unmodified Octave suite 10/10 (459 s) pass after the changes.
+- **Harness results:** coax PASS (`Z_ref` 7.5e-5, `S21` 1.9e-4 dB, `S11`
+  0.05 dB); msl-notchfilter 8/10 checks pass (1.4e-8..6.0e-6); conducting
+  sheet and fieldprobes FAIL on the tracked defects.
+- **Next:** RM-140 (FD dump/probe), RM-139 (conducting sheet), RM-141
+  (excited-port current), then RM-118/RM-119 and the rest of the list.
+
 ## Session record 2026-10-26 (Wave C closure, cylindrical operator)
 
 - **Completed:** RM-134. The cylindrical `(rho, alpha, z)` operator reproduces
