@@ -52,6 +52,14 @@ All four cases now pass. HDF5 snapshots are normalised by the peak of the whole
 file, not per timestep, so late near-zero snapshots are compared against a
 meaningful scale.
 
+## Approval
+
+The bounds in this file were approved by the repository owner (Mustafa Berkan
+BICER) on 2026-10-26, together with the measured values above. Margin at the
+time of approval (bound / measured): coax 40-260x, conducting sheet 2.7-10x,
+fieldprobes ~330x, MSL ~1700x. Re-approval is required for any later change to
+these numbers.
+
 ## Rule
 
 A bound may only change together with a recorded measurement that justifies it
