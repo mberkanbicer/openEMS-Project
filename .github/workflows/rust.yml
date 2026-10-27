@@ -61,6 +61,8 @@ jobs:
           fi
       - name: Migration records
         run: python3 scripts/ci/check_migration_docs.py
+      - name: Installed layout
+        run: bash scripts/ci/check_cmake_install.sh
 
   hdf5:
     name: Linux (HDF5 feature)
