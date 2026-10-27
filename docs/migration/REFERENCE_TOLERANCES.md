@@ -67,6 +67,12 @@ meaningful scale.
 | --- | --- | --- |
 | Polygon vertex after edge/boolean/offset operations | 1.5 grid steps (1.5e-5 m at the 10 um output grid) | The Rust port uses Clipper2 while native uses Clipper 1; a shallow arc/segment intersection rounds to a neighbouring integer coordinate. Two of nine fixtures differ at one vertex each; the other seven are exact. Total copper area differs by <= 1.7e-3 relative. This is a new bound for a newly ported component (not a relaxation): it was introduced on 2026-10-27 and **requires owner re-approval** |
 
+## Curve excitation probes (2026-10-27, approval pending)
+
+| Quantity | Bound | Justification |
+| --- | --- | --- |
+| `combinedtests/cavity` voltage probes (`ut1x`, `ut1y`, `ut1z`) against native | 1e-3 relative, on the peak and on every sample | The curve source now excites the same edges on both sides. Measured over the full 20000 steps: peak difference 4.8e-5 / 9.2e-6 / 2.9e-5 and maximum sample difference 1.6e-4 / 4.5e-5 / 1.2e-4, i.e. a 5.8x margin. The per-sample drift is the accumulated f64 round-off of a high-Q cavity, not a model difference. This is a new bound for a newly ported component (the probe trace was identically zero before the port), introduced on 2026-10-27 and **requires owner re-approval** |
+
 ## Approval
 
 The bounds in this file were approved by the repository owner (Mustafa Berkan

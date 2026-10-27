@@ -91,3 +91,43 @@ dependencies required by openEMS. No dependencies were installed.
   analytical/reference cases before any Rust implementation.
 - Run the full original solver tests/smokes once the pinned stack is buildable;
   preserve failures and numerical tolerances.
+
+## Rust implementation notes (2026-10-27)
+
+Two behaviour-level gaps were found and closed after the initial audit. Both are
+recorded here because the audit's source map alone does not show them.
+
+### Curve excitations need `Operator::FindPath`
+
+`Operator_Ext_Excitation::BuildExtension` (`FDTD/extensions/operator_ext_excitation.cpp:235-288`)
+has a special branch for `CSPrimCurve`/`CSPrimWire` primitives: containment
+testing can never hit a one-dimensional primitive, so it walks the curve points,
+calls `Operator::FindPath` (`FDTD/operator.cpp:391`) and excites every edge on
+the resulting path. The Rust port originally only had the containment branch, so
+an `<Excitation>` whose primitive was a `Curve` (the pattern used by
+`combinedtests/cavity`) produced an identically zero field. The testsuite did not
+catch it because `check_frequency.m` compares a spectrum against `max(val)`,
+which is 0 for an all-zero trace, so the case passed vacuously.
+
+`openEMS/rust/src/operator.rs` now ports `SnapLine2Mesh` (dual=false,
+full=true), `Point_Line_Distance` with the cylindrical metric, the greedy
+`FindPath` walk (native neighbour order, strict `foot`/`dist` comparisons), the
+out-of-domain failure and the closure loop, and the curve branch of the
+excitation setup including the hard-excite VV/VI zeroing.
+`scripts/ci/run_curve_excitation_check_wsl.sh` compares the three cavity voltage
+probes against native: peak differences 4.8e-5 / 9.2e-6 / 2.9e-5 and maximum
+sample differences 1.6e-4 / 4.5e-5 / 1.2e-4 over 20000 steps.
+
+### Threading granularity
+
+The base engine starts and joins its worker set on every update. The native
+multithreaded engine keeps an OpenMP pool alive, so the per-step thread cost is
+negligible there. The Rust port measured 12.4 s with the threaded kernel against
+2.6 s serial on the 9152-cell cavity case. `worker_count` now falls back to the
+calling thread below 16384 cells per worker; the 2.1M-cell Coax case still uses
+the threads (57 s against 131 s serial) and its output is byte-identical between
+`--engine=basic` and `--engine=multithreaded`.
+
+SSE/SSE-compressed remain a documented performance-only omission (ADR 0002); the
+measured gap is recorded in
+`docs/migration/reference-data/perf/performance-baseline.md`.
