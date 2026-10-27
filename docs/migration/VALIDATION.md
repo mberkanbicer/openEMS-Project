@@ -1522,6 +1522,25 @@ raw dump of a lossy box, `sar_calc` processes it).
 
 Direct SAR result dumps (`DumpType` 20..22) are tracked separately as RM-136.
 
+## GUI renderer and application launch (RM-015, RM-097)
+
+The GUI wave has no numerical reference yet; the evidence is unit-test and
+launch based:
+
+| Check | Measured | Verdict |
+| --- | --- | --- |
+| `qcsxcad-core::tessellate` geometry | 11 tests: box bounds and 12 triangles, degenerate plane, cylinder axis/radius, sphere radius, spherical shell radii, extruded polygon elevation/length, rotational polygon revolution, cylindrical wedge bounds, polyhedron triangulation, wire tube surfaces, transform + property colors | PASS |
+| `qcsxcad-egui` camera | center projects to the NDC origin; fitted bounds stay inside the clip volume for the perspective and orthographic cameras | PASS |
+| `appcsxcad --version` / `--help` | `AppCSXCAD 0.1.0` / usage text, exit 0 | PASS |
+| headless graphical launch | window creation, egui buffer updates and the 3D pipelines run without wgpu validation errors; the WSLg compositor cannot present a frame (`Io error: Broken pipe`), so the interactive launch awaits the RM-106 checklist | LIMITED |
+
+The tessellation mirrors the native `VTKPrimitives` sources listed in
+`audits/gui.md`; visual parity against native screenshots is still pending
+(RM-106). Four launch blockers found here were fixed: argv[0] was opened as
+the input file, egui had no bundled fonts, `update_buffers` was never called
+and the egui pipeline declared no depth format while the pass carried a depth
+attachment.
+
 ## Cylindrical SAR (RM-143)
 
 `scripts/ci/run_cylindrical_sar_check_wsl.sh` runs a lossy muscle-like shell

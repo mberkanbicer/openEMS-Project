@@ -9,7 +9,7 @@ pass, including analytic propagation, UPML absorption, CFL, quarter-cell
 material averaging and native-HDF5 dump reading.
 
 Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
-(57 `Verified`, 43 `Implemented`, 43 `Not Started`, 3 `Blocked` at the last
+(57 `Verified`, 45 `Implemented`, 41 `Not Started`, 3 `Blocked` at the last
 update; see the snapshot there for the live count). The largest open areas are the extension
 framework and remaining physics extensions, NF2FF/SAR, the native CLI and
 scripting interfaces, the GUI feature surface, and the differential harness over
@@ -636,7 +636,7 @@ list below is the current execution plan.
 | Task | Work | Why it is first |
 | --- | --- | --- |
 | RM-123 | Regression CI gate (`.github/workflows/reference.yml`) | **Implemented**; the first GitHub Actions run must confirm the runner plumbing |
-| RM-097.. | GUI wave (QCSXCAD / AppCSXCAD) | Next large dependency block after the engine work; the cylindrical engine chain (RM-134/137/138) is verified |
+| RM-098.. | GUI wave continued (structure tree, editors, file I/O, exports) | RM-015 and RM-097 are implemented; the remaining GUI tasks build on the tessellation and launch fixes |
 
 ### 2. Engine and dump completeness (open, in order)
 
