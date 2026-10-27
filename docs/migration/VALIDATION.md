@@ -1644,7 +1644,8 @@ Rust binding raises `ValueError`.
 | `openems-core` | 245 + 2 tests pass |
 | Cavity differential | peaks 5.807516e-06 / 2.316531e-05 / 7.766571e-06 vs native 5.807240e-06 / 2.316510e-05 / 7.766348e-06 (4.8e-5 / 9.2e-6 / 2.9e-5); maximum sample difference 1.6e-4 / 4.5e-5 / 1.2e-4; **bit-identical** for all 6667 samples when the native timestep is pinned, which isolates the residual to the pre-existing `calc_timestep` summation-order difference |
 | Regression | `Coax` `ut1`/`et`/`ht` and all `msl_port` probes are byte-identical before and after the change; `scripts/ci/run_curve_excitation_check_wsl.sh` gates the behaviour |
-| Not ported | the `Operator_Cylinder` overrides (azimuth fold, start/stop swap, alpha-seam split), tracked as RM-148 |
+| Wire primitive | not walked: native `ToCurve()` matches `Type == CURVE` only, and the earlier wire fallback produced a 4.27e-5 probe where native is exactly zero; `wire_excitation_is_not_walked_as_a_curve` pins it |
+| Not ported | the `Operator_Cylinder` overrides (azimuth fold, start/stop swap, alpha-seam split), tracked as RM-148; metal curves are not PEC yet (RM-150) |
 
 ## MATLAB C-ABI contracts (RM-094)
 

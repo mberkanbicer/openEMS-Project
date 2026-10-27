@@ -62,7 +62,7 @@ RM-127.
 | `Verified` | 88 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-071, RM-072, RM-073, RM-074, RM-075, RM-079, RM-082, RM-083, RM-084, RM-085, RM-086, RM-087, RM-088, RM-089, RM-090, RM-091, RM-092, RM-093, RM-095, RM-096, RM-117, RM-118, RM-119, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133, RM-134, RM-135, RM-136, RM-137, RM-138, RM-139, RM-140, RM-141, RM-142, RM-143, RM-123, RM-112, RM-113, RM-114, RM-115, RM-116, RM-145, RM-146, RM-023, RM-024, RM-025, RM-013, RM-026, RM-030, RM-031, RM-032, RM-033, RM-094, RM-120, RM-149, RM-026, RM-030, RM-031, RM-032, RM-033, RM-120, RM-027, RM-028, RM-029, RM-034, RM-035, RM-036, RM-107, RM-108, RM-109, RM-110, RM-111 |
 | `Implemented` | 55 | RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022, RM-037, RM-038, RM-039, RM-040, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-057, RM-060, RM-064, RM-065, RM-066, RM-067, RM-068, RM-069, RM-070, RM-076, RM-077, RM-078, RM-080, RM-081, RM-098, RM-099, RM-100, RM-101, RM-102, RM-103, RM-104, RM-105, RM-106, RM-026 |
 | `Blocked` | 3 | RM-125, RM-127, RM-144 |
-| `Not Started` | 3 | all remaining tasks |
+| `Not Started` | 4 | all remaining tasks |
 
 Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
@@ -75,7 +75,7 @@ Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
 
 
-## Remaining backlog (3 tasks) and execution order
+## Remaining backlog (4 tasks) and execution order
 
 The three `Not Started` rows that remain. Everything else is `Verified`,
 `Implemented` or a recorded exception.
@@ -84,6 +84,7 @@ The three `Not Started` rows that remain. Everything else is `Verified`,
 | --- | --- | --- | --- | --- |
 | RM-121 | P2 | Performance baseline vs native | RM-065 | The measured table exists under `docs/migration/reference-data/perf/`; it must be re-measured on the final solver before it is recorded as verified |
 | RM-148 | P1 | Cylindrical `FindPath`/`SnapLine2Mesh` overrides | RM-149 | Curve excitation now works on the base algorithm; the cylindrical overrides are the remaining parity gap |
+| RM-150 | P2 | Metal `Curve` primitives are not PEC | RM-149 | `FindPath` is ported; the metal-edge marking is missing |
 | RM-122 | P2 | Memory baseline vs native | RM-065 | Same run as RM-121 |
 
 Blocked: RM-125 (full-stack acceptance), RM-127 (final audit), RM-144 (GUI
@@ -283,6 +284,7 @@ progress.
 | RM-147 | P2 | Render discrete-material models in the viewport (native `QVTKStructure::RenderDiscMaterialModel` and `--RenderDiscMaterial`) | RM-097 | M | `qcsxcad_core::discrete` ports `CSPropDiscMaterial::CreatePolyDataModel`: for every mesh node and axis it compares the two neighbouring cells and emits a quad on the material/background boundary (native winding, scale and property transform), and the tessellator appends it when `render_discrete` is on. `--RenderDiscMaterial` now sets `GuiState.render_disc_models`, the renderer rebuilds on the flag change and the geometry includes the white discrete surface. Tests: a single cell exposes all six faces (12 triangles, unit bounds), adjacent cells drop the shared face (10 quads), an empty grid is empty, the property scale applies, the native HDF5 fixture loads and renders, and the tessellator only includes the surface when enabled. The native source defect where the flag also toggled edit mode stays resolved | Implemented |
 | RM-148 | P1 | Cylindrical `FindPath`/`SnapLine2Mesh` overrides (azimuth fold, start/stop swap, alpha-seam split) | RM-149 | M | `Operator_Cylinder::FindPath` (`FDTD/operator_cylinder.cpp:320-475`), `SnapLine2Mesh` (`:307-317`) and `SnapToMeshLine` (`:277-282`) fold the azimuth delta into +/-pi, swap start and stop when alpha decreases, and split a segment that crosses the alpha seam with `LinePlaneIntersection` (`openEMS/tools/useful.cpp:292`) plus the closed-alpha index remap (`:467-472`). The Rust excitation setup calls the base algorithm for every mesh type, so a curve whose azimuth decreases, spans more than pi, or crosses the seam can pick a different edge set than native. The Cartesian metric inside `Point_Line_Distance` is ported and tested; this task adds the cylindrical overrides and a differential case | Not Started |
 | RM-149 | P1 | Curve and wire excitations (a `Curve` primitive produced an identically zero field) | RM-134 | L | `openEMS/rust/src/operator.rs` now ports `Operator::FindPath` (`FDTD/operator.cpp:391-497`) with `SnapLine2Mesh` (`:361-389`), `Point_Line_Distance` including the cylindrical metric, the native greedy neighbour order and tie-breaking, the out-of-domain failure and the closure loop, and adds the curve/wire branch of the excitation setup (`operator_ext_excitation.cpp:235-288`): per consecutive point pair the point is evaluated in the operator mesh system with the primitive transform, the path is walked, and each edge gets a voltage excitation (types 0 and 1) with the weighted excitation times the edge length, with VV/VI zeroed for hard-excite type 1 outside the amplitude gate. Five tests cover the tie-breaking staircase, an axis-aligned segment, the out-of-domain failure, the cylindrical chord metric and an end-to-end curve excitation. `combinedtests/cavity`: peak differences 4.8e-5 / 9.2e-6 / 2.9e-5 and maximum sample differences 1.6e-4 / 4.5e-5 / 1.2e-4 over 20000 steps; with the native timestep pinned all 6667 samples are bit-identical, so the residual is the pre-existing `calc_timestep` summation-order difference. `Coax` and `msl_port` outputs are byte-identical before and after; 245 + 2 `openems-core` tests pass. The gate is `scripts/ci/run_curve_excitation_check_wsl.sh` | Verified |
+| RM-150 | P2 | Metal `Curve` primitives are not PEC | RM-149 | M | Native `Operator::CalcPEC_Curves` (`FDTD/operator.cpp:2064-2097`) walks a metal curve with `FindPath` and marks every edge on the path as PEC, exactly like the curve excitation branch. The Rust operator has no equivalent: a `<Metal><Curve>` is silently not metal (one-dimensional primitives never satisfy the containment test). Now unblocked by the `FindPath` port; needs the `FindPath` walk plus the native edge marking and a differential case | Not Started |
 ---
 
 ## Gate checklists
