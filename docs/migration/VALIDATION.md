@@ -1522,6 +1522,61 @@ raw dump of a lossy box, `sar_calc` processes it).
 
 Direct SAR result dumps (`DumpType` 20..22) are tracked separately as RM-136.
 
+## GUI project I/O, undo/redo and exports (RM-102..RM-104)
+
+Verified headlessly; the interactive checklist is RM-106.
+
+| Check | Measured | Verdict |
+| --- | --- | --- |
+| Undo/redo | add property -> rename -> undo -> undo restores `""` and then removes the property; redo replays both; a new edit clears the redo stack; primitive, grid-line and parameter edits undo in reverse order; the history stops at 100 steps | PASS |
+| Bare CSXCAD round trip | read -> edit -> render -> re-read equals the edited structure; a single XML declaration | PASS |
+| openEMS wrapper round trip | `<FDTD NumberOfTimesteps="1000" EndCriteria="1e-5"/>`, `<BoundaryCond .../>` and `<Excitation Type="0" f0="1e9"/>` survive a save; exactly one `<ContinuousStructure>` element | PASS |
+| Save / Save As | Save writes the loaded path and clears the modified flag; Save As adopts the new path and a following Save writes it | PASS |
+| CLI | `appcsxcad --disableEdit --export-polydata-vtk=/tmp/appexp <project.xml>` loads the project, prints the native export lines and writes `ground.vtp` (2252 bytes, `NumberOfPolys="12"`, `NumberOfLines="12"`); a missing project reports an error | PASS |
+| Exports | per-property `.vtp` (`NumberOfPolys="12"`, scaled by the 1 mm delta unit), binary `.stl` (12 triangles, 84 + 50*12 bytes, scaled), ASCII `.ply` (36 vertices, 12 faces), POV-Ray `mesh2` with two `vertex_vectors` blocks and the fill colors, X3D with two `IndexedFaceSet` elements | PASS |
+| Settings | the persisted window size round-trips and clamps to 320x240 .. 16384 | PASS |
+
+### Migration decisions
+
+- Save preserves the openEMS wrapper. Native `QCSXCAD::Write2XML` writes only
+  the `ContinuousStructure` element, so a save after opening a solver project
+  drops every openEMS setting. The port substitutes the regenerated structure
+  into the original document instead; the decision is recorded in
+  `audits/gui.md`.
+- Save As adopts the new path. Native's export dialog leaves `m_filename`
+  unchanged, so a following Save writes the previous file; the port updates it.
+- New properties start without a fill color (native assigns a random color at
+  construction) so documents and exports are reproducible.
+- Property file names fall back to `property_<index>` and replace path
+  separators, so an export can never leave its directory.
+- File dialogs are in-app path windows instead of `QFileDialog`; the file
+  operations themselves are the same.
+- `--disableEdit` is implemented; `--RenderDiscMaterial` records the render
+  flag but no longer toggles the edit flag (confirmed native defect). Discrete
+  material rendering itself is tracked as RM-147.
+
+## GUI editing model (RM-098..RM-101)
+
+The editing wave is verified headlessly; the interactive checklist is RM-106.
+
+| Check | Measured | Verdict |
+| --- | --- | --- |
+| Tree labels and grouping | `tree_rows` emits `Material::substrate` and `Box - ID: 1` in model order, hides primitives of collapsed properties and carries the property visibility/color | PASS |
+| Property edits | Name, visibility, fill/edge color, coordinate system, material (isotropic + 3 components of Epsilon/Mue/Kappa/Sigma), excitation (type, number, enabled, frequency, delay, per-component excitation and propagation terms), probe (number, type, normal, weight, start/stop, oversampling, FD samples), dump (type, mode, file type, multi-grid level, sub-sampling, oversampling, FD samples, SAR method) and resolution factor survive `to_xml_string` -> `from_xml_str`; mismatched edits return an error | PASS |
+| Primitive edits | Add/edit/delete of a box (bounds `[-1,1] x [-2,2] x [-3,3]`, priority 4) survives a reload; all six native creatable types build; a frame with twelve primitive shapes renders without panic | PASS |
+| Grid and parameter edits | Lines, delta unit and resolution increase survive a reload and every axis compares line by line; constant and linear parameters round-trip name, value, `(min, max, step)` and the sweep flag; removing a parameter shifts the indices | PASS |
+| Editor frames | `egui::Context::run_ui` renders the tree, property, primitive and mesh editors over a document with all six property types and every renderable shape | PASS |
+
+### Defect found: duplicated dump-box oversampling
+
+Native `CSPropProbeBox` owns the single `m_OverSampling` field and
+`CSPropDumpBox` inherits it. The Rust model had a second `oversampling` field
+on `DumpBoxProperties`; both writers set the same `OverSampling` attribute, so
+the dump value silently replaced the probe value in every written file, and
+the FD dump path read the dump copy while the Python setter wrote the probe
+copy. The dump copy is removed; dump boxes now read the probe field, matching
+native.
+
 ## GUI renderer and application launch (RM-015, RM-097)
 
 The GUI wave has no numerical reference yet; the evidence is unit-test and
