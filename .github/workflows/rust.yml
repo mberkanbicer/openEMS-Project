@@ -75,8 +75,8 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libhdf5-dev pkg-config
       - name: Build and test with the hdf5 feature
         run: cargo test -p csxcad-core -p openems-core --features hdf5
-      - name: Discrete-material HDF5 reader
-        run: cargo test -p csxcad-core --features hdf5 disc_material
+      - name: HDF5 reader and discrete-material tests
+        run: cargo test -p csxcad-core --features hdf5 hdf5
 
   windows:
     name: Windows (build, tests)
