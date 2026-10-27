@@ -145,8 +145,16 @@ if (${BUILD_RUST})
             DESTINATION bin RENAME openEMS${CMAKE_EXECUTABLE_SUFFIX})
     install(PROGRAMS ${RUST_TARGET_DIR}/release/appcsxcad${CMAKE_EXECUTABLE_SUFFIX}
             DESTINATION bin RENAME AppCSXCAD${CMAKE_EXECUTABLE_SUFFIX})
-    install(PROGRAMS ${RUST_TARGET_DIR}/release/hyp2mat-rs${CMAKE_EXECUTABLE_SUFFIX}
-            DESTINATION bin RENAME hyp2mat${CMAKE_EXECUTABLE_SUFFIX})
+    install(PROGRAMS ${RUST_TARGET_DIR}/release/hyp2mat${CMAKE_EXECUTABLE_SUFFIX}
+            DESTINATION bin)
+    # The native install ships these three commands next to openEMS.
+    install(PROGRAMS ${RUST_TARGET_DIR}/release/nf2ff-cli${CMAKE_EXECUTABLE_SUFFIX}
+            DESTINATION bin RENAME nf2ff${CMAKE_EXECUTABLE_SUFFIX})
+    install(PROGRAMS ${RUST_TARGET_DIR}/release/sar-cli${CMAKE_EXECUTABLE_SUFFIX}
+            DESTINATION bin RENAME sar_calc${CMAKE_EXECUTABLE_SUFFIX})
+    # RM-116: the CTB command line (info/convert/renorm) for MATLAB/Octave.
+    install(PROGRAMS ${RUST_TARGET_DIR}/release/ctb${CMAKE_EXECUTABLE_SUFFIX}
+            DESTINATION bin)
 
     # C ABI libraries consumed by the MATLAB/Octave MEX layer.
     install(FILES
