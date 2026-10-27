@@ -59,10 +59,10 @@ RM-127.
 
 | Status | Count | Tasks |
 | --- | --- | --- |
-| `Verified` | 63 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-071, RM-072, RM-073, RM-074, RM-075, RM-079, RM-082, RM-083, RM-084, RM-085, RM-086, RM-087, RM-088, RM-089, RM-090, RM-091, RM-092, RM-093, RM-095, RM-096, RM-117, RM-118, RM-119, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133, RM-134, RM-135, RM-136, RM-137, RM-138, RM-139, RM-140, RM-141, RM-142, RM-143, RM-123, RM-112, RM-113, RM-114, RM-115, RM-145 |
+| `Verified` | 64 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-071, RM-072, RM-073, RM-074, RM-075, RM-079, RM-082, RM-083, RM-084, RM-085, RM-086, RM-087, RM-088, RM-089, RM-090, RM-091, RM-092, RM-093, RM-095, RM-096, RM-117, RM-118, RM-119, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133, RM-134, RM-135, RM-136, RM-137, RM-138, RM-139, RM-140, RM-141, RM-142, RM-143, RM-123, RM-112, RM-113, RM-114, RM-115, RM-116, RM-145 |
 | `Implemented` | 55 | RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022, RM-037, RM-038, RM-039, RM-040, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-057, RM-060, RM-064, RM-065, RM-066, RM-067, RM-068, RM-069, RM-070, RM-076, RM-077, RM-078, RM-080, RM-081, RM-098, RM-099, RM-100, RM-101, RM-102, RM-103, RM-104, RM-105, RM-106, RM-146 |
 | `Blocked` | 3 | RM-125, RM-127, RM-144 |
-| `Not Started` | 26 | all remaining tasks |
+| `Not Started` | 25 | all remaining tasks |
 
 Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
@@ -75,7 +75,7 @@ Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
 
 
-## Remaining backlog (26 tasks) and execution order
+## Remaining backlog (25 tasks) and execution order
 
 The tasks below are the `Not Started` rows of this document, grouped by the order they will be executed. Wave A is complete and pushed; the remaining waves are ordered by dependency and by what can be verified in this workspace.
 
@@ -115,7 +115,6 @@ The tasks below are the `Not Started` rows of this document, grouped by the orde
 | RM-109 | P1 | Match CSXCAD XML output | RM-108 |
 | RM-110 | P2 | Match QucsStudio and PDF output | RM-108 |
 | RM-111 | P1 | Match hyp2mat CLI options/behavior | RM-109 |
-| RM-116 | P1 | CTB delivery form for MATLAB/Octave | RM-112 |
 
 ### Wave F - CSXCAD depth, validation and CI
 
@@ -313,7 +312,7 @@ Wave C additionally needs a Python interpreter compatible with the PyO3 version 
 | RM-113 | P1 | Complete CTB transform set and dimensions | RM-112 | L | S/Y/Z/ABCD/H/G transforms for 1..5 ports with shape and reference validation; `a_pi`/`a_t`/`a_mul`/`a_series`/`a_shunt` return `Result` and reject argument-count mismatches. Differential vs Octave: 2-port S->A at 50/75, A->S, `a_series`/`a_shunt` exactly 0.0, `a_mul`/`a_t` <=1.7e-16, 3-port S<->Y/Z/Z<->Y and `s_renorm` <=5.25e-16; 8 differential tests over 84 fixtures | Verified |
 | RM-114 | P1 | Touchstone v1/v2 read/write parity | RM-112 | L | Reader/writer port `read_touchstone.m`/`write_touchstone.m`: v1 keyword handling, RI/MA/DB, Hz/kHz/MHz/GHz, scalar and per-port `R`, comments, wrapped records, 1..5 ports, plus v2 (`[Version] 2.0`, `[Number of Ports]`, `[Number of Frequencies]`/`[Number of Data Points]`, `[Two-Port Data Order]` 12/21, per-port `[Reference]`). Six native cases write **byte-identically** (316/1028/211/1136/940/313 B) and read back exactly; 24 malformed inputs are rejected with clear errors instead of NaN. Native quirks preserved: the v1 >=3-port row-major write (N-1), the `a_T` determinant (N-3), the stale `net.y` (N-4) | Verified |
 | RM-115 | P1 | CTB network operations parity | RM-113 | M | InitNetwork (scalar and per-port), AddElement2Port (`R_se`, `L_se`, `C_se`, `R_sh`, `L_sh`, `C_sh`, `Y_sh`, `Z_se`, 1:N transformers), ApplyCurrent2Port, ApplyRFPower2Port, SetPortTermination, including multi-port variants. Differential vs Octave: chained C_se/R_se/L_sh/C_sh+R_sh case <=4.2e-16 in S/Z/Y and <=1.7e-16 in ABCD, current/power application <=1.7e-16, termination (s, z, stale y, Z0) <=4.2e-16 | Verified |
-| RM-116 | P1 | CTB delivery form for MATLAB/Octave | RM-112 | L | M-file/MEX or CLI path exercised | Not Started |
+| RM-116 | P1 | CTB delivery form for MATLAB/Octave | RM-112 | L | The `ctb` binary delivers the Rust transforms to MATLAB/Octave: `info`, `convert --to <s/y/z/h/g> [--ref R[,R...]]` and `renorm --to R[,R...]`, with clear errors and exit codes. The M-file wrappers `CTB/rust/matlab/ctb_convert.m`/`ctb_info.m` call it through `system()` and read the result with the unmodified native `read_touchstone.m`. Exercised in Octave 11.1.0 (`tests/octave/cli_exercise.m`): S->Z error 4.25e-5 and back 3.16e-7 (the native `.6e` Touchstone precision), `info` reports ports/frequencies/reference. Per-port references produce Touchstone v2, which the native v1 reader cannot parse; those files are read by the Rust library or `ctb info` (documented in the wrapper). Rust CLI integration tests cover convert/renorm/info and five invalid invocations. 65 lib + 4 CLI + 8 differential + 1 doc test pass; fmt and clippy clean | Verified |
 ## WS9 - Validation and CI
 
 | ID | Pri | Task | Depends | Est | Acceptance / Evidence | Status |
@@ -525,3 +524,4 @@ in the task's acceptance column.
 | 2026-10-27 | RM-145 | Verified | SAR averaging parity: the native full-edge cube search, air power zeroing, own-cube overwrite, step-2 face statistics, partial-used switch and counters are ported; the cylindrical SAR check reports 2.565e-3 per-cell (bound 1e-2), 0 of 1936 cells above 1 %, peak -2.06e-7, valid/used counters equal, E-field DFT 8.241e-7 |
 | 2026-10-27 | RM-146 | Implemented | End criteria: CalcFastEnergy weighted like native, wall-clock 4 s default, exact Nyquist mode, maxExcite seed and negative criteria; 238 Rust tests, Python 298+150 and the 4-case harness pass. The exact stop-time comparison is blocked by the pinned native binary (no --exact-endcriteria) and the failing native rebuild |
 | 2026-10-27 | RM-112, RM-113, RM-114, RM-115 | Verified | CTB wave: per-port `RefImpedance`, complete S/Y/Z/A/H/G transforms, Touchstone v1/v2 and the network operations. 65 lib + 8 differential + 1 doc test; 84 Octave fixtures; six native Touchstone files write byte-identically; worst differential deviation 5.25e-16 against 1e-12/1e-11 bounds. Native quirks N-1..N-12 are recorded in `audits/ctb.md` |
+| 2026-10-27 | RM-116 | Verified | The `ctb` CLI (`info`, `convert`, `renorm`) delivers the Rust transforms to MATLAB/Octave through `ctb_convert.m`/`ctb_info.m` and the unmodified native `read_touchstone.m`. Octave exercise: S->Z 4.25e-5, round trip 3.16e-7 (native `.6e` precision); 4 CLI integration tests; 78 CTB tests total |

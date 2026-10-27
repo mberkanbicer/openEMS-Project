@@ -1589,6 +1589,20 @@ design, so a stop-time equality on two different machines is not a meaningful
 test; the port is verified at the semantics level and RM-146 stays
 `Implemented`.
 
+### CTB delivery to MATLAB/Octave (RM-116)
+
+| Check | Result |
+| --- | --- |
+| CLI | `ctb info`, `ctb convert --to s|y|z|h|g [--ref ...]`, `ctb renorm --to ...`; four integration tests plus five invalid invocations with non-zero exits and messages |
+| Octave wrapper | `CTB/rust/matlab/ctb_convert.m` and `ctb_info.m` call the binary via `system()`; the converted file is read with the unmodified native `read_touchstone.m` |
+| Octave exercise | `CTB_BIN=target/debug/ctb octave --no-gui --quiet tests/octave/cli_exercise.m`: S->Z error 4.25e-5, back to S 3.16e-7 (7 significant digits of the native `.6e` format), `info` reports 2 ports / 2 frequencies / 50 ohm |
+| Tests | 65 lib + 4 CLI + 8 differential + 1 doc = 78 pass; `cargo fmt --check` and `cargo clippy --all-targets` clean |
+
+Per-port reference vectors are written as Touchstone v2 `[Reference]` blocks;
+the native v1 `read_touchstone.m` cannot parse those, so the M-file wrapper is
+documented for scalar references and per-port data is read through the Rust
+library or `ctb info`.
+
 ## CTB parity (RM-112..RM-115)
 
 `CTB/rust` was split into `ref_impedance`, `transforms`, `abcd`, `touchstone`
