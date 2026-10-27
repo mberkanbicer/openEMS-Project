@@ -1,6 +1,7 @@
 name: Rust
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
@@ -37,6 +38,10 @@ jobs:
           fetch-depth: 0
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
+      # RM-030: the workspace unifies the `hdf5` feature, so the default check
+      # needs the HDF5 development files as well.
+      - name: Install HDF5 development files
+        run: sudo apt-get update && sudo apt-get install -y libhdf5-dev pkg-config
       - name: Check the whole workspace
         run: cargo check --workspace
       - name: Numerical core tests
@@ -69,7 +74,9 @@ jobs:
       - name: Install HDF5 development files
         run: sudo apt-get update && sudo apt-get install -y libhdf5-dev pkg-config
       - name: Build and test with the hdf5 feature
-        run: cargo test -p openems-core --features hdf5
+        run: cargo test -p csxcad-core -p openems-core --features hdf5
+      - name: Discrete-material HDF5 reader
+        run: cargo test -p csxcad-core --features hdf5 disc_material
 
   windows:
     name: Windows (build, tests)
@@ -80,9 +87,19 @@ jobs:
           submodules: recursive
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
+      # RM-030: HDF5 comes from the runner's vcpkg, which the workspace check
+      # needs because the feature is unified across the workspace.
+      - name: Install HDF5 (vcpkg)
+        run: vcpkg install hdf5:x64-windows
+        shell: pwsh
       - name: Check the whole workspace
+        env:
+          HDF5_LIB_DIR: C:\vcpkg\installed\x64-windows\lib
         run: cargo check --workspace
       - name: Numerical core tests
+        env:
+          HDF5_LIB_DIR: C:\vcpkg\installed\x64-windows\lib
+          PATH: C:\vcpkg\installed\x64-windows\bin;${{ env.PATH }}
         run: cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs
       - name: Placeholder policy self-test
         run: python scripts/ci/check_placeholders.py --self-test
@@ -96,10 +113,12 @@ jobs:
           submodules: recursive
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
+      - name: Install HDF5
+        run: brew install hdf5
       - name: Check the whole workspace
-        run: cargo check --workspace
+        run: HDF5_LIB_DIR="$(brew --prefix)/opt/hdf5/lib" cargo check --workspace
       - name: Numerical core tests
-        run: cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs
+        run: HDF5_LIB_DIR="$(brew --prefix)/opt/hdf5/lib" cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs
 
   freebsd:
     name: FreeBSD (check)
@@ -112,5 +131,5 @@ jobs:
         uses: vmactions/freebsd-vm@v1
         with:
           usesh: true
-          prepare: pkg install -y rust
-          run: cargo check --workspace
+          prepare: pkg install -y rust hdf5
+          run: env HDF5_LIB_DIR=/usr/local/lib cargo check --workspace

@@ -8,6 +8,10 @@ name: Reference
 # bounds live in `docs/migration/REFERENCE_TOLERANCES.md`.
 
 on:
+  # RM-124: nightly differential reference run.
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
   push:
     branches:
       - master
