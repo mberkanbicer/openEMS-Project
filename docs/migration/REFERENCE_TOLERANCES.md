@@ -61,6 +61,12 @@ meaningful scale.
 | CTB transforms and network chains | `|delta| <= 1e-12 (transforms) / 1e-11 (network) * max(1, |expected|)` | Gauss-Jordan versus LAPACK LU elimination rounding only; the measured worst case is 5.25e-16 (2000x margin) |
 | Touchstone files | byte-identical for v1 writes, exact read of native files | The writer reproduces the native line and number formatting; six native cases are byte-identical |
 
+## hyp2mat polygon deviation (2026-10-27, approval pending)
+
+| Quantity | Bound | Justification |
+| --- | --- | --- |
+| Polygon vertex after edge/boolean/offset operations | 1.5 grid steps (1.5e-5 m at the 10 um output grid) | The Rust port uses Clipper2 while native uses Clipper 1; a shallow arc/segment intersection rounds to a neighbouring integer coordinate. Two of nine fixtures differ at one vertex each; the other seven are exact. Total copper area differs by <= 1.7e-3 relative. This is a new bound for a newly ported component (not a relaxation): it was introduced on 2026-10-27 and **requires owner re-approval** |
+
 ## Approval
 
 The bounds in this file were approved by the repository owner (Mustafa Berkan

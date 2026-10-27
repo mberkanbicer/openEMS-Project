@@ -9,7 +9,7 @@ pass, including analytic propagation, UPML absorption, CFL, quarter-cell
 material averaging and native-HDF5 dump reading.
 
 Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
-(65 `Verified`, 54 `Implemented`, 25 `Not Started`, 3 `Blocked` at the last
+(77 `Verified`, 54 `Implemented`, 13 `Not Started`, 3 `Blocked` at the last
 update; see the snapshot there for the live count). The largest open areas are the extension
 framework and remaining physics extensions, NF2FF/SAR, the native CLI and
 scripting interfaces, the GUI feature surface, and the differential harness over
@@ -627,7 +627,9 @@ the SAR 1 g/10 g averaging-cube search (RM-145), the end-criteria stop time
 
 ## Next task
 
-Wave C (CLI, Python, Octave/MATLAB, dumps, SAR, NF2FF) is closed and verified.
+Waves A, C, D and E (CLI, Python, Octave/MATLAB, dumps, SAR, NF2FF, QCSXCAD/AppCSXCAD,
+hyp2mat and CTB) are closed and verified, and the CSXCAD depth wave
+(RM-027/028/029/034/035/036) is verified against a native rebuild.
 The remaining work is tracked per task in `REMEDIATION_TASKS.md`; the ordered
 list below is the current execution plan.
 
@@ -635,8 +637,9 @@ list below is the current execution plan.
 
 | Task | Work | Why it is first |
 | --- | --- | --- |
-| RM-123 | Regression CI gate (`.github/workflows/reference.yml`) | **Implemented**; the first GitHub Actions run must confirm the runner plumbing |
-| RM-107..RM-111 | Remaining hyp2mat tasks | CTB RM-112..RM-116 and SAR RM-145 are verified; RM-146 is verified (exact cadence: both solvers stop at 1488 for 1e-5). Next: the hyp2mat polygon/XML/QucsStudio/CLI tasks and the MATLAB/Octave delivery form, then RM-147 and the remaining validation/CI work |
+| RM-030 | Enable the `hdf5` feature in CI | **Not started**; the feature is validated locally (200 CSXCAD tests in WSL) but no workflow job sets it |
+| RM-120, RM-124 | Cross-platform runtime CI and the nightly reference run | **Not started**; both extend the existing `Reference` workflow |
+| RM-023..RM-026, RM-031..RM-033, RM-094 | fparser decisions, CSXCAD Python/MATLAB surface breadth and contract tests | **Not started**; the CSXCAD depth wave closed the model/XML gaps they depended on |
 
 ### 2. Engine and dump completeness (open, in order)
 

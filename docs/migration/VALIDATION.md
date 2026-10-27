@@ -1615,6 +1615,85 @@ accepts `Y_sh` while its help says `Y_se`. The port adds v2 reading, explicit
 errors for malformed files and per-port references in `s2a`/`a2s` (native
 aborts or returns garbage); those are documented deviations.
 
+## Python packages under the native names (RM-013)
+
+| Check | Result |
+| --- | --- |
+| `CSXCAD/rust-py` packaging | new `pyproject.toml`: `python-source = "python"`, `module-name = "csxcad_py"`, `python-packages = ["CSXCAD"]`; the wheel ships the compiled `csxcad_py` extension **and** the pure-Python `CSXCAD` package (native layout `CSXCAD.CSXCAD`, `CSXCAD.CSProperties`, `CSXCAD.CSPrimitives`, `CSXCAD.CSRectGrid`, `CSXCAD.CSTransform`, `CSXCAD.Utilities`) |
+| `openEMS/rust-py` packaging | distribution name changed from `openems-py` to the native `openEMS`, so `importlib.metadata.version("openEMS")` resolves and `openEMS.__version__` is `0.1.0` instead of the fallback `0.0.0` |
+| Installed import | `cd /tmp && env -u PYTHONPATH python -c "from CSXCAD import ContinuousStructure; from openEMS import openEMS"` -> `CSXCAD 0.1.0`, `openEMS 0.1.0`, `ContinuousStructure().GetGrid()` -> `CSRectGrid`, solver class `openEMS.openEMS.openEMS` |
+| CI gate | `scripts/ci/build_rust_python_wsl.sh` now performs that import from `/tmp` with `PYTHONPATH` unset after `maturin develop`, so a wheel that loses the package fails the build |
+| Regression | native Python suites still pass against the installed packages: 298 openEMS + 150 CSXCAD |
+
+A stale `site-packages/csxcad_py` copy left by an earlier non-package build had
+to be removed once; the editable install now points at the repository source.
+The repository root is not safe as a working directory for the import check
+because the `CSXCAD/` source directory shadows the installed package (the native
+tree has the same property); the check runs from `/tmp`.
+
+## CSXCAD depth: native XML corpus and differential harness (RM-027..RM-036)
+
+### Corpus
+
+`CSXCAD/rust/tests/native_gen/run_native_generator.sh` copies the pinned native
+`CSXCAD/` and `openEMS/` (never the repository copies), builds them, and writes
+fixtures back into the repository:
+
+| Artefact | Content |
+| --- | --- |
+| `tests/fixtures/xml/` | 11 documents written by native `ContinuousStructure::Write2XML` + `manifest.txt` (property types, primitive types, transforms, parameters, cylindrical coordinates, background/grid, openEMS wrapper, DiscMaterial) |
+| `tests/fixtures/native/` | 11 model reports produced by a **native re-read** (`ReadFromXML`, `read_back = 1`) |
+| `tests/fixtures/mesh/` | 22 STL/PLY files (native test meshes, VTK-written ASCII/binary STL, quad PLY, multi-solid, malformed) + VTK-derived expectations |
+
+Two complete regenerations produced the identical fixture hash
+`58726f26e30b24465c30e7082c8edd687370446e5d3e938a682c3a732235e17d`, so the corpus is
+reproducible rather than hand-written.
+
+### Results
+
+| Area | Evidence |
+| --- | --- |
+| XML dispatch and round trip (RM-028) | manifest/disk agreement, strict and compatibility parse, native -> Rust -> Rust -> Rust model equality, byte-stable second write, openEMS wrapper extraction, native transform element names |
+| Differential model harness (RM-029) | counts and types, grid, background, parameters (native `IncreaseStep` walks), property fields, primitive priority/coordinate system/bounds/dimension, transform matrices, containment/priority queries, object area, native `isGeometryValid` |
+| Expression integration (RM-027) | parameter/coordinate/weight/transform expressions through bounding boxes and containment; native error codes 1, 2, 3, 4, `100 + fparser code`, `-1`; strict error vs native warn+skip for a malformed transform |
+| Transform/parameter parity (RM-034) | native `tscenario` matrices (pre/post multiply, `Rotate_Origin`, degree mode, `Matrix`+`Scale3`, invert), extra-argument truncation, zero axis, singular inverse, sweep/`set_linear_range`/zero-step termination |
+| Mesh corpus (RM-035) | exact point/face order and winding, quad arity, multi-solid merging, XML round trip, malformed rejection; empty meshes rejected like native |
+| Performance baseline (RM-036) | 158,337-byte document: release serialize 3.03 ms (49.8 MB/s), parse 4.04 ms (37.3 MB/s), bounds 1.50 microseconds/primitive, 100 containment queries 183 ms; debug 10.20/16.03 ms |
+| Tests | `cargo test`: **194 passed** (157 lib + 37 integration); `cargo test --features hdf5`: **200 passed** (163 lib) |
+
+Porting defects fixed by this wave: native transform element names on write,
+native extra-argument truncation, and the `Box` update-error path (evaluate all
+`P1` components, short-circuit `P2` only when `P1` fails).
+
+The native `DispersiveMaterial` tag cannot be dispatched because native never
+writes it; `11_disc_material` reports `read_back = 0` because native cannot
+reload a `DiscMaterial` without its HDF5 file. Both are recorded in the reports
+and asserted in the tests.
+
+## hyp2mat parity (RM-107..RM-111)
+
+| Check | Result |
+| --- | --- |
+| Fixtures (RM-107) | 9 `.hyp` files: 3 native EAGLE examples, 6 grammar-derived synthetic files (planes/clearances, pours/voids, arcs, vias, rotated/oval/oblong pads, cutout, multi-layer, flood, metric/english/weight); SHA-256 manifest + provenance README |
+| Polygon operations (RM-108) | stateful native `Polygon` with a Rust port of Clipper 1's offset builder; expectations from a native oracle built against `lib/polygon.cc`, compared as exact grid-unit vertex sets |
+| CSXCAD output (RM-109) | `-f csxcad` reproduces the native MATLAB writer (non-polygon lines byte-identical; geometry exact for 7/9, <= one 10 um step on the two arc fixtures; copper area <= 1.7e-3 relative). `tests/native/run_native_read_check.sh`: pinned native `libCSXCAD` reads all 9 Rust XML documents and its model dump is **identical** to the Rust dump (255 lines: counts, types, names, material values, grid, delta unit, background, priorities, owners) |
+| QucsStudio and PDF (RM-110) | properties exact, items within the same one-grid-step bound, identical stderr multiset; PDF renders under Ghostscript 10.06 with 3/3/3/3/4/3/3/5/3 pages (composite + one page per metal layer) |
+| CLI (RM-111) | full native option set, stdin/stdout, `--help`/`--version`, exit codes and messages, binary installed as `hyp2mat`; `-v` board/layer summary byte-identical to native `std::cerr` for 9/9 fixtures; five output variants per fixture are deterministic (45/45 identical SHA-256); 23 CLI integration tests |
+| Tests | `cargo test`: **114 passed** (77 lib + 23 CLI + 14 fixture); `cargo fmt --check` and `cargo clippy --all-targets` clean |
+
+Preserved native quirks: `{UNITS=METRIC}` means centimetres, imperial copper
+weight thickness is 1000x (native defect), device `VAL=` is always a string, a
+deprecated `PAD` yields a zero-size pad, the plane-mask filter uses the target
+net name, a syntax error exits 0, and `-f pdf` without `-o` prints
+`pdf output file missing` and writes nothing. The additive `--csxcad-xml`
+extension is the only new output path; `-f csxcad` keeps the native MATLAB
+script so `matlab/ImportHyperLynx.m` still works.
+
+Accepted deviation: the two arc fixtures resolve one shallow polygon
+intersection one 10 um grid step apart (Clipper2 versus Clipper 1 integer
+rounding). The bound is 1.5 grid steps and is asserted explicitly; it is
+recorded in `REFERENCE_TOLERANCES.md` and awaits owner re-approval.
+
 ## Regression CI (RM-123)
 
 `.github/workflows/reference.yml` runs on every push/PR that touches Rust,
