@@ -24,6 +24,10 @@ CLAUDE.md
 .windsurf*
 .copilot*
 
+# Python bytecode from the CI helper scripts
+__pycache__/
+*.pyc
+
 # Rust workspace build output and local scratch files
 /target/
 **/target/
