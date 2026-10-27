@@ -1522,6 +1522,100 @@ raw dump of a lossy box, `sar_calc` processes it).
 
 Direct SAR result dumps (`DumpType` 20..22) are tracked separately as RM-136.
 
+## SAR averaging-cube parity (RM-145)
+
+The kernel in `openEMS/rust/src/sar.rs` was rewritten against
+`openEMS/tools/sar_calculation.cpp`:
+
+| Native rule | Rust before | Rust now |
+| --- | --- | --- |
+| `FindFittingCubicalMass` receives the full edge `(m/rho)^(1/3)/2` and walks the half edge | the same number was used as the half edge (8x cube mass) | full edge, `GetCubicalMass(pos, edge/2)` |
+| power density zeroed in air (`*= 0.5*(dens>0)`) | kept everywhere | zero in air (both E/conductivity and E/J paths) |
+| the centre value is overwritten by its own cube | `max(existing, own)` | overwrite, `max` only for the peak |
+| step 2 stores the face/frequency that raised the value | smallest-volume face | native value-based selection |
+| partial cells marked used only when the method allows | always marked | `mark_partial_as_used` (false for IEEE 62704) |
+| `used_cubes = count(used) - valid`, air counted in step 1 | `valid + unused` | separate `used_cells`/`air_cells`, counters partition the grid |
+| constructor defaults = SIMPLE | `maxBGRatio 0.5`, `ignoreFaceValid false` | SIMPLE |
+
+Evidence, `scripts/ci/run_cylindrical_sar_check_wsl.sh` with `EndCriteria=-1`
+on both sides (the criterion is isolated in RM-146):
+
+| Check | Before | Now |
+| --- | --- | --- |
+| probe `et` vs native | shapes differed (251 vs 1001) | 1001/1001 rows, max relative difference **0.0** |
+| raw E-field DFT | 1.195e-3 | **8.241e-7** |
+| 1 g per-cell, relative to the peak | 6.557e-1, 1534/1936 cells > 1 % | **2.565e-3, 0/1936 cells > 1 %** |
+| 1 g peak | +0.32 % | **-2.06e-7** |
+| `valid_cubes` / `used_cubes` | 1600 / 1600 vs 1600 / 0 | **1600 / 0 vs 1600 / 0** |
+
+Bound: per-cell 1e-2 relative to the peak (margin 3.9x). Justification: native
+stores the volumes, densities, power densities and SAR in `float` and
+accumulates in `double`; the residual worst cell differs by ~1 % of its own
+value, consistent with f32 rounding accumulated over a cube of ~1000 cells.
+`run_sar_dump_check_wsl.sh` still passes (raw+sar_calc peak 9.0e-8, 1 g maxSAR
+finite). Unit tests pin the 1 g five-cell cube (2 mm cells, partials 1.0), air
+power zeroing, the counter partition and the full-edge convention.
+
+## End-criteria parity (RM-146)
+
+`CalcFastEnergy` is now exactly native: per cell `eps0*(E0^2+E1^2+E2^2) +
+mue0*(H0^2+H1^2+H2^2)` in native order, over `GetNumberOfLines(n, false)-1`
+cells; a closed cylindrical azimuth hides its two seam planes, and the
+steady-state extension uses the same helper. The loop follows `openems.cpp`:
+the default evaluates only after four seconds of wall clock, `--exact-endcriteria`
+evaluates every excitation Nyquist period (with the native startup line),
+`maxE` is seeded at the maximum-excitation timestep (without updating `change`
+in default mode), and a negative `EndCriteria` disables the criterion.
+
+| Check | Result |
+| --- | --- |
+| energy formula (unit) | `eps0/mue0` weighted sum over the interior cells |
+| cadence (unit) | exact mode hits multiples of the Nyquist (Dirac/Step = 1); default fires at 4 s and then every 4 s |
+| fast default run (integration) | 30-step Gaussian run reaches NrTS instead of stopping on the old 100-step cadence |
+| negative criterion | `EndCriteria=-1` is kept (disables) |
+| `openems-core` | 238 tests pass |
+| Python suites | 298 + 150 pass |
+| reference harness | 4/4 pass |
+| cylindrical SAR check | with the criterion disabled on both sides, 1001/1001 probe rows and a bit-identical probe |
+
+**Open:** the exact stop-time comparison needs a native binary with
+`--exact-endcriteria`. The pinned `~/opt/openEMS` v0.37.0 predates the option
+(it parses the flag as the input file), and rebuilding from the worktree fails
+during the CSXCAD configure step because the submodule `.git` pointer contains
+a Windows path (`fatal: not a git repository:
+.../CSXCAD/D:/openEMS-Project/.git/worktrees/...`; log
+`build_20261027_125956.log`). The native default cadence is wall-clock based by
+design, so a stop-time equality on two different machines is not a meaningful
+test; the port is verified at the semantics level and RM-146 stays
+`Implemented`.
+
+## CTB parity (RM-112..RM-115)
+
+`CTB/rust` was split into `ref_impedance`, `transforms`, `abcd`, `touchstone`
+and `network` modules. Octave 11.1.0 generated 84 fixtures (75 numeric/meta
+texts, 9 native `.sNp` files) from the unmodified `CTB/*.m`.
+
+| Check | Result |
+| --- | --- |
+| Rust tests | 65 lib + 8 differential + 1 doc test pass |
+| per-port references | 3-port `[50;75;60]` S->Z 5.25e-16; `[50;50;50]` vs scalar exactly 0.0; renormalisation 3.3e-16 |
+| 2/3-port transforms | S/Y/Z/A round trips <=5.25e-16; `a_series`/`a_shunt` exactly 0.0; `a_mul`/`a_t` <=1.7e-16 |
+| Touchstone | six native cases write byte-identically (316/1028/211/1136/940/313 B) and read back exactly; 1..5 ports, RI/MA/DB, unit prefixes, wrapped records; v2 keywords parsed; 24 malformed inputs rejected |
+| network operations | element chains, current/power application and termination <=4.2e-16 |
+
+Bounds: 1e-12 absolute-ish (`|delta| <= tol*max(1,|expected|)`) for the
+transforms and 1e-11 for the network chains; the worst measured deviation is
+5.25e-16, i.e. 2000x margin. The residual is Gauss-Jordan versus LAPACK LU
+elimination rounding, not a model difference.
+
+Native quirks are preserved and recorded in `audits/ctb.md`: the v1 >=3-port
+Touchstone writer is row-major (native reads it back transposed), `a_T` uses
+`Z1/Z2` for `A(1,1)` but `Z3` for the shunt arm (`det != 1`), `a_PI` cannot run
+at all (`Y1.Y2`), `SetPortTermination` leaves `net.y` stale, and `AddElement2Port`
+accepts `Y_sh` while its help says `Y_se`. The port adds v2 reading, explicit
+errors for malformed files and per-port references in `s2a`/`a2s` (native
+aborts or returns garbage); those are documented deviations.
+
 ## Regression CI (RM-123)
 
 `.github/workflows/reference.yml` runs on every push/PR that touches Rust,

@@ -117,3 +117,48 @@ frequencies commonly propagate through MATLAB operations.
   malformed records.
 - Resolve the confirmed defects and type-name mismatch in the CTB source
   repository before treating those behaviors as stable migration references.
+
+## Rust port verification (2026-10-27, RM-112..RM-115)
+
+The port was compared against Octave 11.1.0 running the unmodified `CTB/*.m`
+(84 fixtures: 75 numeric/meta texts, 9 native `.sNp` files). Native quirks
+were preserved unless they are undefined behaviour; the deviations are listed
+below so they are not mistaken for parity.
+
+### Preserved native quirks
+
+| Id | Behaviour | Handling |
+| --- | --- | --- |
+| N-1 | `write_touchstone.m` emits >=3-port v1 records **row-major**, while every Touchstone reader (its own included) is column-major, so a native 3-port file reads back transposed (measured 0.259) | v1 output is byte-identical, so the same file is produced and the same misreading occurs; v2 output (new) is column-major |
+| N-2 | `a_PI.m` cannot run: line 14 uses `Y1.Y2` instead of `Y1.*Y2` (Octave: complex matrix indexed with `.`) | Rust implements the intended element-wise product and pins it against `a_series`/`a_shunt` cascades; no native fixture is possible |
+| N-3 | `a_T.m` uses `Z1/Z2` in `A(1,1)` but `Z3` as the shunt arm, so `det != 1` | reproduced verbatim (e.g. `a_t(10,20,30)` -> 1.2778) and pinned by the differential test |
+| N-4 | `SetPortTermination.m` rebuilds `net.s` but leaves `net.y` stale | preserved and asserted |
+| N-5 | `AddElement2Port.m` accepts `'Y_sh'` while its help says `'Y_se'` | only `y_sh` accepted |
+| N-6 | `ApplyCurrent2Port.m` line 36 lacks a semicolon (prints `current = ...`) | cosmetic, not ported |
+| N-12 | `num2str` uses exponent notation for `|x| < 1e-4` in the `R` field | the same value is written in plain decimal; all fixture references (`1`, `50`, `75`, `50+5i`) are byte-identical |
+
+### Deviations (deliberate)
+
+- Touchstone v2 keywords are read (`[Version] 2.0`, `[Number of Ports]`,
+  `[Number of Frequencies]`/`[Number of Data Points]`, `[Two-Port Data Order]`
+  12/21, per-port `[Reference]`); native cannot read v2 at all.
+- Several data records on one line are consumed instead of dropped (N-9).
+- Wrong extensions, a missing/NaN `R`, surplus per-port entries (N-10),
+  negative/zero reference impedances, count/port mismatches,
+  `[Matrix Format] Lower` and mixed-mode order are rejected with clear errors
+  instead of producing NaN or garbage (N-7, N-8).
+- `s2a`/`a2s` generalise to per-port references where `s2a.m` aborts and
+  `a2s.m` silently returns garbage (N-11).
+- `g`/`h` Touchstone data types are writable (native errors), and
+  `init_network_with_ref` is new (native hardcodes 50 ohm).
+- H/G transforms have no M-file counterpart; they are defined from the native
+  Z/Y transforms plus the textbook definitions and covered by round-trip tests
+  only.
+
+### Verification
+
+`CTB/rust`: 65 lib + 8 differential + 1 doc test pass; `cargo fmt --check` and
+`cargo clippy --all-targets` are clean. The worst differential deviation is
+5.25e-16 against the 1e-12/1e-11 bounds; six native Touchstone files are
+written byte-identically. Evidence and bounds are recorded in `VALIDATION.md`
+and `REFERENCE_TOLERANCES.md`.

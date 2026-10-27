@@ -52,6 +52,15 @@ All four cases now pass. HDF5 snapshots are normalised by the peak of the whole
 file, not per timestep, so late near-zero snapshots are compared against a
 meaningful scale.
 
+## SAR averaging and CTB bounds (2026-10-27)
+
+| Quantity | Bound | Justification |
+| --- | --- | --- |
+| SAR 1 g / 10 g per cell | 1e-2 relative to the native peak | Native stores the cube volumes, densities, powers and SAR in `float` and accumulates in `double`; the measured residual is 2.565e-3 (0 cells above 1 % of the peak), consistent with f32 rounding over a cube of ~1000 cells, not a model difference |
+| SAR 1 g / 10 g peak | 1e-3 relative | The peak is a single cube average; measured -2.06e-7 |
+| CTB transforms and network chains | `|delta| <= 1e-12 (transforms) / 1e-11 (network) * max(1, |expected|)` | Gauss-Jordan versus LAPACK LU elimination rounding only; the measured worst case is 5.25e-16 (2000x margin) |
+| Touchstone files | byte-identical for v1 writes, exact read of native files | The writer reproduces the native line and number formatting; six native cases are byte-identical |
+
 ## Approval
 
 The bounds in this file were approved by the repository owner (Mustafa Berkan
