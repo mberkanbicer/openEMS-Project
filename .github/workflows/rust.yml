@@ -151,6 +151,9 @@ jobs:
         with:
           usesh: true
           prepare: pkg install -y rust hdf5 cmake python3
+          # hyp2mat is excluded: its clipper2c-sys build script has no FreeBSD
+          # target (exception E-004). Everything else, including the fparser
+          # differential suite, is checked here.
           run: |
-            env HDF5_LIB_DIR=/usr/local/lib cargo check --workspace
+            env HDF5_LIB_DIR=/usr/local/lib cargo check --workspace --exclude hyp2mat-rs
             python3 fparser/rust/tests/run_differential.py
