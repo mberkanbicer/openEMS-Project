@@ -139,7 +139,7 @@ the SAR 1 g/10 g averaging-cube search (RM-145), the end-criteria stop time
   | csxcad-matlab | CSXCAD/rust-matlab | cdylib | 18 FFI functions with 7 contract tests; the Octave M-file surface test checks all 58 public + 12 private native M-files |
   | openems-core | openEMS/rust | lib | 238 + 2 tests pass, clippy clean, fmt clean |
   | openems-processing | openEMS/rust | lib | 10 tests pass, clippy clean, fmt clean |
-  | openems-matlab | openEMS/rust-matlab | cdylib | Compiles cleanly (29 FFI functions) |
+  | openems-matlab | openEMS/rust-matlab | cdylib | 34 C-ABI entry points with 25 contract tests and 54 Octave checks |
   | openems-cli | openEMS/rust-cli | bin | Compiles cleanly |
   | qcsxcad-egui | QCSXCAD/rust-egui | lib | Compiles cleanly |
   | appcsxcad | AppCSXCAD/rust | bin | Compiles cleanly |

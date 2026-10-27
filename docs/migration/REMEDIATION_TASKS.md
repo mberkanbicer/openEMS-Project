@@ -59,10 +59,10 @@ RM-127.
 
 | Status | Count | Tasks |
 | --- | --- | --- |
-| `Verified` | 86 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-071, RM-072, RM-073, RM-074, RM-075, RM-079, RM-082, RM-083, RM-084, RM-085, RM-086, RM-087, RM-088, RM-089, RM-090, RM-091, RM-092, RM-093, RM-095, RM-096, RM-117, RM-118, RM-119, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133, RM-134, RM-135, RM-136, RM-137, RM-138, RM-139, RM-140, RM-141, RM-142, RM-143, RM-123, RM-112, RM-113, RM-114, RM-115, RM-116, RM-145, RM-146, RM-023, RM-024, RM-025, RM-013, RM-026, RM-030, RM-031, RM-032, RM-033, RM-120, RM-026, RM-030, RM-031, RM-032, RM-033, RM-120, RM-027, RM-028, RM-029, RM-034, RM-035, RM-036, RM-107, RM-108, RM-109, RM-110, RM-111 |
+| `Verified` | 87 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-071, RM-072, RM-073, RM-074, RM-075, RM-079, RM-082, RM-083, RM-084, RM-085, RM-086, RM-087, RM-088, RM-089, RM-090, RM-091, RM-092, RM-093, RM-095, RM-096, RM-117, RM-118, RM-119, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133, RM-134, RM-135, RM-136, RM-137, RM-138, RM-139, RM-140, RM-141, RM-142, RM-143, RM-123, RM-112, RM-113, RM-114, RM-115, RM-116, RM-145, RM-146, RM-023, RM-024, RM-025, RM-013, RM-026, RM-030, RM-031, RM-032, RM-033, RM-094, RM-120, RM-026, RM-030, RM-031, RM-032, RM-033, RM-120, RM-027, RM-028, RM-029, RM-034, RM-035, RM-036, RM-107, RM-108, RM-109, RM-110, RM-111 |
 | `Implemented` | 55 | RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022, RM-037, RM-038, RM-039, RM-040, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-057, RM-060, RM-064, RM-065, RM-066, RM-067, RM-068, RM-069, RM-070, RM-076, RM-077, RM-078, RM-080, RM-081, RM-098, RM-099, RM-100, RM-101, RM-102, RM-103, RM-104, RM-105, RM-106, RM-026 |
 | `Blocked` | 3 | RM-125, RM-127, RM-144 |
-| `Not Started` | 3 | all remaining tasks |
+| `Not Started` | 2 | all remaining tasks |
 
 Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
@@ -75,14 +75,13 @@ Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
 
 
-## Remaining backlog (3 tasks) and execution order
+## Remaining backlog (2 tasks) and execution order
 
 The three `Not Started` rows that remain. Everything else is `Verified`,
 `Implemented` or a recorded exception.
 
 | ID | Pri | Task | Depends | Why it is left |
 | --- | --- | --- | --- | --- |
-| RM-094 | P1 | Match error identifiers, ownership, array orientation | RM-090,RM-093 | MATLAB/Octave C-ABI contract tests (in progress in a separate worktree task) |
 | RM-121 | P2 | Performance baseline vs native | RM-065 | The measured table exists under `docs/migration/reference-data/perf/`; it must be re-measured on the final solver before it is recorded as verified |
 | RM-122 | P2 | Memory baseline vs native | RM-065 | Same run as RM-121 |
 
@@ -211,7 +210,7 @@ progress.
 | RM-091 | P0 | Make native MATLAB/Octave M-file suite work through CLI | RM-083 | L | 9/10 native suite cases pass (cylindrical deferred by D-02, tracked as RM-134); both MSL smoke tests run unchanged | Verified |
 | RM-092 | P0 | Match MATLAB `calcPort`, `CalcNF2FF`, post-processing | RM-091,RM-074 | L | Coax Z 50.09..51.12 Ohm (native 50.49..51.10), msl_port S11 -54 dB, rect_waveguide S11 -33.6 dB, nf2ff Dmax 1.5 (2.97% pattern deviation) | Verified |
 | RM-093 | P1 | Implement CSXCAD MATLAB M-file surface | RM-032 | L | 58/58 CSXCAD public M-files and 70/70 openEMS public M-files resolve; 12 CSXCAD private helpers present and exercised by the suite | Verified |
-| RM-094 | P1 | Match error identifiers, ownership, array orientation | RM-090,RM-093 | M | Contract tests from the interface audits | Not Started |
+| RM-094 | P1 | Match error identifiers, ownership, array orientation | RM-090,RM-093 | M | `openEMS/rust-matlab` now exposes 34 `extern "C"` symbols (26 existing + 8 added: `set_csx`, `get_csx`, `set_boundary_cond`, `get_boundary_cond`, `last_error_id`, `last_error_message`, `last_error_code`, `free_string`) with a checked-in inventory that pins each signature and cites the native API line. Contracts asserted from the C boundary (25 crate tests + 54 Octave checks through an `.oct` shim): the native face accessors including the `-1` sentinels, the silent out-of-range no-op and the PML type forcing; the `SetupFDTD` codes 3/2; the exact `openEMS:SetBoundaryCond` identifiers; CSX ownership identity, single-slot replacement and clearing; a live-handle registry that turns null, double free and use-after-free into the native deleted-object error; and the six-entry xmin..zmax array in both 1x6 and 6x1 column-major shapes. Native deviations recorded: the core substitutes a default pulse where native aborts without an excitation, and `set_over_sampling(0)` is clamped (native would divide by zero) | Verified |
 | RM-095 | P0 | Run native Python suite (31 tests + 150 CSXCAD) unchanged | RM-085..RM-090 | M | Recorded pass counts | Verified |
 | RM-096 | P0 | Run native Octave suite and MSL smoke tests unchanged | RM-091..RM-093 | M | `run_testsuite` 9 passed / 1 error (cylindrical, D-02) in 598 s; `MSL_NotchFilter.m` and `MSL_NotchFilter.py` both complete unchanged | Verified |
 ## WS7 - GUI
@@ -458,6 +457,7 @@ in the task's acceptance column.
 | 2026-10-27 | RM-013 | Verified | Installed-package import with the native names: `CSXCAD` ships its pure-Python package plus `csxcad_py` (`python-packages`), `openEMS` uses the native distribution name so `__version__` is 0.1.0, and the CI build script asserts `from CSXCAD import ContinuousStructure; from openEMS import openEMS` from `/tmp` with `PYTHONPATH` unset. Native Python suites: 298 + 150 |
 | 2026-10-27 | RM-023..RM-025 | Verified | fparser decisions and coverage: 45,223 corpus rows (22,894 optimizer-enabled), 45,221 expressions and 45,196 callback checks with zero mismatches; ADR 0006 + E-001 for the numeric backends; ADR 0008 for the C++/FFI surface (no C++ wrapper; CLI, Python, MATLAB/Octave and XML are the compatibility surfaces) |
 | 2026-10-27 | RM-031..RM-033 | Verified | CSXCAD interface depth: the Python surface inventory (33 classes, 293 public declarations, 0 absent), the MATLAB inventory (70 M-files, 114 declarations, 58 public, 0 absent) and the ownership/lifetime contract suites; two real Python ownership bugs fixed; CSXCAD 200 tests, rust-py 2, rust-matlab 7, Python 36, native Python 298 + 150 and the Octave wrapper suite pass |
+| 2026-10-27 | RM-094 | Verified | MATLAB C-ABI contracts: 34 exported symbols with a pinned inventory, native error identifiers and numeric codes, CSX ownership identity/clear, a live-handle registry replacing UB on double free/use-after-free, and the six-entry boundary array in both vector shapes. 25 crate tests + 54 Octave checks; 21 ABI deviations found and 11 fixed |
 | 2026-10-27 | RM-026, RM-030, RM-120 | Verified | CI matrix green in run `40580893146`: Linux (workspace check, five crates, policy gates), macOS (check + tests), Windows (check + tests with vcpkg HDF5), FreeBSD (check without hyp2mat, fparser differential), the HDF5-feature job and the fparser differential on macOS. RM-124 is implemented as a nightly schedule with a green dispatch run (`40580897904`) |
 | 2026-10-27 | RM-107..RM-111 | Verified | hyp2mat: 9-fixture corpus with SHA-256 manifest; polygon edges/booleans/offset against a native `polytest` oracle; `-f csxcad` and `--csxcad-xml`; QucsStudio/PDF parity; full native CLI. Evidence: native model dump byte-identical 9/9, `-v` summary byte-identical 9/9, `--raw` byte-identical 4/4, 45/45 outputs deterministic, PDFs render 3/3/3/3/4/3/3/5/3 pages, native CSXCAD reads all 9 Rust XML documents with an identical model dump (255 lines), 114 Rust tests |
 | 2026-10-27 | RM-027..RM-036 | Verified | CSXCAD depth: 11 native-written XML fixtures with a deterministic generator (two runs, identical sha256), a native re-read differential harness, expression integration tests with native error codes, transform/parameter edge cases (three porting defects fixed), 22 STL/PLY mesh fixtures with VTK expectations, and a recorded performance baseline. 194 tests (200 with `--features hdf5`) |

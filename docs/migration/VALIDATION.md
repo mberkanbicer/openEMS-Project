@@ -1634,6 +1634,26 @@ property causes double ownership and a double free; parameter-set transforms
 `Utilities.GetMultiDirs` with an invalid name silently returns `None` where the
 Rust binding raises `ValueError`.
 
+## MATLAB C-ABI contracts (RM-094)
+
+| Check | Result |
+| --- | --- |
+| Exported symbols | 34 `extern "C"` entry points (26 pre-existing + 8 added), identical to `nm -D`, pinned by `src/abi_inventory.rs` |
+| Crate tests | 25 passed (3 inventory + 22 contract), `cargo fmt --check` and `clippy --all-targets` clean |
+| Octave consumer | 54 checks through an `.oct` shim linked against both delivery libraries (Octave 11.1.0 has no `loadlibrary`) |
+| Native citations | every expectation quotes the native file:line (face accessors `openems.cpp:810-846`, `SetCSX` ownership `:1163-1175`, setup codes `:1177-1234`, `SetBoundaryCond.m:51-71`, Python controller `openEMS.pyx:169-179/320-331`, deleted-object message `CSXCAD.pyx:118`) |
+
+Deviations fixed: `Get_BC_Type`/`Get_PML_Size` now return the native `-1`
+sentinels, `Set_BC_PML` forces the face type, the Reset default PML size is 8,
+`SetupFDTD` reports the native codes 3 and 2 with messages, `SetCSX(NULL)` is a
+clear instead of a null dereference, and `openems_free` drops the geometry.
+Array orientation is asserted in both 1x6 and 6x1 column-major shapes.
+
+Recorded deviations: a missing excitation aborts native `SetupFDTD` with code 3
+while the core applies a default pulse (tracked as a follow-up on
+`openEMS/rust/src/openems.rs`), and `set_over_sampling(0)` is clamped because
+native zero divides by zero in processing.
+
 ## CI platform matrix and HDF5 feature (RM-026, RM-030, RM-120, RM-124)
 
 `.github/workflows/rust.yml` run `40580893146`:
