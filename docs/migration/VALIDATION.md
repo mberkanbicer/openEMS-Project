@@ -1576,6 +1576,7 @@ in default mode), and a negative `EndCriteria` disables the criterion.
 | `openems-core` | 238 tests pass |
 | Python suites | 298 + 150 pass |
 | reference harness | 4/4 pass |
+| Octave suite | 10/10 pass (1235.9 s), every simulation case invoked with `--exact-endcriteria`, including `coax_cylindrical` |
 | cylindrical SAR check | with the criterion disabled on both sides, 1001/1001 probe rows and a bit-identical probe |
 
 **Open:** the exact stop-time comparison needs a native binary with
