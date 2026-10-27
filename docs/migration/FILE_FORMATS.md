@@ -103,3 +103,30 @@ The SAR calculation keeps the native quantities:
 
 The raw SAR data group uses `Conductivity`, `Density` and `Volume` under
 `/CellData` and the field datasets under `/FieldData/SAR`.
+
+## 5. hyp2mat outputs (RM-107..RM-111)
+
+The PCB converter keeps the native formats:
+
+- `-f csxcad` writes the native MATLAB/Octave script (`pcb.m`) that
+  `matlab/ImportHyperLynx.m` consumes, with the native `AddHyperLynxMetal2D`,
+  `AddHyperLynxDielectric`, `AddPolygon` and device/port tables.
+- `--csxcad-xml` (additive) writes a CSXCAD `ContinuousStructure` document
+  through `csxcad-core`: the same grid, materials, priorities and polygon
+  vertices, and it round-trips through the Rust core and the native CSXCAD
+  reader (see `VALIDATION.md`).
+- `-f qucs` writes the QucsStudio layout text, with the native device and port
+  messages on stderr (they must not appear in the layout).
+- `-f pdf` writes a multi-page PDF in PostScript points: a composite page plus
+  one page per metal layer, with the native palette/HSV colours and captions.
+- `--raw` keeps unmerged copper polygons; without it adjacent and overlapping
+  copper is joined exactly like the native Clipper 1 code.
+
+## 6. CTB Touchstone files (RM-112..RM-116)
+
+`ctb` reads and writes Touchstone v1 and v2 with the native formatting
+(`%.6e`, `RI`/`MA`/`DB` where applicable), the native per-port reference
+handling, and the native transform set (S/Y/Z/ABCD/H/G). The `ctb` CLI keeps
+the parameter type in the option line; per-port reference vectors are written
+as a v2 `[Reference]` block, which the native v1 `read_touchstone.m` cannot
+parse (documented in `CTB/rust/matlab/ctb_convert.m`).
