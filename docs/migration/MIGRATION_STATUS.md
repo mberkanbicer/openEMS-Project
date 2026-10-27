@@ -137,7 +137,7 @@ the SAR 1 g/10 g averaging-cube search (RM-145), the end-criteria stop time
   | csxcad-core | CSXCAD/rust | lib | 194 tests pass (200 with HDF5), including the native XML corpus, differential model harness and mesh fixtures; clippy and fmt clean |
   | csxcad-python | CSXCAD/rust-py | lib+package | 2 Rust tests plus 36 Python surface/contract tests; the native Python suite (150 tests) passes against it; installs as the native `CSXCAD` package |
   | csxcad-matlab | CSXCAD/rust-matlab | cdylib | 18 FFI functions with 7 contract tests; the Octave M-file surface test checks all 58 public + 12 private native M-files |
-  | openems-core | openEMS/rust | lib | 238 + 2 tests pass, clippy clean, fmt clean |
+  | openems-core | openEMS/rust | lib | 245 + 2 tests pass, clippy clean, fmt clean |
   | openems-processing | openEMS/rust | lib | 10 tests pass, clippy clean, fmt clean |
   | openems-matlab | openEMS/rust-matlab | cdylib | 34 C-ABI entry points with 25 contract tests and 54 Octave checks |
   | openems-cli | openEMS/rust-cli | bin | Compiles cleanly |
