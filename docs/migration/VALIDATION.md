@@ -1522,6 +1522,21 @@ raw dump of a lossy box, `sar_calc` processes it).
 
 Direct SAR result dumps (`DumpType` 20..22) are tracked separately as RM-136.
 
+## GUI PNG capture and visual QA (RM-105, RM-106)
+
+| Check | Measured | Verdict |
+| --- | --- | --- |
+| PNG writer | a 2x1 RGBA buffer decodes back byte-identical; a wrong buffer length is rejected | PASS |
+| Offscreen capture | 64x48 render of an orange box: 3072 RGBA pixels, >100 non-background pixels, `export_image` writes a 64x48 PNG that decodes to the same content | PASS |
+| Full UI frame | 1280x800 frame through the real wgpu pipelines and egui widgets: `audits/gui-screenshot.png` (251592 bytes, 1280x800, >50 distinct colours). The layout shows the tree with `Material::substrate`, `Box - ID: 1` and the selected `Sphere - ID: 2`, the property editor (name, visibility, coordinates, colors, isotropic, Epsilon/Mue/Kappa/Sigma), the primitive editor (priority, center, radius, delete), the mesh/parameter editor and the 3D viewport with the sphere and box | PASS |
+| Defects found by the artifact | duplicate `ScrollArea` ID (egui warning), missing arrow/bulb glyphs (empty boxes) and a selected primitive hidden by the tree's expansion state; all fixed | PASS |
+
+The frame is rendered offscreen because WSLg cannot present a frame in this
+environment (`Io error: Broken pipe`). Seven interactive items (real-display
+presentation, keyboard-focus edge case, dialogs, mouse interaction, camera
+controls, native side-by-side parity, platform matrix) remain open in
+`audits/gui-qa.md`; RM-106 therefore stays `Implemented`.
+
 ## GUI project I/O, undo/redo and exports (RM-102..RM-104)
 
 Verified headlessly; the interactive checklist is RM-106.

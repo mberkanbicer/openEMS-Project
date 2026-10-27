@@ -9,7 +9,7 @@ pass, including analytic propagation, UPML absorption, CFL, quarter-cell
 material averaging and native-HDF5 dump reading.
 
 Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
-(57 `Verified`, 52 `Implemented`, 35 `Not Started`, 3 `Blocked` at the last
+(57 `Verified`, 54 `Implemented`, 33 `Not Started`, 3 `Blocked` at the last
 update; see the snapshot there for the live count). The largest open areas are the extension
 framework and remaining physics extensions, NF2FF/SAR, the native CLI and
 scripting interfaces, the GUI feature surface, and the differential harness over
@@ -636,7 +636,7 @@ list below is the current execution plan.
 | Task | Work | Why it is first |
 | --- | --- | --- |
 | RM-123 | Regression CI gate (`.github/workflows/reference.yml`) | **Implemented**; the first GitHub Actions run must confirm the runner plumbing |
-| RM-105.. | Remaining GUI tasks (PNG capture and manual QA), then RM-145/RM-146 | RM-098..RM-104 are implemented. Next: PNG capture from the wgpu frame, the RM-106 manual/visual checklist, then the two open solver gaps (SAR averaging cubes, end-criteria stop time) |
+| RM-145, RM-146 | Open solver parity gaps | The GUI wave (RM-015, RM-097..RM-106) is implemented; only the interactive checklist sign-off remains. Next are the two P1 solver deviations: the SAR 1 g/10 g averaging-cube search and the end-criteria stop time |
 
 ### 2. Engine and dump completeness (open, in order)
 
