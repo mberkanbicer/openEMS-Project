@@ -59,10 +59,10 @@ RM-127.
 
 | Status | Count | Tasks |
 | --- | --- | --- |
-| `Verified` | 77 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-071, RM-072, RM-073, RM-074, RM-075, RM-079, RM-082, RM-083, RM-084, RM-085, RM-086, RM-087, RM-088, RM-089, RM-090, RM-091, RM-092, RM-093, RM-095, RM-096, RM-117, RM-118, RM-119, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133, RM-134, RM-135, RM-136, RM-137, RM-138, RM-139, RM-140, RM-141, RM-142, RM-143, RM-123, RM-112, RM-113, RM-114, RM-115, RM-116, RM-145, RM-146, RM-013, RM-027, RM-028, RM-029, RM-034, RM-035, RM-036, RM-107, RM-108, RM-109, RM-110, RM-111 |
-| `Implemented` | 54 | RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022, RM-037, RM-038, RM-039, RM-040, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-057, RM-060, RM-064, RM-065, RM-066, RM-067, RM-068, RM-069, RM-070, RM-076, RM-077, RM-078, RM-080, RM-081, RM-098, RM-099, RM-100, RM-101, RM-102, RM-103, RM-104, RM-105, RM-106 |
+| `Verified` | 80 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-009, RM-011, RM-012, RM-014, RM-016, RM-017, RM-056, RM-058, RM-059, RM-061, RM-062, RM-063, RM-071, RM-072, RM-073, RM-074, RM-075, RM-079, RM-082, RM-083, RM-084, RM-085, RM-086, RM-087, RM-088, RM-089, RM-090, RM-091, RM-092, RM-093, RM-095, RM-096, RM-117, RM-118, RM-119, RM-126, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133, RM-134, RM-135, RM-136, RM-137, RM-138, RM-139, RM-140, RM-141, RM-142, RM-143, RM-123, RM-112, RM-113, RM-114, RM-115, RM-116, RM-145, RM-146, RM-023, RM-024, RM-025, RM-013, RM-027, RM-028, RM-029, RM-034, RM-035, RM-036, RM-107, RM-108, RM-109, RM-110, RM-111 |
+| `Implemented` | 55 | RM-006, RM-007, RM-008, RM-010, RM-018, RM-019, RM-020, RM-021, RM-022, RM-037, RM-038, RM-039, RM-040, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-057, RM-060, RM-064, RM-065, RM-066, RM-067, RM-068, RM-069, RM-070, RM-076, RM-077, RM-078, RM-080, RM-081, RM-098, RM-099, RM-100, RM-101, RM-102, RM-103, RM-104, RM-105, RM-106, RM-026 |
 | `Blocked` | 3 | RM-125, RM-127, RM-144 |
-| `Not Started` | 13 | all remaining tasks |
+| `Not Started` | 9 | all remaining tasks |
 
 Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
@@ -75,7 +75,7 @@ Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
 
 
-## Remaining backlog (13 tasks) and execution order
+## Remaining backlog (9 tasks) and execution order
 
 The tasks below are the `Not Started` rows of this document, grouped by the order they will be executed. Waves A, C, D and E are complete and pushed, and the CSXCAD depth wave (RM-027/028/029/034/035/036) is verified; the remaining waves are ordered by dependency and by what can be verified in this workspace.
 
@@ -109,10 +109,6 @@ The tasks below are the `Not Started` rows of this document, grouped by the orde
 
 | ID | Pri | Task | Depends |
 | --- | --- | --- | --- |
-| RM-023 | P2 | Close optimizer-rule differential coverage or record a bounded exception | RM-006 |
-| RM-024 | P2 | Decide and implement/record optional numeric backends (D-06) | RM-006 |
-| RM-025 | P2 | Decide C++ API/FFI compatibility surface | RM-006 |
-| RM-026 | P2 | Run fparser differential suite on macOS and FreeBSD | RM-023 |
 | RM-030 | P2 | Enable and validate `hdf5` feature in CI | RM-009 |
 | RM-031 | P1 | Raise CSXCAD Python surface to native class inventory | RM-013 |
 | RM-032 | P1 | Raise CSXCAD MATLAB surface to native M-file inventory | RM-016 |
@@ -178,10 +174,10 @@ Wave C additionally needs a Python interpreter compatible with the PyO3 version 
 
 | ID | Pri | Task | Depends | Est | Acceptance / Evidence | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| RM-023 | P2 | Close optimizer-rule differential coverage or record a bounded exception | RM-006 | L | Measured statement with case counts and residual risk | Not Started |
-| RM-024 | P2 | Decide and implement/record optional numeric backends (D-06) | RM-006 | L | ADR + tests or exception register entry | Not Started |
-| RM-025 | P2 | Decide C++ API/FFI compatibility surface | RM-006 | S | ADR; bindings plan | Not Started |
-| RM-026 | P2 | Run fparser differential suite on macOS and FreeBSD | RM-023 | M | Platform logs | Not Started |
+| RM-023 | P2 | Close optimizer-rule differential coverage or record a bounded exception | RM-006 | L | Measured: `fparser/rust/tests/run_differential.py` compares the Rust parser against the pinned C++ parser on **45,223 corpus rows (22,894 with `@optimize`)**, i.e. 45,221 expressions and 45,196 callback-count checks, with zero mismatches at the 1e-12 tolerance (explicit non-finite and float-boundary values). Coverage is recorded per corpus part in `VALIDATION.md`; the bounded residual risk is that the optimizer is a targeted port (constant folding, legacy math lowering, function sharing, observable nested rewrites), not a rule-for-rule port of the 262 generated rules, so a rule whose effect is not observable in a value or callback count is not individually asserted | Verified |
+| RM-024 | P2 | Decide and implement/record optional numeric backends (D-06) | RM-006 | L | `ADR 0006` (accepted 2026-10-24) ports and maintains the `f64` variant only and forbids a runtime numeric-backend abstraction; the omitted `float`, `long double`, long integer and MPFR/GMP variants are recorded as exception `E-001` in `docs/migration/EXCEPTIONS.md` with the impact (extended-precision scripts evaluate in `f64`; the solver and CSXCAD use `f64`) and the compatibility path (a new decision is required for another precision; the native C++ parser stays available for differential checks) | Verified |
+| RM-025 | P2 | Decide C++ API/FFI compatibility surface | RM-006 | S | `ADR 0008` (accepted 2026-10-27): the Rust crates are the canonical implementation and there is no C++ source- or binary-compatible wrapper; the supported surfaces are the CLI binaries, the Python packages with the native names, the MATLAB/Octave CLI plus a narrow reviewed C ABI for structure access, and the CSXCAD XML format. A C ABI is allowed only as documented foreign-runtime glue with a contract test and an interface-audit entry, and system HDF5 stays the only library FFI (exception `E-002`). `EXCEPTIONS.md` was updated: the former `E-002` (no `ctb` binary) was removed because RM-116 delivered the `ctb` command | Verified |
+| RM-026 | P2 | Run fparser differential suite on macOS and FreeBSD | RM-023 | M | `.github/workflows/rust.yml` now runs `python3 fparser/rust/tests/run_differential.py` on the macOS runner (dedicated job) and inside the FreeBSD VM (after `pkg install rust cmake python3`), so the 45,223-case corpus is compared against the pinned C++ parser on both platforms | Implemented |
 | RM-027 | P1 | Add integration tests through CSXCAD expression evaluation | RM-006 | S | `CSXCAD/rust/tests/expression_evaluation.rs` (8 tests) drives expressions end to end: parameter-defined coordinates, expression weights, transform arguments and material values through bounding boxes, containment and priority queries; the native parameter error codes (1, 2, 3, 4 parse/evaluate, `100 + fparser code`, `-1`) are asserted, and a malformed transform argument fails in strict mode where native `CSTransform::ReadFromXML` warns and skips (both paths tested) | Verified |
 ## WS3 - CSXCAD closure
 
@@ -507,6 +503,7 @@ in the task's acceptance column.
 | 2026-10-27 | RM-145 | Verified | SAR averaging parity: the native full-edge cube search, air power zeroing, own-cube overwrite, step-2 face statistics, partial-used switch and counters are ported; the cylindrical SAR check reports 2.565e-3 per-cell (bound 1e-2), 0 of 1936 cells above 1 %, peak -2.06e-7, valid/used counters equal, E-field DFT 8.241e-7 |
 | 2026-10-27 | RM-146 | Implemented | End criteria: CalcFastEnergy weighted like native, wall-clock 4 s default, exact Nyquist mode, maxExcite seed and negative criteria; 238 Rust tests, Python 298+150 and the 4-case harness pass. The exact stop-time comparison is blocked by the pinned native binary (no --exact-endcriteria) and the failing native rebuild |
 | 2026-10-27 | RM-013 | Verified | Installed-package import with the native names: `CSXCAD` ships its pure-Python package plus `csxcad_py` (`python-packages`), `openEMS` uses the native distribution name so `__version__` is 0.1.0, and the CI build script asserts `from CSXCAD import ContinuousStructure; from openEMS import openEMS` from `/tmp` with `PYTHONPATH` unset. Native Python suites: 298 + 150 |
+| 2026-10-27 | RM-023..RM-025 | Verified | fparser decisions and coverage: 45,223 corpus rows (22,894 optimizer-enabled), 45,221 expressions and 45,196 callback checks with zero mismatches; ADR 0006 + E-001 for the numeric backends; ADR 0008 for the C++/FFI surface (no C++ wrapper; CLI, Python, MATLAB/Octave and XML are the compatibility surfaces) |
 | 2026-10-27 | RM-107..RM-111 | Verified | hyp2mat: 9-fixture corpus with SHA-256 manifest; polygon edges/booleans/offset against a native `polytest` oracle; `-f csxcad` and `--csxcad-xml`; QucsStudio/PDF parity; full native CLI. Evidence: native model dump byte-identical 9/9, `-v` summary byte-identical 9/9, `--raw` byte-identical 4/4, 45/45 outputs deterministic, PDFs render 3/3/3/3/4/3/3/5/3 pages, native CSXCAD reads all 9 Rust XML documents with an identical model dump (255 lines), 114 Rust tests |
 | 2026-10-27 | RM-027..RM-036 | Verified | CSXCAD depth: 11 native-written XML fixtures with a deterministic generator (two runs, identical sha256), a native re-read differential harness, expression integration tests with native error codes, transform/parameter edge cases (three porting defects fixed), 22 STL/PLY mesh fixtures with VTK expectations, and a recorded performance baseline. 194 tests (200 with `--features hdf5`) |
 | 2026-10-27 | RM-112, RM-113, RM-114, RM-115 | Verified | CTB wave: per-port `RefImpedance`, complete S/Y/Z/A/H/G transforms, Touchstone v1/v2 and the network operations. 65 lib + 8 differential + 1 doc test; 84 Octave fixtures; six native Touchstone files write byte-identically; worst differential deviation 5.25e-16 against 1e-12/1e-11 bounds. Native quirks N-1..N-12 are recorded in `audits/ctb.md` |

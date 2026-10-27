@@ -120,6 +120,23 @@ jobs:
       - name: Numerical core tests
         run: HDF5_LIB_DIR="$(brew --prefix)/opt/hdf5/lib" cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs
 
+  fparser-differential:
+    # RM-026: the fparser differential suite against the pinned C++ parser on
+    # macOS (Linux runs it in the main job, Windows is covered by the Rust
+    # integration tests).
+    name: fparser differential (macOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: fparser/rust
+      - name: Differential suite against the pinned C++ parser
+        run: python3 fparser/rust/tests/run_differential.py
+
   freebsd:
     name: FreeBSD (check)
     runs-on: ubuntu-latest
@@ -131,5 +148,7 @@ jobs:
         uses: vmactions/freebsd-vm@v1
         with:
           usesh: true
-          prepare: pkg install -y rust hdf5
-          run: env HDF5_LIB_DIR=/usr/local/lib cargo check --workspace
+          prepare: pkg install -y rust hdf5 cmake python3
+          run: |
+            env HDF5_LIB_DIR=/usr/local/lib cargo check --workspace
+            python3 fparser/rust/tests/run_differential.py

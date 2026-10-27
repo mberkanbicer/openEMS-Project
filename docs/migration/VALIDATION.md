@@ -1615,6 +1615,47 @@ accepts `Y_sh` while its help says `Y_se`. The port adds v2 reading, explicit
 errors for malformed files and per-port references in `s2a`/`a2s` (native
 aborts or returns garbage); those are documented deviations.
 
+## fparser optimizer coverage and decisions (RM-023..RM-025)
+
+### Measured optimizer coverage (RM-023)
+
+`fparser/rust/tests/run_differential.py` builds the pinned C++ parser
+(`tests/original_reference.cpp`, CMake) and the Rust parser, runs both over the
+same corpus and compares values (tolerance 1e-12, explicit non-finite and
+float-boundary values), plus the callback-call counts that make the optimizer
+observable.
+
+| Corpus part | Rows | Optimizer-enabled |
+| --- | --- | --- |
+| checked-in cases (`differential_cases.tsv`) | 485 | 328 |
+| generated operator matrix (14 operators x 31 values x 2) | 15,180 | 7,590 |
+| generated builtin matrix | 2,920 | 1,460 |
+| generated nested builtins | 26,245 | 13,123 |
+| nested optimizer regressions | 126 | 126 |
+| zero/error rewrites | 81 | 81 |
+| signed `exp`/`log` rewrites | 48 | 48 |
+| negative `sqrt`/`log` rewrites | 54 | 54 |
+| signed nested composition | 84 | 84 |
+| **total** | **45,223** | **22,894** |
+
+Result: **45,221 expressions and 45,196 callback-count checks compared with zero
+mismatches** under the recorded tolerances.
+
+Residual risk (bounded): the Rust optimizer is a targeted port (constant
+folding, legacy math lowering, function sharing and the observable nested
+rewrites such as `csc(asin(x))`, `log(csc(acos(x)))`, `cbrt(sqrt(x))`), not a
+rule-for-rule port of the 262 generated optimizer rules. A rule whose effect is
+not observable in a value or in a callback count is not individually asserted;
+the 22,894 optimizer-enabled cases are the mitigation, and every observed
+difference is a defect, not tolerance noise.
+
+### Decisions (RM-024, RM-025)
+
+| Task | Decision |
+| --- | --- |
+| RM-024 optional numeric backends | `ADR 0006` keeps `f64` only; the omitted variants (`float`, `long double`, long integer, MPFR/GMP) are recorded as exception `E-001` with the impact and the compatibility path |
+| RM-025 C++ API/FFI surface | `ADR 0008`: the Rust crates are canonical, there is no C++ source/binary-compatible wrapper, external surfaces are the CLI binaries, the Python packages, the MATLAB/Octave CLI plus a narrow reviewed C ABI, and the CSXCAD XML format; a C ABI is allowed only as documented foreign-runtime glue, and system HDF5 remains the only library FFI (`E-002`) |
+
 ## Python packages under the native names (RM-013)
 
 | Check | Result |
