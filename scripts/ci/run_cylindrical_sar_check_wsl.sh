@@ -43,7 +43,11 @@ f0 = 2.0e9
 fc = 0.5e9
 
 sim_path = os.path.join(work, "rust")
-FDTD = openEMS(CoordSystem=1, NrTS=6000, EndCriteria=1e-5)
+# EndCriteria=-1 disables the energy criterion on both sides: the native
+# wall-clock cadence makes an early stop machine-dependent, and the pinned
+# reference binary predates --exact-endcriteria. Both runs therefore execute
+# the full 6000 timesteps, isolating the SAR comparison from RM-146.
+FDTD = openEMS(CoordSystem=1, NrTS=6000, EndCriteria=-1)
 FDTD.SetGaussExcite(f0, fc)
 FDTD.SetBoundaryCond(["PEC"] * 6)
 
@@ -190,8 +194,8 @@ print("  probe t[:6] rust :", ["%.4e" % value for value in rust_et[:6, 0]])
 print("  probe t[:6] native:", ["%.4e" % value for value in native_et[:6, 0]])
 print("  probe t tail rust:", ["%.4e" % value for value in rust_et[-3:, 0]])
 print("  probe cadence: rust rows=%d native rows=%d" % (len(rust_et), len(native_et)))
-print("  NOTE: the rust run stopped on the end criteria earlier than native "
-      "(probe sample count differs); tracked as RM-146")
+print("  NOTE: both runs disabled the end criteria for this comparison "
+      "(EndCriteria=-1); the cadence itself is covered by RM-146 unit tests")
 if rust_et.shape == native_et.shape:
     et_scale = max(float(np.max(np.abs(native_et[:, 1:]))), 1e-30)
     et_diff = float(np.max(np.abs(rust_et[:, 1:] - native_et[:, 1:]))) / et_scale
@@ -235,14 +239,23 @@ print("  boundary cells: max rel. %.3e, cells over 1%% of peak: %d" % (
     float(np.max(boundary)) / scale,
     int(np.sum(boundary > 0.01 * scale))))
 
-# The raw dump inputs and the 1 g peak now match native. The remaining
-# per-cell 1 g differences come from the mass-averaging cube search, which was
-# never numerically compared to native before and is tracked as RM-145; this
-# check reports the numbers instead of hiding them.
-print("  NOTE: the 1 g cube-search kernel still differs from native for %d of %d "
-      "cells (RM-145); only the peak and the raw dump inputs are gated here" % (
-          int(np.sum(diff_field > 0.01 * scale)), diff_field.size))
-assert abs(peak_ratio) < 1e-2, "peak SAR ratio deviates by %.3e" % abs(peak_ratio)
+# RM-145 gate: the cube search now follows native (full-edge box convention,
+# air power zeroed, native assignment and counters). The residual per-cell
+# difference is native float accumulation; bound it relative to the peak.
+bound = 1.0e-2
+assert diff < bound, "1 g SAR differs from native by %.3e (bound %.1e)" % (diff, bound)
+assert abs(peak_ratio) < 1e-3, "peak SAR ratio deviates by %.3e" % abs(peak_ratio)
+over = int(np.sum(diff_field > 0.01 * scale))
+assert over == 0, "%d cells differ from native by more than 1%% of the peak" % over
+assert rust_result.get("valid_cubes") == native_result.get("valid_cubes"), (
+    "valid_cubes %s vs %s" % (rust_result.get("valid_cubes"), native_result.get("valid_cubes")))
+assert rust_result.get("used_cubes") == native_result.get("used_cubes"), (
+    "used_cubes %s vs %s" % (rust_result.get("used_cubes"), native_result.get("used_cubes")))
+assert rust_result.get("unused_cubes") == native_result.get("unused_cubes"), (
+    "unused_cubes %s vs %s" % (rust_result.get("unused_cubes"), native_result.get("unused_cubes")))
+assert rust_result.get("air_cubes") == native_result.get("air_cubes"), (
+    "air_cubes %s vs %s" % (rust_result.get("air_cubes"), native_result.get("air_cubes")))
+print("  gates: per-cell %.1e (bound %.1e), peak 1e-3, counters equal" % (diff, bound))
 for name in ("CubeMass", "CubeVol"):
     if name in rust_result and name in native_result:
         r = rust_result[name].astype(np.float64)
