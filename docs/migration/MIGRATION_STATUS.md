@@ -9,7 +9,7 @@ pass, including analytic propagation, UPML absorption, CFL, quarter-cell
 material averaging and native-HDF5 dump reading.
 
 Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
-(64 `Verified`, 55 `Implemented`, 25 `Not Started`, 3 `Blocked` at the last
+(65 `Verified`, 54 `Implemented`, 25 `Not Started`, 3 `Blocked` at the last
 update; see the snapshot there for the live count). The largest open areas are the extension
 framework and remaining physics extensions, NF2FF/SAR, the native CLI and
 scripting interfaces, the GUI feature surface, and the differential harness over
@@ -636,7 +636,7 @@ list below is the current execution plan.
 | Task | Work | Why it is first |
 | --- | --- | --- |
 | RM-123 | Regression CI gate (`.github/workflows/reference.yml`) | **Implemented**; the first GitHub Actions run must confirm the runner plumbing |
-| RM-107..RM-111 | Remaining hyp2mat tasks | CTB RM-112..RM-116 and SAR RM-145 are verified; RM-146 is implemented (exact stop-time comparison blocked by the pinned native binary, which lacks `--exact-endcriteria`). Next: the hyp2mat polygon/XML/QucsStudio/CLI tasks and the MATLAB/Octave delivery form, then RM-147 and the remaining validation/CI work |
+| RM-107..RM-111 | Remaining hyp2mat tasks | CTB RM-112..RM-116 and SAR RM-145 are verified; RM-146 is verified (exact cadence: both solvers stop at 1488 for 1e-5). Next: the hyp2mat polygon/XML/QucsStudio/CLI tasks and the MATLAB/Octave delivery form, then RM-147 and the remaining validation/CI work |
 
 ### 2. Engine and dump completeness (open, in order)
 

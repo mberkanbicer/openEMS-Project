@@ -1562,47 +1562,31 @@ power zeroing, the counter partition and the full-edge convention.
 mue0*(H0^2+H1^2+H2^2)` in native order, over `GetNumberOfLines(n, false)-1`
 cells; a closed cylindrical azimuth hides its two seam planes, and the
 steady-state extension uses the same helper. The loop follows `openems.cpp`:
-the default evaluates only after four seconds of wall clock, `--exact-endcriteria`
-evaluates every excitation Nyquist period (with the native startup line),
-`maxE` is seeded at the maximum-excitation timestep (without updating `change`
-in default mode), and a negative `EndCriteria` disables the criterion.
+the default evaluates only after four seconds of wall clock,
+`--exact-endcriteria` evaluates every excitation Nyquist period (with the
+native startup line), `maxE` is seeded at the maximum-excitation timestep
+(without updating `change` in default mode), and a negative `EndCriteria`
+disables the criterion.
 
 | Check | Result |
 | --- | --- |
 | energy formula (unit) | `eps0/mue0` weighted sum over the interior cells |
 | cadence (unit) | exact mode hits multiples of the Nyquist (Dirac/Step = 1); default fires at 4 s and then every 4 s |
-| fast default run (integration) | 30-step Gaussian run reaches NrTS instead of stopping on the old 100-step cadence |
+| fast default run (integration) | a 30-step Gaussian run reaches NrTS instead of stopping on the old 100-step cadence |
 | negative criterion | `EndCriteria=-1` is kept (disables) |
 | `openems-core` | 238 tests pass |
 | Python suites | 298 + 150 pass |
+| Octave suite | 10/10 pass, every simulation case with `--exact-endcriteria` |
 | reference harness | 4/4 pass |
-| Octave suite | 10/10 pass (1235.9 s), every simulation case invoked with `--exact-endcriteria`, including `coax_cylindrical` |
-| cylindrical SAR check | with the criterion disabled on both sides, 1001/1001 probe rows and a bit-identical probe |
+| cylindrical SAR check | exact criteria on both sides: **both stop at 1488**, 249/249 probe rows, probe `et` 3.247e-6, E-field DFT 6.801e-7, SAR 2.562e-3, counters equal |
+| native build cross-check | a rebuilt native from the fork source stops at 1e-6/1e-4/1e-3 on 1656/1224/1056, identical to the pinned binary (SAR_raw/et/ht md5 equal; SAR_1g differs only in `proc_time`) |
 
-**Open:** the exact stop-time comparison needs a native binary with
-`--exact-endcriteria`. The pinned `~/opt/openEMS` v0.37.0 predates the option
-(it parses the flag as the input file), and rebuilding from the worktree fails
-during the CSXCAD configure step because the submodule `.git` pointer contains
-a Windows path (`fatal: not a git repository:
-.../CSXCAD/D:/openEMS-Project/.git/worktrees/...`; log
-`build_20261027_125956.log`). The native default cadence is wall-clock based by
-design, so a stop-time equality on two different machines is not a meaningful
-test; the port is verified at the semantics level and RM-146 stays
-`Implemented`.
-
-### CTB delivery to MATLAB/Octave (RM-116)
-
-| Check | Result |
-| --- | --- |
-| CLI | `ctb info`, `ctb convert --to s|y|z|h|g [--ref ...]`, `ctb renorm --to ...`; four integration tests plus five invalid invocations with non-zero exits and messages |
-| Octave wrapper | `CTB/rust/matlab/ctb_convert.m` and `ctb_info.m` call the binary via `system()`; the converted file is read with the unmodified native `read_touchstone.m` |
-| Octave exercise | `CTB_BIN=target/debug/ctb octave --no-gui --quiet tests/octave/cli_exercise.m`: S->Z error 4.25e-5, back to S 3.16e-7 (7 significant digits of the native `.6e` format), `info` reports 2 ports / 2 frequencies / 50 ohm |
-| Tests | 65 lib + 4 CLI + 8 differential + 1 doc = 78 pass; `cargo fmt --check` and `cargo clippy --all-targets` clean |
-
-Per-port reference vectors are written as Touchstone v2 `[Reference]` blocks;
-the native v1 `read_touchstone.m` cannot parse those, so the M-file wrapper is
-documented for scalar references and per-port data is read through the Rust
-library or `ctb info`.
+Native argument order is `openEMS input.xml --exact-endcriteria` (the XML must
+be argv[1]); the earlier "flag unsupported" observation was this ordering
+mistake. The committed check now runs exact mode on both sides and gates the
+probe shape, a non-zero probe scale and the stop step (a 24-step multiple). The
+probe moved from the PEC outer radius (where it was identically zero) to
+rho = 16 mm inside the lossy material.
 
 ## CTB parity (RM-112..RM-115)
 
