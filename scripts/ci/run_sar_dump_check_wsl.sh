@@ -6,7 +6,8 @@
 # against sigma|E|^2/(2 rho) evaluated from the raw dump itself.
 set -euo pipefail
 
-REPO_ROOT=/mnt/c/Users/mberkanbicer/.copilot/repos/copilot-worktrees/openEMS-Project/mberkanbicer-potential-garbanzo
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 export PATH="$REPO_ROOT/bin:$PATH"
 cd "$REPO_ROOT/openEMS/TESTSUITE"
 

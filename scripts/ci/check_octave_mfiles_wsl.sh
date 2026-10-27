@@ -2,7 +2,8 @@
 # Check that every CSXCAD/openEMS MATLAB M-file resolves after addpath.
 set -uo pipefail
 
-REPO_ROOT=/mnt/c/Users/mberkanbicer/.copilot/repos/copilot-worktrees/openEMS-Project/mberkanbicer-potential-garbanzo
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 cd "$REPO_ROOT" || exit 1
 
 octave --no-gui --quiet --eval "
