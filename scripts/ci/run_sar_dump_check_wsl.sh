@@ -9,6 +9,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 export PATH="$REPO_ROOT/bin:$PATH"
+bash "$SCRIPT_DIR/link_rust_openems.sh" --no-build >/dev/null || exit 1
 cd "$REPO_ROOT/openEMS/TESTSUITE"
 
 rm -rf tmp_sarcheck
