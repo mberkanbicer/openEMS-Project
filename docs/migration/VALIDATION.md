@@ -1634,6 +1634,18 @@ property causes double ownership and a double free; parameter-set transforms
 `Utilities.GetMultiDirs` with an invalid name silently returns `None` where the
 Rust binding raises `ValueError`.
 
+## Curve and wire excitations (RM-149)
+
+| Check | Result |
+| --- | --- |
+| `FindPath` port | native neighbour order and tie-breaking, `SnapLine2Mesh` (dual=false, full=true), `Point_Line_Distance` with the cylindrical chord metric, out-of-domain failure, closure loop |
+| Curve branch | point evaluated in the operator mesh system with the primitive transform, path walked, `amp = GetWeightedExcitation * GetEdgeLength`, types 0 and 1 only, VV/VI zeroed for hard excite |
+| Unit tests | 5: tie-breaking staircase (hand-derived), axis-aligned segment, out-of-domain, cylindrical metric (the inward first step pins the chord metric), end-to-end curve excitation |
+| `openems-core` | 245 + 2 tests pass |
+| Cavity differential | peaks 5.807516e-06 / 2.316531e-05 / 7.766571e-06 vs native 5.807240e-06 / 2.316510e-05 / 7.766348e-06 (4.8e-5 / 9.2e-6 / 2.9e-5); maximum sample difference 1.6e-4 / 4.5e-5 / 1.2e-4; **bit-identical** for all 6667 samples when the native timestep is pinned, which isolates the residual to the pre-existing `calc_timestep` summation-order difference |
+| Regression | `Coax` `ut1`/`et`/`ht` and all `msl_port` probes are byte-identical before and after the change; `scripts/ci/run_curve_excitation_check_wsl.sh` gates the behaviour |
+| Not ported | the `Operator_Cylinder` overrides (azimuth fold, start/stop swap, alpha-seam split), tracked as RM-148 |
+
 ## MATLAB C-ABI contracts (RM-094)
 
 | Check | Result |
