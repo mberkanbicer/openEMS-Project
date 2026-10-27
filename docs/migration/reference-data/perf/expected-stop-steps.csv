@@ -1,0 +1,7 @@
+config,case,stop_step
+basic,Coax,1178
+basic,cavity,20000
+basic,msl_port,1716
+default,Coax,1178
+default,cavity,20000
+default,msl_port,1716

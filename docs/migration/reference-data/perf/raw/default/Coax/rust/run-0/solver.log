@@ -1,0 +1,18 @@
+--------------------------------------------------------------------------------
+ openEMS - Electromagnetic Field Solver (Rust)
+ Version: 0.1.0 (Rust migration)
+--------------------------------------------------------------------------------
+Exact-endcriteria: evaluating the end criteria every 62 timestep(s) (this excitation's Nyquist rate)
+[openEMS] Timestep: 100
+[openEMS] Timestep: 200
+[openEMS] Timestep: 300
+[openEMS] Timestep: 400
+[openEMS] Timestep: 500
+[openEMS] Timestep: 600
+[openEMS] Timestep: 700
+[openEMS] Timestep: 800
+[openEMS] Timestep: 900
+[openEMS] Timestep: 1000
+[openEMS] Timestep: 1100
+[openEMS] End-criteria of 40.2 dB reached after 1178 timesteps.
+[openEMS] FDTD simulation completed: 1178 timesteps.

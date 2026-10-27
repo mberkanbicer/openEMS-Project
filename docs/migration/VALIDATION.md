@@ -1615,6 +1615,48 @@ accepts `Y_sh` while its help says `Y_se`. The port adds v2 reading, explicit
 errors for malformed files and per-port references in `s2a`/`a2s` (native
 aborts or returns garbage); those are documented deviations.
 
+## CSXCAD interface depth (RM-031..RM-033)
+
+| Check | Result |
+| --- | --- |
+| Python surface inventory | 7 native `.pyx` files, 33 classes, 360 declarations, 293 public, 256 distinct names, per-file SHA-256 |
+| Python surface test | 33/33 classes, 288/288 public methods, 5/5 module functions present, 0 absent |
+| MATLAB surface inventory | 70 M-files (58 public, 12 private), 114 declarations, per-file SHA-256 |
+| MATLAB surface test | every declaration re-parsed and compared, all 58 public entry points resolve, 0 absent, 2 declared external requirements |
+| Octave wrapper suite | 130 assertions plus an XML round trip re-read by the Rust core |
+| Ownership contracts | 6 Rust core tests + 25 Python binding tests + 7 C-ABI tests, each citing the native source line |
+| Bugs fixed | delete of a foreign property could remove a colliding id; delete of a detached property raised instead of a no-op |
+| Regressions | native Python suites 298 + 150 pass; CSXCAD 200, rust-py 2, rust-matlab 7, Python 36 |
+
+Deliberate deviations (asserted, not reproduced): native double-add of a
+property causes double ownership and a double free; parameter-set transforms
+(`CSTransform(pset)`) are not modelled by the numeric 4x4 Rust transform; and
+`Utilities.GetMultiDirs` with an invalid name silently returns `None` where the
+Rust binding raises `ValueError`.
+
+## CI platform matrix and HDF5 feature (RM-026, RM-030, RM-120, RM-124)
+
+`.github/workflows/rust.yml` run `40580893146`:
+
+| Job | Result |
+| --- | --- |
+| Linux (workspace check, five numerical crates, policy gates) | green, 2m9s |
+| macOS (workspace check + the same tests) | green, 2m59s |
+| Windows (workspace check + tests, HDF5 from vcpkg) | green, 8m7s |
+| FreeBSD (workspace check without `hyp2mat-rs`, fparser differential) | green, 2m49s |
+| Linux HDF5 feature (`csxcad-core` + `openems-core`, six HDF5 reader tests) | green, 1m52s |
+| fparser differential (macOS) | green, 54s |
+| Reference (differential harness over `reference-data/`) | green, dispatched run `40580897904`, 4m8s |
+
+The `hdf5` feature is unified across the workspace, so every job installs the
+development files (apt, vcpkg, Homebrew, FreeBSD pkg); the HDF5 job also runs
+`reads_native_discrete_material_hdf5_layout_and_properties`. FreeBSD excludes
+`hyp2mat-rs` only because its `clipper2c-sys` backend has no FreeBSD target
+(exception `E-004`); the solver, CSXCAD, CTB, GUI crates and the fparser
+differential suite all run there. `RM-124` adds a nightly `cron` schedule to the
+Reference workflow; the dispatch path is proven, the first scheduled artifact is
+still pending.
+
 ## fparser optimizer coverage and decisions (RM-023..RM-025)
 
 ### Measured optimizer coverage (RM-023)
