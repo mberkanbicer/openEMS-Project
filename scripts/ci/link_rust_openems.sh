@@ -9,9 +9,12 @@
 # without touching a single M-file.
 #
 # `CalcNF2FF.m` searches `<repo>/openEMS/nf2ff/nf2ff` first (the native source
-# build location), and `CalcSAR.m` searches `<repo>/../bin/sar_calc`. Note that
-# the native `searchBinary` concatenates PATH entries without a separator, so a
-# PATH lookup never matches; the binaries must sit at the explicit locations.
+# build location). Note that the native `searchBinary` concatenates PATH entries
+# without a separator, so a PATH lookup never matches; the binary must sit at
+# that explicit location. `CalcSAR.m`'s only explicit path is
+# `<repo>/../bin/sar_calc` (the installed layout), while
+# `scripts/ci/run_sar_dump_check_wsl.sh` calls `<repo>/bin/sar_calc` directly,
+# so that one is linked inside the tree only.
 #
 # Usage: scripts/ci/link_rust_openems.sh [--no-build]
 set -euo pipefail
@@ -44,4 +47,3 @@ link nf2ff-cli "$REPO_ROOT/openEMS/nf2ff/nf2ff"
 # parent of the repository; provide both so either call site resolves.
 link nf2ff-cli "$REPO_ROOT/bin/nf2ff"
 link sar-cli "$REPO_ROOT/bin/sar_calc"
-link sar-cli "$REPO_ROOT/../bin/sar_calc"
