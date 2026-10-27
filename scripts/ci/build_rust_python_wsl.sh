@@ -44,13 +44,22 @@ done
 
 export PYTHONPATH="$REPO_ROOT/CSXCAD/rust-py/python:$REPO_ROOT/openEMS/rust-py/python${PYTHONPATH:+:$PYTHONPATH}"
 
-python - <<'PY'
+# RM-013: the installed packages must be importable with the native names and
+# without PYTHONPATH, exactly like the Cython/Python originals.
+( cd /tmp && env -u PYTHONPATH python - <<'PY'
+from CSXCAD import ContinuousStructure
+from openEMS import openEMS
+import CSXCAD
 import csxcad_py
-import openEMS
+import openEMS as openems_package
 from openEMS import _openems
 
+print("CSXCAD:", CSXCAD.__file__, CSXCAD.__version__)
+print("openEMS:", openems_package.__file__, openems_package.__version__)
 print("csxcad_py:", csxcad_py.__file__)
-print("openEMS:", openEMS.__file__)
 print("_openems:", _openems.__file__)
+print("grid:", type(ContinuousStructure().GetGrid()).__name__)
+print("solver:", openEMS)
 PY
+)
 echo "Rust Python extensions installed in $VENV"
