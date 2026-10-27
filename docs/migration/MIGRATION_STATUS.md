@@ -627,61 +627,27 @@ the SAR 1 g/10 g averaging-cube search (RM-145), the end-criteria stop time
 
 ## Next task
 
-Waves A, C, D and E (CLI, Python, Octave/MATLAB, dumps, SAR, NF2FF, QCSXCAD/AppCSXCAD,
-hyp2mat and CTB) are closed and verified, and the CSXCAD depth wave
-(RM-027/028/029/034/035/036) is verified against a native rebuild.
-The remaining work is tracked per task in `REMEDIATION_TASKS.md`; the ordered
-list below is the current execution plan.
+Waves A, C, D and E (CLI, Python, Octave/MATLAB, dumps, SAR, NF2FF,
+QCSXCAD/AppCSXCAD, hyp2mat, CTB), the CSXCAD depth wave (RM-027/028/029/
+034/035/036), the CSXCAD interface contracts (RM-031/032/033), the fparser
+decisions (RM-023/024/025), the MATLAB C-ABI contracts (RM-094) and the CI
+matrix (RM-026/030/120) are verified.
 
-### 1. Differential gaps found by the harness (RM-117 evidence)
-
-| Task | Work | Why it is first |
+| Task | Work | State |
 | --- | --- | --- |
-| RM-030 | Enable the `hdf5` feature in CI | **Not started**; the feature is validated locally (200 CSXCAD tests in WSL) but no workflow job sets it |
-| RM-120, RM-124 | Cross-platform runtime CI and the nightly reference run | **Not started**; both extend the existing `Reference` workflow |
-| RM-023..RM-026, RM-031..RM-033, RM-094 | fparser decisions, CSXCAD Python/MATLAB surface breadth and contract tests | **Not started**; the CSXCAD depth wave closed the model/XML gaps they depended on |
+| RM-121 | Performance baseline vs native | The harness and a first table exist; re-measure on the final solver (the curve-excitation fix and the threading threshold changed both solvers' work) and record it |
+| RM-122 | Memory baseline vs native | Same run; peak RSS is already captured per case |
+| RM-124 | Nightly reference run | The schedule and dispatch are in place; the first 03:00 UTC artifact is still pending |
 
-### 2. Engine and dump completeness (open, in order)
+Follow-ups found during the last validation pass, not yet tasks:
 
-| Task | Work | Why it is next |
-| --- | --- | --- |
-| RM-136 | Direct SAR result dumps (`DumpType` 20..22) | **Verified** on 2026-10-26: the in-solver `SAR_Calculation` writes local and 1 g results |
-| RM-140 | Native FD sampling cadence, `.vtr` dumps and dump cropping | **Verified** on 2026-10-26 (`fieldprobes` PASS) |
-| RM-142 | Incident field in the 1 mm PEC/PMC channel | **Verified** on 2026-10-26 (native `ApplyMagneticBC` clearing rules) |
-| RM-139 | Conducting-sheet transmission | **Verified** on 2026-10-26 (0.036-0.073 dB, 0.18-0.20 deg) |
-| RM-137 | `rho = 0` axis in cylindrical meshes | **Verified** on 2026-10-26 (TM010/TM110 vs analytic, probe 4.2e-5 vs native) |
-| RM-138 | Cylindrical field dumps (`/Mesh/{rho,alpha,z}` plus metric-aware values) | **Verified** on 2026-10-26 (HDF5 mesh bit-identical, field 5.2e-6, profile 3e-4) |
-| RM-143 | SAR on cylindrical meshes (metric volumes + native dump layout) | **Verified** on 2026-10-27 (cell data exact, E-field 1.195e-3, 1 g peak +0.32 %) |
-
-### 3. Verification infrastructure
-
-| Task | Work |
-| --- | --- |
-| RM-117 | Differential harness over `reference-data/` |
-| RM-118 | Execute every reference case through the harness |
-| RM-119 | Approve and record tolerances |
-| RM-123/RM-124 | Regression CI gate and nightly reference run |
-| RM-120..RM-122 | Cross-platform runtime CI, performance and memory baselines |
-
-### 4. GUI wave (QCSXCAD / AppCSXCAD)
-
-RM-097..RM-106 and RM-015: primitive/property rendering, structure tree,
-editors, editing operations, mesh/parameter editing, undo/redo, file I/O and
-CLI parity, real exports, PNG capture, and the manual QA checklist.
-
-### 5. hyp2mat and CTB waves
-
-RM-107..RM-116: `.hyp` fixtures, polygon booleans, CSXCAD XML output,
-QucsStudio/PDF output, CLI parity, CTB impedance/transform/Touchstone/network
-delivery parity.
-
-### 6. Compatibility and final acceptance
-
-RM-013/RM-023..RM-036/RM-094 (naming, optimizer rules, numeric backends,
-CSXCAD expression integration, XML fixtures, Python/MATLAB surface parity,
-error contracts) followed by RM-125 (full-stack acceptance) and RM-127 (final
-audit against `AGENTS.md` Section 21). RM-125/RM-127 stay `Blocked` until the
-waves above close.
+- `openEMS/rust/src/openems.rs` substitutes a default excitation where native
+  `SetupFDTD` aborts with code 3 (recorded as a deviation in `VALIDATION.md`).
+- `--nativeFieldDumps` (the VTK writer's native-vector mode) has no Rust
+  equivalent yet; the CLI now exists, so this part of RM-144 is no longer
+  blocked by a missing binary.
+- The curve-excitation port unblocks the `SnapLine2Mesh` half of RM-144 once a
+  consumer needs it (the GUI seam swap).
 
 ## Session record
 
