@@ -134,17 +134,17 @@ the SAR 1 g/10 g averaging-cube search (RM-145), the end-criteria stop time
   | Crate | Path | Type | Status |
   |-------|------|------|--------|
   | fparser-rs | fparser/rust | lib | 52 tests pass, clippy clean, fmt clean |
-  | csxcad-core | CSXCAD/rust | lib | 145 tests pass (148 with HDF5), clippy clean, fmt clean |
-  | csxcad-python | CSXCAD/rust-py | lib | Builds cleanly, tests pass |
-  | csxcad-matlab | CSXCAD/rust-matlab | cdylib | Compiles cleanly (18 FFI functions) |
-  | openems-core | openEMS/rust | lib | 90 tests pass, clippy clean, fmt clean |
+  | csxcad-core | CSXCAD/rust | lib | 194 tests pass (200 with HDF5), including the native XML corpus, differential model harness and mesh fixtures; clippy and fmt clean |
+  | csxcad-python | CSXCAD/rust-py | lib+package | 2 Rust tests plus 36 Python surface/contract tests; the native Python suite (150 tests) passes against it; installs as the native `CSXCAD` package |
+  | csxcad-matlab | CSXCAD/rust-matlab | cdylib | 18 FFI functions with 7 contract tests; the Octave M-file surface test checks all 58 public + 12 private native M-files |
+  | openems-core | openEMS/rust | lib | 238 + 2 tests pass, clippy clean, fmt clean |
   | openems-processing | openEMS/rust | lib | 10 tests pass, clippy clean, fmt clean |
   | openems-matlab | openEMS/rust-matlab | cdylib | Compiles cleanly (29 FFI functions) |
   | openems-cli | openEMS/rust-cli | bin | Compiles cleanly |
   | qcsxcad-egui | QCSXCAD/rust-egui | lib | Compiles cleanly |
   | appcsxcad | AppCSXCAD/rust | bin | Compiles cleanly |
-  | hyp2mat-rs | hyp2mat/rust | lib+bin | 14 tests pass, clippy clean, end-to-end tested |
-  | ctb-rs | CTB/rust | lib | Compiles cleanly, MATLAB R2025b probes passed |
+  | hyp2mat-rs | hyp2mat/rust | lib+bin | 114 tests pass (77 lib + 23 CLI + 14 fixture corpus); native differential model dump and `-v` summary byte-identical for all 9 fixtures |
+  | ctb-rs | CTB/rust | lib+bin | 65 lib + 8 differential + 4 CLI + 1 doc tests; the `ctb` CLI plus Octave M-file wrappers are exercised in Octave 11.1.0 |
 
 - Root Cargo workspace builds all 13 crates with proper dependency ordering
   (fparser → CSXCAD → openEMS → QCSXCAD → AppCSXCAD, hyp2mat after CSXCAD,
