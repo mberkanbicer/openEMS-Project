@@ -43,11 +43,10 @@ f0 = 2.0e9
 fc = 0.5e9
 
 sim_path = os.path.join(work, "rust")
-# EndCriteria=-1 disables the energy criterion on both sides: the native
-# wall-clock cadence makes an early stop machine-dependent, and the pinned
-# reference binary predates --exact-endcriteria. Both runs therefore execute
-# the full 6000 timesteps, isolating the SAR comparison from RM-146.
-FDTD = openEMS(CoordSystem=1, NrTS=6000, EndCriteria=-1)
+# Exact end criteria: evaluate the energy every excitation Nyquist period, so
+# the Rust and native runs stop at the same deterministic timestep (native is
+# invoked as `openEMS input.xml --exact-endcriteria`, options follow the file).
+FDTD = openEMS(CoordSystem=1, NrTS=6000, EndCriteria=1e-5)
 FDTD.SetGaussExcite(f0, fc)
 FDTD.SetBoundaryCond(["PEC"] * 6)
 
@@ -66,14 +65,16 @@ material.AddBox([0, -np.pi, 0], [radius, np.pi, height])
 # off-axis z-directed line source
 src = CSX.AddExcitation("source", exc_type=0, exc_val=[0, 0, 1])
 src.AddBox([4 * dr, 0, 2 * dz], [4 * dr, 0, height - 2 * dz])
-CSX.AddProbe("et", p_type=2).AddPoint([10 * dr, np.pi / 4, height / 2])
+# inside the material (rho = 16 mm): a probe on the PEC outer radius would be
+# identically zero and prove nothing
+CSX.AddProbe("et", p_type=2).AddPoint([8 * dr, np.pi / 4, height / 2])
 
 raw = CSX.AddDump("SAR_raw", dump_type=29, dump_mode=2, file_type=1, frequency=[f0])
 raw.AddBox([0, -np.pi, 0], [radius, np.pi, height])
 result = CSX.AddDump("SAR_1g", dump_type=21, dump_mode=2, file_type=1, frequency=[f0])
 result.AddBox([0, -np.pi, 0], [radius, np.pi, height])
 
-error = FDTD.Run(sim_path, cleanup=False)
+error = FDTD.Run(sim_path, cleanup=False, exact_endcriteria=True)
 if error != 0:
     raise SystemExit("rust run failed: %d" % error)
 FDTD.Write2XML(os.path.join(sim_path, "input.xml"))
@@ -81,7 +82,8 @@ print("rust run done")
 PY
 
 cp "$WORK/rust/input.xml" "$WORK/native/input.xml"
-( cd "$WORK/native" && "${NATIVE_OPENEMS:-$HOME/opt/openEMS/bin/openEMS}" input.xml > log 2>&1 )
+# native parses the XML as argv[1]; options follow the file
+( cd "$WORK/native" && "${NATIVE_OPENEMS:-$HOME/opt/openEMS/bin/openEMS}" input.xml --exact-endcriteria > log 2>&1 )
 
 "$PYTHON" - "$WORK" <<'PY'
 import os
@@ -194,15 +196,21 @@ print("  probe t[:6] rust :", ["%.4e" % value for value in rust_et[:6, 0]])
 print("  probe t[:6] native:", ["%.4e" % value for value in native_et[:6, 0]])
 print("  probe t tail rust:", ["%.4e" % value for value in rust_et[-3:, 0]])
 print("  probe cadence: rust rows=%d native rows=%d" % (len(rust_et), len(native_et)))
-print("  NOTE: both runs disabled the end criteria for this comparison "
-      "(EndCriteria=-1); the cadence itself is covered by RM-146 unit tests")
-if rust_et.shape == native_et.shape:
-    et_scale = max(float(np.max(np.abs(native_et[:, 1:]))), 1e-30)
-    et_diff = float(np.max(np.abs(rust_et[:, 1:] - native_et[:, 1:]))) / et_scale
-    print("  probe et vs native: max rel. difference %.3e" % et_diff)
-else:
-    print("  probe et: shapes differ rust %s native %s" % (
+# RM-146 gate: both runs used the exact Nyquist cadence, so they must stop on
+# the same timestep and produce the same probe samples.
+assert rust_et.shape == native_et.shape, (
+    "probe shapes differ rust %s native %s (stop step differs)" % (
         rust_et.shape, native_et.shape))
+et_scale = max(float(np.max(np.abs(native_et[:, 1:]))), 1e-30)
+et_diff = float(np.max(np.abs(rust_et[:, 1:] - native_et[:, 1:]))) / et_scale
+print("  probe et vs native: max rel. difference %.3e" % et_diff)
+assert et_diff < 1e-4, "probe et differs by %.3e" % et_diff
+assert et_scale > 1e-6, "the probe trace is identically zero (%.3e)" % et_scale
+native_log = open(os.path.join(work, "native", "log")).read()
+assert "Exact-endcriteria" in native_log, "native did not use the exact cadence"
+stop_step = (len(rust_et) - 1) * 6
+print("  stop timestep: %d (probe interval 6, %d rows)" % (stop_step, len(rust_et)))
+assert stop_step % 24 == 0, "stop %d is not a 24-step Nyquist multiple" % stop_step
 
 r_field, n_field = rust_raw["field"], native_raw["field"]
 scale = float(np.max(np.abs(n_field)))
