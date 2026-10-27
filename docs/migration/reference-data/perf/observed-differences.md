@@ -69,5 +69,24 @@ is 0, and both the "inside" test (`max(val) >= max1*rel`) and the "outside" test
 vacuously. A per-case row in `VALIDATION.md` that only records PASS therefore
 does not prove the probes carried signal.
 
-Status: open. Not fixed here — RM-121/RM-122 are measurement tasks and the
-solver source is out of scope for this change.
+Status: **fixed** by RM-149 (2026-10-27). The excitation setup now walks a
+`Curve` primitive with the native `Operator::FindPath` and excites every edge on
+the path. Re-measured on the same case:
+
+| output | native peak | Rust peak |
+| --- | --- | --- |
+| `ut1x` | 5.807240e-06 | 5.807516e-06 |
+| `ut1y` | 2.316510e-05 | 2.316531e-05 |
+| `ut1z` | 7.766348e-06 | 7.766571e-06 |
+
+With the native timestep pinned in the XML (`<FDTD TimeStep="3.808880293356461e-12">`)
+all 6667 samples of all three probes are bit-identical, so the remaining
+relative difference (4.8e-5 / 9.2e-6 / 2.9e-5 on the peaks, up to 1.6e-4 per
+sample) is the pre-existing `calc_timestep` summation-order difference, not the
+excitation. The dedicated gate is
+`scripts/ci/run_curve_excitation_check_wsl.sh`. The harness keeps its
+"identically zero in the Rust run" warning as a regression guard.
+
+Wire primitives are deliberately **not** walked: native `ToCurve()` accepts only
+`Type == CURVE`, and a `<Wire>` excitation is excited through the containment
+path (which a thin wire does not satisfy), so both solvers report zero for it.
