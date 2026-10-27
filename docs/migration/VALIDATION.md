@@ -1522,6 +1522,23 @@ raw dump of a lossy box, `sar_calc` processes it).
 
 Direct SAR result dumps (`DumpType` 20..22) are tracked separately as RM-136.
 
+## Regression CI (RM-123)
+
+`.github/workflows/reference.yml` runs on every push/PR that touches Rust,
+Python, `scripts/ci` or the reference captures:
+
+| Step | Command | Result |
+| --- | --- | --- |
+| Numerical core | `cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs` and `cargo test -p openems-core --features hdf5` | PASS |
+| Python suites | `bash scripts/ci/run_rust_python_tests_wsl.sh` | PASS |
+| Differential harness | `bash scripts/ci/run_reference_harness_wsl.sh` (4/4 cases) | PASS |
+
+GitHub Actions evidence on `mberkanbicer-rust-migration-audit`: runs
+40394042360, 40398852196, 40409688197, 40422519177, 40482929043 and
+40495994980 all finished `success` (3m34s..5m45s); the last one ran commit
+`33802a4`. The runner installs `libhdf5-dev`, `pkg-config`, `python3-venv`,
+`numpy`, `scipy`, `h5py` and `matplotlib`, then builds the maturin extensions.
+
 ## GUI PNG capture and visual QA (RM-105, RM-106)
 
 | Check | Measured | Verdict |
