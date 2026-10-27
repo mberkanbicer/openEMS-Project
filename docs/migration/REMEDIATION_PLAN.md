@@ -115,6 +115,7 @@ documentation integrity.
 | D-05 | MATLAB strategy | Make the Rust CLI binary-compatible with the native `openEMS` executable first, so the unchanged M-file suite drives it; keep a C ABI only for CSXCAD structure access. | RM-091..RM-093 |
 | D-06 | fparser optional numeric backends | Formally accept `f64`-only as documented, or implement `long double`/MPFR/GMP. Default: accept as a recorded exception. | RM-024 |
 | D-07 | Numerical tolerances | Approve per-case tolerances derived from `VALIDATION.md` repeatability before any differential test is declared passing. | RM-119 |
+| D-08 | C++ API/FFI surface | The Rust crates are canonical; no C++ source/binary-compatible wrapper. Compatibility surfaces are the CLI binaries, the Python packages, the MATLAB/Octave CLI plus a narrow reviewed C ABI, and the CSXCAD XML format (`ADR 0008`). | RM-025 |
 
 **Stop condition:** if D-01 is not resolved, do not start WS1-WS9 work; any new
 code would deepen the fork.
