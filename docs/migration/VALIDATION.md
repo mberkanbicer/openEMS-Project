@@ -1697,6 +1697,15 @@ restored tree lives on a slower volume and the dump-heavy cases are I/O bound;
 the assertions, sample counts and values are unchanged, so this is a disk
 effect, not a solver change.
 
+## Metal curves are PEC (RM-150)
+
+| Check | Result |
+| --- | --- |
+| Implementation | `calc_ec_operator` calls `calc_pec_curves`: METAL property curves are walked with `FindPath` (points evaluated in the operator mesh system with the primitive transform) and `VV`/`VI` are zeroed on every path edge, with the primitive marked used |
+| Native parity | mirrors `Operator::CalcPEC_Curves` (`FDTD/operator.cpp:2064-2097`); only a `Curve` is walked (`ToCurve()` matches `Type == CURVE`), and the native `m_Nr_PEC` statistics counter has no Rust consumer |
+| Test | `metal_curve_marks_the_path_as_pec`: the two path edges are exactly zero, the neighbouring edge keeps `VV = 1` and `VI > 0`, and the primitive is used |
+| Regression | `openems-core` 245 + 2 tests; cavity curve gate unchanged (peaks 4.8e-5 / 9.2e-6 / 2.9e-5) |
+
 ## Curve and wire excitations (RM-149)
 
 | Check | Result |
