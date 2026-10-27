@@ -1,18 +1,18 @@
-	Command being timed: "/tmp/openems-perf-ibaqgvux/bin/rust-openems-cli /tmp/openems-perf-ibaqgvux/cases/Coax.xml --exact-endcriteria --engine basic"
-	User time (seconds): 54.63
-	System time (seconds): 0.41
+	Command being timed: "/tmp/openems-perf-59qpozhi/bin/rust-openems-cli /tmp/openems-perf-59qpozhi/cases/Coax.xml --exact-endcriteria --engine basic"
+	User time (seconds): 110.57
+	System time (seconds): 0.59
 	Percent of CPU this job got: 99%
-	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:55.08
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:51.29
 	Average shared text size (kbytes): 0
 	Average unshared data size (kbytes): 0
 	Average stack size (kbytes): 0
 	Average total size (kbytes): 0
-	Maximum resident set size (kbytes): 756272
+	Maximum resident set size (kbytes): 755880
 	Average resident set size (kbytes): 0
 	Major (requiring I/O) page faults: 0
-	Minor (reclaiming a frame) page faults: 260946
+	Minor (reclaiming a frame) page faults: 260949
 	Voluntary context switches: 1
-	Involuntary context switches: 170
+	Involuntary context switches: 321
 	Swaps: 0
 	File system inputs: 0
 	File system outputs: 0

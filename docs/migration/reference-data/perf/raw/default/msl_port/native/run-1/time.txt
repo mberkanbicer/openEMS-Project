@@ -1,18 +1,18 @@
-	Command being timed: "/tmp/openems-perf-ibaqgvux/bin/native-openEMS /tmp/openems-perf-ibaqgvux/cases/msl_port.xml --exact-endcriteria"
-	User time (seconds): 0.25
-	System time (seconds): 0.01
-	Percent of CPU this job got: 105%
-	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.25
+	Command being timed: "/tmp/openems-perf-59qpozhi/bin/native-openEMS /tmp/openems-perf-59qpozhi/cases/msl_port.xml --exact-endcriteria"
+	User time (seconds): 0.50
+	System time (seconds): 0.03
+	Percent of CPU this job got: 104%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.51
 	Average shared text size (kbytes): 0
 	Average unshared data size (kbytes): 0
 	Average stack size (kbytes): 0
 	Average total size (kbytes): 0
-	Maximum resident set size (kbytes): 48076
+	Maximum resident set size (kbytes): 47952
 	Average resident set size (kbytes): 0
 	Major (requiring I/O) page faults: 0
-	Minor (reclaiming a frame) page faults: 3078
-	Voluntary context switches: 298
-	Involuntary context switches: 1
+	Minor (reclaiming a frame) page faults: 3080
+	Voluntary context switches: 295
+	Involuntary context switches: 2
 	Swaps: 0
 	File system inputs: 0
 	File system outputs: 0

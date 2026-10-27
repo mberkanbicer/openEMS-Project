@@ -1634,6 +1634,41 @@ property causes double ownership and a double free; parameter-set transforms
 `Utilities.GetMultiDirs` with an invalid name silently returns `None` where the
 Rust binding raises `ValueError`.
 
+## Performance and memory baseline (RM-121, RM-122)
+
+`scripts/ci/run_performance_baseline_wsl.sh`, final code, both binaries pinned by
+SHA-256 in the generated table. Machine: i9-13900H, 20 threads, 48 GiB, WSL2.
+
+| Engine | Case | Native wall / RSS | Rust wall / RSS | Ratio |
+| --- | --- | --- | --- | --- |
+| default | cavity (9 152 cells, 20 000 steps) | 1.34 s / 46.5 MiB | 5.07 s / 14.7 MiB | 3.78x / 0.32x |
+| default | Coax (2.1M cells, 1 178 steps) | 24.99 s / 249.4 MiB | 53.53 s / 738.6 MiB | 2.14x / 2.96x |
+| default | msl_port (14 098 cells, 1 716 steps) | 0.51 s / 46.8 MiB | 1.49 s / 17.8 MiB | 2.92x / 0.38x |
+| basic | cavity | 2.81 s / 45.9 MiB | 5.10 s / 14.7 MiB | 1.81x / 0.32x |
+| basic | Coax | 42.38 s / 239.5 MiB | 111.29 s / 738.3 MiB | 2.63x / 3.08x |
+| basic | msl_port | 0.69 s / 46.3 MiB | 1.40 s / 18.0 MiB | 2.03x / 0.39x |
+
+All twelve runs stop on the same timestep and produce the same output row
+counts (`default` and `basic`, every case). Throughput is 36-46 MCells/s on the
+Rust side against 47-137 MCells/s natively.
+
+Reading:
+
+- The serial kernel is within 1.8-2.6x of native's serial engine; the residual
+  is the deferred SSE vectorisation (ADR 0002), not the update equations.
+- The default engine is 2.1-3.8x slower: the threaded kernel starts and joins
+  its workers per time step, which the 16384-cells-per-worker threshold keeps
+  off the small cases but cannot amortise as well as the native OpenMP pool.
+- Peak memory is 0.32-0.39x native on the small cases but **2.96-3.08x on the
+  2.1M-cell Coax case** (738.6 vs 249.4 MiB): the Rust operator keeps the full
+  material and coefficient arrays, while the native compressed-SSE engine stores
+  the compressed form. Recorded as a known difference; no compressed engine
+  exists in the port (ADR 0002).
+- The numbers are roughly 2x the earlier measurement on the previous worktree
+  because the restored tree lives on a slower volume; the ratios, stop steps and
+  output counts are the comparable quantities, and the table records the
+  binaries' hashes and machine.
+
 ## Octave testsuite after the curve-excitation port (2026-10-27)
 
 `scripts/ci/run_octave_testsuite_wsl.sh` on the restored tree:

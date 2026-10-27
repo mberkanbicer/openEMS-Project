@@ -22,12 +22,16 @@ Max. number of timesteps: 5000 ( --> 5.5991 * Excitation signal length)
 Create FDTD engine
 Running FDTD engine... this may take a while... grab a cup of coffee?!?
 Exact-endcriteria: evaluating the end criteria every 62 timestep(s) (this excitation's Nyquist rate)
-[@        4s] Timestep:          165 || Speed:   77.6 MC/s (2.694e-02 s/TS) || Energy: ~4.07e-20 (- 0.00dB)
-[@        8s] Timestep:          285 || Speed:   62.4 MC/s (3.353e-02 s/TS) || Energy: ~3.10e-17 (- 0.00dB)
-[@       12s] Timestep:          480 || Speed:  101.8 MC/s (2.054e-02 s/TS) || Energy: ~2.45e-15 (- 0.00dB)
-[@       16s] Timestep:          675 || Speed:  101.6 MC/s (2.058e-02 s/TS) || Energy: ~4.85e-15 (- 0.00dB)
-[@       20s] Timestep:          868 || Speed:   99.8 MC/s (2.095e-02 s/TS) || Energy: ~1.03e-15 (- 6.73dB)
-[@       24s] Timestep:         1080 || Speed:  103.6 MC/s (2.018e-02 s/TS) || Energy: ~1.17e-18 (-36.19dB)
+[@        4s] Timestep:           90 || Speed:   40.3 MC/s (5.188e-02 s/TS) || Energy: ~8.63e-22 (- 0.00dB)
+[@        9s] Timestep:          165 || Speed:   31.3 MC/s (6.676e-02 s/TS) || Energy: ~4.07e-20 (- 0.00dB)
+[@       14s] Timestep:          225 || Speed:   28.7 MC/s (7.299e-02 s/TS) || Energy: ~8.38e-19 (- 0.00dB)
+[@       18s] Timestep:          285 || Speed:   29.2 MC/s (7.163e-02 s/TS) || Energy: ~3.10e-17 (- 0.00dB)
+[@       22s] Timestep:          405 || Speed:   56.3 MC/s (3.716e-02 s/TS) || Energy: ~1.14e-15 (- 0.00dB)
+[@       27s] Timestep:          540 || Speed:   65.4 MC/s (3.199e-02 s/TS) || Energy: ~4.01e-15 (- 0.00dB)
+[@       31s] Timestep:          675 || Speed:   70.5 MC/s (2.968e-02 s/TS) || Energy: ~4.85e-15 (- 0.00dB)
+[@       35s] Timestep:          810 || Speed:   70.6 MC/s (2.963e-02 s/TS) || Energy: ~1.85e-15 (- 4.20dB)
+[@       39s] Timestep:          960 || Speed:   76.3 MC/s (2.742e-02 s/TS) || Energy: ~8.81e-17 (-17.41dB)
+[@       43s] Timestep:         1110 || Speed:   76.1 MC/s (2.748e-02 s/TS) || Energy: ~1.17e-18 (-36.19dB)
 RunFDTD: end-criteria of -40.00dB reached after 1178 timesteps (-40.18dB)
-Time for 1178 iterations with 2091204.00 cells : 26.66 sec
-Speed: 92.41 MCells/s 
+Time for 1178 iterations with 2091204.00 cells : 45.31 sec
+Speed: 54.37 MCells/s 

@@ -2,17 +2,17 @@
 
 Measured comparison of the Rust solver (`openems-cli`) against the pinned native openEMS on identical input XML. Every number in this file was produced by `scripts/ci/run_performance_baseline_wsl.sh`; nothing is estimated.
 
-- Generated: 2026-10-27 19:38:29 (UTC)
-- Repository revision at run time: `f9d462220c0c` (informational; the measured binaries are pinned by their SHA-256 below)
+- Generated: 2026-10-27 23:13:02 (UTC)
+- Repository revision at run time: `f1cdbe5` (informational; the measured binaries are pinned by their SHA-256 below)
 - Native solver: `/home/mberkanbicer/opt/openEMS/bin/openEMS` (openEMS 64bit -- version v0.37.0)
   - SHA-256 `339f2c2e7dbc04f5eb6f8516413e35c4a85bc9f09d81e1b8f91c9845c782bf11`
-- Rust solver: `/mnt/c/Users/mberkanbicer/.copilot/repos/copilot-worktrees/openEMS-Project/mberkanbicer-potential-garbanzo/target/release/openems-cli` (built 2026-10-27T14:04:37Z)
-  - SHA-256 `34589b24a80ee9e0e8ef6c7373f2140f754d0aaef8fbe42e589ba30154657e63`
+- Rust solver: `/mnt/d/openEMS-Project-rust/target/release/openems-cli` (built 2026-10-27T22:05:39Z)
+  - SHA-256 `7e0522fcab7aa1c288fe77cfe1e99e3476e558922bc81f3f6739e1638e8b8266`
 - Both binaries are copied into the scratch working directory before the first run, so a rebuild during the measurement cannot mix two executables.
 - CPU: 13th Gen Intel(R) Core(TM) i9-13900H — 20 hardware threads
 - Memory: 48026 MiB total
 - Kernel: `Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.43`
-- Load average at start: `0.55 0.19 0.07 1/348 520`
+- Load average at start: `0.99 0.29 0.10 1/331 491`
 
 ## Method
 
@@ -45,23 +45,23 @@ The raw `/usr/bin/time -v` output and solver logs of every run are stored next t
 
 | case | solver | engine | threads | wall s (best) | wall s (runs) | peak RSS MiB | MCells/s | stop step | wall ratio | RSS ratio |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| cavity | native | compressed SSE + multi-threading | 20 | 0.83 | 0.83, 0.85 | 46.6 | 220.53 | 20000 | - | - |
-| cavity | rust | fastest (threaded kernel) | 20 | 10.50 | 14.71, 10.50 | 14.7 | 17.43 | 20000 | 12.65× | 0.32× |
-| Coax | native | compressed SSE + multi-threading | 20 | 11.36 | 11.52, 11.36 | 249.5 | 216.85 | 1178 | - | - |
-| Coax | rust | fastest (threaded kernel) | 20 | 25.18 | 25.18, 25.19 | 738.6 | 97.83 | 1178 | 2.22× | 2.96× |
-| msl_port | native | compressed SSE + multi-threading | 20 | 0.25 | 0.25, 0.25 | 46.9 | 96.77 | 1716 | - | - |
-| msl_port | rust | fastest (threaded kernel) | 20 | 1.78 | 2.04, 1.78 | 17.8 | 13.59 | 1716 | 7.12× | 0.38× |
+| cavity | native | compressed SSE + multi-threading | 20 | 1.34 | 1.49, 1.34 | 46.5 | 136.60 | 20000 | - | - |
+| cavity | rust | fastest (threaded kernel) | 20 | 5.07 | 5.07, 5.21 | 14.7 | 36.10 | 20000 | 3.78× | 0.32× |
+| Coax | native | compressed SSE + multi-threading | 20 | 24.99 | 25.48, 24.99 | 249.4 | 98.58 | 1178 | - | - |
+| Coax | rust | fastest (threaded kernel) | 20 | 53.53 | 53.53, 53.73 | 738.6 | 46.02 | 1178 | 2.14× | 2.96× |
+| msl_port | native | compressed SSE + multi-threading | 20 | 0.51 | 0.53, 0.51 | 46.8 | 47.44 | 1716 | - | - |
+| msl_port | rust | fastest (threaded kernel) | 20 | 1.49 | 1.49, 1.52 | 17.8 | 16.24 | 1716 | 2.92× | 0.38× |
 
 ## Results — `--engine basic`, one thread
 
 | case | solver | engine | threads | wall s (best) | wall s (runs) | peak RSS MiB | MCells/s | stop step | wall ratio | RSS ratio |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| cavity | native | basic | 1 | 1.43 | 1.43, 1.44 | 46.4 | 128.00 | 20000 | - | - |
-| cavity | rust | basic (serial kernel) | 1 | 2.43 | 2.69, 2.43 | 14.6 | 75.33 | 20000 | 1.70× | 0.32× |
-| Coax | native | basic | 1 | 29.44 | 29.91, 29.44 | 239.6 | 83.68 | 1178 | - | - |
-| Coax | rust | basic (serial kernel) | 1 | 54.28 | 55.08, 54.28 | 738.6 | 45.38 | 1178 | 1.84× | 3.08× |
-| msl_port | native | basic | 1 | 0.39 | 0.39, 0.40 | 46.3 | 62.03 | 1716 | - | - |
-| msl_port | rust | basic (serial kernel) | 1 | 0.74 | 0.74, 0.80 | 17.6 | 32.69 | 1716 | 1.90× | 0.38× |
+| cavity | native | basic | 1 | 2.81 | 2.86, 2.81 | 45.9 | 65.14 | 20000 | - | - |
+| cavity | rust | basic (serial kernel) | 1 | 5.10 | 5.30, 5.10 | 14.7 | 35.89 | 20000 | 1.81× | 0.32× |
+| Coax | native | basic | 1 | 42.38 | 51.56, 42.38 | 239.5 | 58.13 | 1178 | - | - |
+| Coax | rust | basic (serial kernel) | 1 | 111.29 | 111.29, 118.63 | 738.3 | 22.14 | 1178 | 2.63× | 3.08× |
+| msl_port | native | basic | 1 | 0.69 | 0.69, 0.70 | 46.3 | 35.06 | 1716 | - | - |
+| msl_port | rust | basic (serial kernel) | 1 | 1.40 | 1.40, 1.41 | 18.0 | 17.28 | 1716 | 2.03× | 0.39× |
 
 ## Notes
 
@@ -71,16 +71,15 @@ The raw `/usr/bin/time -v` output and solver logs of every run are stored next t
 
 ## Solver agreement
 
-Both solvers simulated the same input, so the stop timestep and the produced output files must agree. Data-row counts of every output file of the fastest run of each solver (probes, ports, energy dumps):
+Both solvers simulated the same input, so the stop timestep and the produced output files must agree. Data-row counts and the peak sample magnitude of every output file of the fastest run of each solver (probes, ports, energy dumps):
 
 | config | case | stop step native | stop step rust | output files | agreement |
 | --- | --- | --- | --- | --- | --- |
-| default | cavity | 20000 | 20000 | 5 | row counts equal, **zero output in Rust** |
+| default | cavity | 20000 | 20000 | 5 | identical row counts |
 | default | Coax | 1178 | 1178 | 4 | identical row counts |
 | default | msl_port | 1716 | 1716 | 12 | identical row counts |
-| basic | cavity | 20000 | 20000 | 5 | row counts equal, **zero output in Rust** |
+| basic | cavity | 20000 | 20000 | 5 | identical row counts |
 | basic | Coax | 1178 | 1178 | 4 | identical row counts |
 | basic | msl_port | 1716 | 1716 | 12 | identical row counts |
 
-Solver differences found while producing this table are recorded in
-`observed-differences.md` next to this file.
+Solver differences found while producing this table are recorded in `observed-differences.md` next to this file.

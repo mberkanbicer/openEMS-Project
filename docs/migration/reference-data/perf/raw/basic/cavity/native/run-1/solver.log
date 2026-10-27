@@ -24,5 +24,5 @@ Running FDTD engine... this may take a while... grab a cup of coffee?!?
 Exact-endcriteria: evaluating the end criteria every 14 timestep(s) (this excitation's Nyquist rate)
 RunFDTD: Warning: Max. number of timesteps was reached before the end-criteria of -60dB was reached... 
 	You may want to choose a higher number of max. timesteps... 
-Time for 20000 iterations with 9152 cells : 1.42079 sec
-Speed: 128.83 MCells/s 
+Time for 20000 iterations with 9152 cells : 2.76134 sec
+Speed: 66.2866 MCells/s 

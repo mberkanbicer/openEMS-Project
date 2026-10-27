@@ -23,5 +23,5 @@ Create FDTD engine
 Running FDTD engine... this may take a while... grab a cup of coffee?!?
 Exact-endcriteria: evaluating the end criteria every 132 timestep(s) (this excitation's Nyquist rate)
 RunFDTD: end-criteria of -50dB reached after 1716 timesteps (-59.2551dB)
-Time for 1716 iterations with 14098 cells : 0.35876 sec
-Speed: 67.4327 MCells/s 
+Time for 1716 iterations with 14098 cells : 0.62107 sec
+Speed: 38.9524 MCells/s 
