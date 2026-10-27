@@ -96,10 +96,12 @@ jobs:
         env:
           HDF5_LIB_DIR: C:\vcpkg\installed\x64-windows\lib
         run: cargo check --workspace
+      - name: Add the HDF5 DLLs to PATH
+        run: echo "C:\vcpkg\installed\x64-windows\bin" >> $env:GITHUB_PATH
+        shell: pwsh
       - name: Numerical core tests
         env:
           HDF5_LIB_DIR: C:\vcpkg\installed\x64-windows\lib
-          PATH: C:\vcpkg\installed\x64-windows\bin;${{ env.PATH }}
         run: cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs
       - name: Placeholder policy self-test
         run: python scripts/ci/check_placeholders.py --self-test
