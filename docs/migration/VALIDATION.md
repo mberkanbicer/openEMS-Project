@@ -1634,6 +1634,34 @@ property causes double ownership and a double free; parameter-set transforms
 `Utilities.GetMultiDirs` with an invalid name silently returns `None` where the
 Rust binding raises `ValueError`.
 
+## Octave testsuite after the curve-excitation port (2026-10-27)
+
+`scripts/ci/run_octave_testsuite_wsl.sh` on the restored tree:
+
+| Case | Result | Time |
+| --- | --- | --- |
+| unittests/port_setup | PASS | 1.4 s |
+| unittests/transforms | PASS | 1.7 s |
+| probes/fieldprobes | PASS | 189.6 s |
+| combinedtests/Coax | PASS | 63.5 s |
+| combinedtests/cavity | PASS | 303.8 s |
+| combinedtests/coax_cylindrical | PASS | 12.6 s |
+| combinedtests/msl_port | PASS | 14.4 s |
+| combinedtests/nf2ff_dipole | PASS | 483.3 s |
+| combinedtests/rect_waveguide | PASS | 34.3 s |
+| enginetests/engine_compare | PASS | 1200.8 s |
+
+**10 passed, 0 failed, 0 errors in 2305.7 s.** The cavity case now passes with
+non-zero probes (the excitation fix); `nf2ff_dipole` needed the Rust `nf2ff` CLI
+at `<repo>/openEMS/nf2ff/nf2ff`, which `scripts/ci/link_rust_openems.sh`
+provides (native `searchBinary` concatenates PATH entries without a separator,
+so a PATH lookup cannot match).
+
+The absolute times are ~1.9x the earlier run on the previous worktree. The
+restored tree lives on a slower volume and the dump-heavy cases are I/O bound;
+the assertions, sample counts and values are unchanged, so this is a disk
+effect, not a solver change.
+
 ## Curve and wire excitations (RM-149)
 
 | Check | Result |
