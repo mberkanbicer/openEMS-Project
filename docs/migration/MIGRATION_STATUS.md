@@ -685,6 +685,20 @@ waves above close.
 
 ## Session record
 
+### Canonical tree moved (2026-10-27)
+
+The validation host deleted the `mberkanbicer-potential-garbanzo` worktree under
+`.copilot/repos/copilot-worktrees` while the session was running. The tree was
+re-cloned from GitHub to `D:\openEMS-Project-rust` on branch
+`mberkanbicer-rust-migration-audit` (submodules at the recorded commits, full
+history, not shallow). Every committed change survived; the only lost work was
+an uncommitted `openEMS/rust/src/operator.rs` curve-excitation port, which was
+restarted from the committed source. The WSL helpers no longer hard-code the old
+path (they derive the repository root); the pinned native binaries
+(`~/opt/openEMS`, `~/openems-exact`) and the `~/rustpy-venv` environment live
+outside the tree and were unaffected.
+
+
 - **Completed:** All seven submodule Rust ports committed and building cleanly
   (fparser-rs, csxcad-core, csxcad-python, csxcad-matlab, openems-core,
   openems-processing, openems-matlab, openems-cli, qcsxcad-egui, appcsxcad,
