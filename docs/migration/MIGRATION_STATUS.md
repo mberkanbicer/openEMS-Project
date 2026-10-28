@@ -641,7 +641,19 @@ the performance and memory baseline (RM-121/RM-122) are verified.
 | RM-125 | Full-stack acceptance run | Harness ready (`scripts/ci/run_full_acceptance_wsl.sh`); runs after RM-148 lands |
 | RM-127 | Final audit against `AGENTS.md` Section 21 | After the acceptance report |
 | RM-144 | Cylindrical port/line snapping and `--nativeFieldDumps` | Depends on RM-148 and the VTK native-vector mode (RM-078) |
-| RM-124 | Nightly reference run | The schedule and dispatch are in place; the first 03:00 UTC artifact is still pending |
+| RM-124 | Nightly reference run | The schedule and dispatch are in place, but GitHub Actions is disabled for the repository, so no scheduled run is created |
+
+**CI is unavailable (2026-10-28).** `gh workflow run rust.yml` returns
+`HTTP 422: Actions has been disabled for this repository`, and no run has
+been created for any push after `f69ed4d` (the last one, 40602679364/40602679322,
+is green). GitHub does not expose the reason through the API used here; the
+repository setting reports Actions as enabled, so this is an account-side
+restriction, not a workflow change. Until it is lifted, the local acceptance
+run (`scripts/ci/run_full_acceptance_wsl.sh`) is the substitute for the Linux
+job: it performs the same workspace build, crate/HDF5 tests, policy gates and
+install-layout check, plus the Python, Octave and differential suites that CI
+does not run. The macOS, Windows and FreeBSD jobs cannot be reproduced on this
+host and stay unverified for any commit after the last green run.
 
 Follow-ups found during the last validation pass, not yet tasks:
 
