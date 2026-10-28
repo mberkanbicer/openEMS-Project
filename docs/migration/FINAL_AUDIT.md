@@ -17,6 +17,12 @@ criteria are met, five are partly met and three are not met. The blockers are
 the 53 `Implemented` rows, RM-144, and the platform/GUI evidence that this host
 cannot produce; they are listed in Section 3.
 
+> **2026-10-28 note:** the counts above are those of the audit revision
+> (`e71b743`). The live counts are in `REMEDIATION_TASKS.md`
+> (143 `Verified`, 7 `Implemented`, 1 `Blocked`); `REMAINING_WORK.md` carries
+> the remaining rows, the work each needs and the owner decisions. The verdict
+> below stands until that list is closed.
+
 ## 1 Checklist
 
 | # | Criterion (`AGENTS.md` Section 21) | Verdict | Evidence | Gap |

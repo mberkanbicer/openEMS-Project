@@ -9,14 +9,16 @@ pass, including analytic propagation, UPML absorption, CFL, quarter-cell
 material averaging and native-HDF5 dump reading.
 
 Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
-(142 `Verified`, 8 `Implemented`, 0 `Not Started`, 1 `Blocked` at the last
+(143 `Verified`, 7 `Implemented`, 0 `Not Started`, 1 `Blocked` at the last
 update; see the snapshot there for the live count). The solver, the CSXCAD
 depth wave, hyp2mat, CTB, fparser, the Python/Octave/MATLAB surfaces, the
 C-ABI contracts, the CI matrix, the performance baseline, the cylindrical
 path walk (RM-148), the full-stack acceptance run (RM-125) and the final
 audit (RM-127) are verified. `FINAL_AUDIT.md` finds the migration **not
-complete**: 53 rows are still `Implemented` and RM-144 is blocked, so the
+complete**: 7 rows are still `Implemented` and RM-144 is blocked, so the
 remaining work is their verification evidence, not new architecture.
+`REMAINING_WORK.md` lists those rows with the work each one needs, the grey
+areas and the decisions that only the owner can make.
 
 ### Status and evidence policy
 
