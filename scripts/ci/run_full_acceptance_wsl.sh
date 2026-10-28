@@ -52,11 +52,10 @@ run() {
   local name="$1"
   shift
   local log="$LOG_DIR/$(echo "$name" | tr ' /' '__').log"
-  echo "=== $name ==="
   ( cd "$REPO_ROOT" && "$@" ) >"$log" 2>&1
   local code=$?
   printf '%s\n' "$code" >"$log.status"
-  echo "$log"
+  printf '%s\n' "$log"
 }
 
 sum_passed() {
