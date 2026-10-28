@@ -82,7 +82,7 @@ sum_passed() {
 sum_unittest() {
   local log="$1"
   local total
-  total=$(grep -hE "^Ran [0-9]+ tests" "$log" | grep -oE "[0-9]+" | awk '{s+=$1} END {print s+0}')
+  total=$(grep -hoE "^Ran [0-9]+ tests" "$log" | grep -oE "[0-9]+" | awk '{s+=$1} END {print s+0}')
   echo "${total:-0} unittest cases passed"
 }
 
