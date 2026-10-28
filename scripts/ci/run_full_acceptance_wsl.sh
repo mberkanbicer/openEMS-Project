@@ -18,11 +18,17 @@ export PATH="$HOME/.cargo/bin:$PATH"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-LOG_DIR="${TMPDIR:-/tmp}/openems-acceptance"
+# Logs live outside /tmp so a WSL restart does not throw away finished checks,
+# and the directory is keyed by the revision: a rerun after a new commit starts
+# clean instead of reusing evidence from different code.
+REV="$(cd "$REPO_ROOT" && git rev-parse --short HEAD)"
+if [ -n "$(cd "$REPO_ROOT" && git status --porcelain --untracked-files=no)" ]; then
+  REV="$REV-dirty"
+fi
+LOG_DIR="${ACCEPTANCE_LOG_DIR:-$HOME/.cache/openems-acceptance/$REV}"
 REPORT="${ACCEPTANCE_REPORT:-$REPO_ROOT/docs/migration/ACCEPTANCE.md}"
 
 mkdir -p "$LOG_DIR"
-rm -f "$LOG_DIR"/*.log "$LOG_DIR"/*.status
 
 rows=()
 failed=0
@@ -52,6 +58,14 @@ run() {
   local name="$1"
   shift
   local log="$LOG_DIR/$(echo "$name" | tr ' /' '__').log"
+  # A check that already finished cleanly for this revision is reused, so a
+  # restarted run does not repeat the one-hour Octave suite.
+  if [ "${ACCEPTANCE_RESUME:-1}" = "1" ] && [ -f "$log.status" ] \
+      && [ "$(cat "$log.status" 2>/dev/null)" = "0" ]; then
+    echo "cached: $name" >&2
+    printf '%s\n' "$log"
+    return 0
+  fi
   ( cd "$REPO_ROOT" && "$@" ) >"$log" 2>&1
   local code=$?
   printf '%s\n' "$code" >"$log.status"
