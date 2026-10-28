@@ -9,7 +9,7 @@ pass, including analytic propagation, UPML absorption, CFL, quarter-cell
 material averaging and native-HDF5 dump reading.
 
 Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
-(117 `Verified`, 33 `Implemented`, 0 `Not Started`, 1 `Blocked` at the last
+(120 `Verified`, 30 `Implemented`, 0 `Not Started`, 1 `Blocked` at the last
 update; see the snapshot there for the live count). The solver, the CSXCAD
 depth wave, hyp2mat, CTB, fparser, the Python/Octave/MATLAB surfaces, the
 C-ABI contracts, the CI matrix, the performance baseline, the cylindrical
