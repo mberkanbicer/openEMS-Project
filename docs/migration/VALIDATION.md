@@ -1634,6 +1634,16 @@ property causes double ownership and a double free; parameter-set transforms
 `Utilities.GetMultiDirs` with an invalid name silently returns `None` where the
 Rust binding raises `ValueError`.
 
+## Boundary conditions, mesh geometry and required input (RM-044..RM-048, RM-064)
+
+| Check | Evidence |
+| --- | --- |
+| Mur per-face delta | `mur_uses_the_local_face_delta_on_a_graded_mesh`: 1/2/3 mm x, 2 mm y, 5 mm z; every coefficient matches `(c*dt - delta)/(c*dt + delta)` with its face delta, and the 1 mm and 3 mm x faces differ by >0.2 |
+| PEC tangential-only | `pec_boundary_zeroes_only_tangential_components`: tangential `VV` exactly 0, normal component > 0 on every low face |
+| PMC matching native | `pmc_boundary_matches_the_native_magnetic_bc`: low face clears all three, high face tangential only, normal preserved |
+| `discLines` mesh | `nonuniform_mesh_edge_lengths_and_ec_coefficients`: `num_lines = [4,3,3]`, edge lengths 1/2/3 mm with the last node repeating the previous delta, analytic areas, `vi_y/vi_x = 4.0` |
+| Required CSX | `setup_requires_a_csx_geometry`: no geometry means `setup_fdtd()` false and no engine, exactly like native `SetupFDTD` |
+
 ## Probes and engine interface (RM-066..RM-068)
 
 | Check | Result |
