@@ -1634,6 +1634,24 @@ property causes double ownership and a double free; parameter-set transforms
 `Utilities.GetMultiDirs` with an invalid name silently returns `None` where the
 Rust binding raises `ValueError`.
 
+## Timestep method parity (RM-151, open)
+
+Native `Operator::Operator()` sets `m_TimeStepVar = 3` (`FDTD/operator.cpp:57`),
+i.e. `Rennings_2`, and `openEMS <input> --no-simulation -v` prints both the value
+and the name. Measured against the port:
+
+| Mesh | Native `Timestep (s)` | Port | Difference |
+| --- | --- | --- | --- |
+| uniform 1 mm, 4 cells | 1.92583e-12 | 1.66782e-12 (Var1, the port default) | 13.4% |
+| graded x 1/2/3, y 2, z 5 mm | 3.03659e-12 | 3.14720e-12 (Var3 forced) | 3.6% |
+
+Two separate gaps: the default method is Var1 instead of Var3, and the Var3
+implementation does not reproduce the native loop on a graded mesh. Flipping the
+default also exposes an f32 precision limit in the Debye pole test (its static
+ratio misses the analytic 1e-6 bound by 1.07e-6). The verified runs are not
+affected because their XMLs set `TimeStepMethod`; the defect is tracked as
+RM-151 and the default stays Var1 until the Var3 loop matches native.
+
 ## Boundary conditions, mesh geometry and required input (RM-044..RM-048, RM-064)
 
 | Check | Evidence |
