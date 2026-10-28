@@ -1646,7 +1646,11 @@ and the name. Measured against the port:
 | graded x 1/2/3, y 2, z 5 mm | 3.03659e-12 | 3.14720e-12 (Var3 forced) | 3.6% |
 
 Two separate gaps: the default method is Var1 instead of Var3, and the Var3
-implementation does not reproduce the native loop on a graded mesh. Flipping the
+implementation does not reproduce the native loop on a graded mesh. The same dt
+difference already shows up in the sampled excitation: on a 3-cell 1 mm mesh
+with a 1 GHz sinus the native `et`/`ht` files hold 1040 samples and the port
+1039, the Gaussian trace differs by 7.8e-7 relative, and Dirac/Step are
+bit-identical. Flipping the
 default also exposes an f32 precision limit in the Debye pole test (its static
 ratio misses the analytic 1e-6 bound by 1.07e-6). The verified runs are not
 affected because their XMLs set `TimeStepMethod`; the defect is tracked as
