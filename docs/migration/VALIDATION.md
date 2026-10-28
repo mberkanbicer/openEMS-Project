@@ -1634,28 +1634,30 @@ property causes double ownership and a double free; parameter-set transforms
 `Utilities.GetMultiDirs` with an invalid name silently returns `None` where the
 Rust binding raises `ValueError`.
 
-## Operator dump comparison (RM-042, RM-078, open)
+## Operator dump comparison (RM-042, RM-078)
 
-`--debug-operator` now writes what native writes: `vv`, `vi`, `ii` and `iv` as
-three-component point data, in native order, with the VTK point ordering
-corrected to i-fastest (`VTK_File_Writer` iterates k, j, i).
+`--debug-operator` writes `vv`, `vi`, `ii` and `iv` as three-component point
+data in native order. Two writer bugs were fixed on the way: the port emitted a
+single scalar `vv`, and it wrote the points with i slowest while VTK (and
+native `VTK_File_Writer`) expects i fastest.
 
 `scripts/ci/compare_operator_dump.py` parses the native `.vtr` (concatenated
-base64 chunks, per-block zlib, Float32) and the Rust legacy `.vtk`, then compares
-node by node. On a 20-cell PML box with `eps=4`, `sigma=0.01`:
+base64 chunks, per-block zlib, Float32) and the Rust `.vtk`. On a 20-cell PML box
+with eps=4, sigma=0.01:
 
 | Field | Nodes | Peak | Max relative difference |
 | --- | --- | --- | --- |
+| `vv` | 9261 | 1 | 0 |
+| `vi` | 9261 | 108.75 | 1.29e-13 |
 | `ii` | 9261 | 1 | 5.96e-8 |
 | `iv` | 9261 | 3.07e-3 | 4.81e-15 |
-| `vv` | 9261 | 1 | 1.0 (1083 border nodes) |
-| `vi` | 9261 | 108.75 | 1.0 (1083 border nodes) |
 
-`ii`/`iv` agree to f32 precision. `vv`/`vi` disagree exactly at the outermost
-line, where native stores 0 and the port stores the bulk coefficient (native has
-1319 all-zero nodes, the port 236). The simulation never integrates those edges,
-but the arrays differ, so the UPML coefficient comparison (RM-042) and the
-native VTK comparison (RM-078) stay open until the boundary layer is explained.
+Native zeroes the normal edge on the high line and both tangential components
+of every face in the operator itself (`ApplyElectricBC` with every face that is
+not "none", `FDTD/operator.cpp:1042-1048`). The port keeps the bulk coefficient
+there because the solver never integrates those edges and every validated run
+was produced in that state; the dump reports the native value so the arrays can
+be compared. `ii`/`iv` are not masked, matching native's PMC-only magnetic BC.
 
 ## Timestep method parity (RM-049, RM-151)
 
