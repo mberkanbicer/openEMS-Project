@@ -547,3 +547,5 @@ blockers, next task. Do not rewrite history.
 | 2026-10-27 | Native Octave testsuite | green | 10/10 PASS in 2305.7 s (including `nf2ff_dipole` after linking the CLI); `VALIDATION.md` |
 | 2026-10-28 | RM-148 | Verified | Cylindrical `FindPath`/`SnapLine2Mesh` overrides; five hand-derived edge-list tests; native `-vvv` prints the same seam internals and `Voltage excitations: 4 (3, 1, 0)`; probes agree to 4.7e-7/2.1e-7/2.2e-7 |
 | 2026-10-28 | RM-007, RM-008 | Verified | `check_placeholders.py --self-test` and the CI changed-file gate; `check_migration_docs.py` passes and Section 12 logs every session |
+| 2026-10-28 | RM-125 | Verified | `scripts/ci/run_full_acceptance_wsl.sh` at `e71b743`: 13/13 PASS (759 crate tests, 469 HDF5, 448 Python cases, Octave 10/10, 51 differential cases, SAR and curve gates, CTB, install layout, records); report in `ACCEPTANCE.md` |
+| 2026-10-28 | RM-127 | Verified | `FINAL_AUDIT.md`: 13 Section-21 criteria, 4 met / 5 partly / 3 not met; all 96 `Verified` rows carry a command, result and artefact; migration not complete -- 53 `Implemented` rows and RM-144 remain |

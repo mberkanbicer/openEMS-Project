@@ -1634,6 +1634,44 @@ property causes double ownership and a double free; parameter-set transforms
 `Utilities.GetMultiDirs` with an invalid name silently returns `None` where the
 Rust binding raises `ValueError`.
 
+## Full-stack acceptance run (RM-125)
+
+`scripts/ci/run_full_acceptance_wsl.sh` at revision `e71b743`, one session, one
+host (WSL2, i9-13900H). The report is `ACCEPTANCE.md`; the script writes it from
+the same logs it checks, and a check only counts as PASS when its command exits
+0 *and* its log carries no failure marker (the harness's own classification is
+covered by a three-case self-check: pass, silent failure, failure marker).
+
+| Check | Result |
+| --- | --- |
+| workspace build (release) | PASS |
+| crate unit + integration tests | 759 tests |
+| HDF5 feature tests | 469 tests |
+| Python packages build + native imports | 2 packages |
+| native Python suites | 448 cases |
+| native Octave testsuite | 10 passed, 0 failed, 0 errors |
+| differential reference harness | 51 cases |
+| cylindrical SAR differential | per-cell 2.6e-3 (bound 1e-2), counters equal |
+| curve-excitation differential | 4.8e-5 / 9.2e-6 / 2.9e-5 on the peaks |
+| CTB Octave delivery | PASS |
+| CMake install layout | `AppCSXCAD ctb hyp2mat nf2ff openEMS sar_calc` + MATLAB libs/trees |
+| migration records | PASS |
+| placeholder policy self-test | PASS |
+
+The Octave suite took 331 s in this session (the earlier 2305 s run was on a
+cold cache); the assertions and values are identical. This run covers the Linux
+CI job and adds the Python, Octave and differential suites that CI does not run;
+it does not cover the Windows, macOS or FreeBSD jobs.
+
+## Final audit (RM-127)
+
+`docs/migration/FINAL_AUDIT.md` records the 13 `AGENTS.md` Section 21 criteria:
+4 met, 5 partly met, 3 not met. The mechanical part of the audit confirmed that
+all 96 `Verified` rows name a command, a result and an artefact. The verdict is
+that the migration is **not complete**: 53 rows are still `Implemented`, RM-144
+is blocked, and the platform/GUI evidence cannot be produced on this host while
+GitHub Actions is disabled and no GUI session can present a frame.
+
 ## Performance and memory baseline (RM-121, RM-122)
 
 `scripts/ci/run_performance_baseline_wsl.sh`, final code, both binaries pinned by

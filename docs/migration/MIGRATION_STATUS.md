@@ -9,13 +9,14 @@ pass, including analytic propagation, UPML absorption, CFL, quarter-cell
 material averaging and native-HDF5 dump reading.
 
 Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
-(94 `Verified`, 53 `Implemented`, 0 `Not Started`, 3 `Blocked` at the last
+(96 `Verified`, 53 `Implemented`, 0 `Not Started`, 1 `Blocked` at the last
 update; see the snapshot there for the live count). The solver, the CSXCAD
 depth wave, hyp2mat, CTB, fparser, the Python/Octave/MATLAB surfaces, the
-C-ABI contracts, the CI matrix, the performance baseline and the cylindrical
-path walk (RM-148) are verified. The open areas are the full-stack
-acceptance run (RM-125), the final audit (RM-127) and the verification
-evidence for the 55 `Implemented` rows.
+C-ABI contracts, the CI matrix, the performance baseline, the cylindrical
+path walk (RM-148), the full-stack acceptance run (RM-125) and the final
+audit (RM-127) are verified. `FINAL_AUDIT.md` finds the migration **not
+complete**: 53 rows are still `Implemented` and RM-144 is blocked, so the
+remaining work is their verification evidence, not new architecture.
 
 ### Status and evidence policy
 
@@ -638,8 +639,6 @@ the performance and memory baseline (RM-121/RM-122) are verified.
 
 | Task | Work | State |
 | --- | --- | --- |
-| RM-125 | Full-stack acceptance run | Harness ready (`scripts/ci/run_full_acceptance_wsl.sh`); runs after RM-148 lands |
-| RM-127 | Final audit against `AGENTS.md` Section 21 | After the acceptance report |
 | RM-144 | Cylindrical port/line snapping and `--nativeFieldDumps` | Depends on RM-148 and the VTK native-vector mode (RM-078) |
 | RM-124 | Nightly reference run | The schedule and dispatch are in place, but GitHub Actions is disabled for the repository, so no scheduled run is created |
 
