@@ -54,10 +54,11 @@ write_xml "$WORK/gauss.xml" 0 'f0="1e9" fc="2e9"' "3e9"
 write_xml "$WORK/sinus.xml" 1 'f0="1e9"' "1e9"
 write_xml "$WORK/dirac.xml" 2 'f_max="10e9"' "10e9"
 write_xml "$WORK/step.xml" 3 'f_max="10e9"' "10e9"
+write_xml "$WORK/custom2.xml" 10 'f0="1e9" Function="exp(-pow((t-5e-9)/1e-9,2))*sin(2*pi*1e9*t)"' "1e9"
 write_xml "$WORK/custom.xml" 10 'f0="1e9" Function="sin(2*pi*1e9*t)"' "1e9"
 
 status=0
-for case in gauss sinus dirac step custom; do
+for case in gauss sinus dirac step custom custom2; do
   mkdir -p "$WORK/native_$case" "$WORK/rust_$case"
   ( cd "$WORK/native_$case" && "$NATIVE_BIN" "../$case.xml" --no-simulation >native.log 2>&1 )
   ( cd "$WORK/rust_$case" && "$RUST_BIN" "../$case.xml" --no-simulation >rust.log 2>&1 )

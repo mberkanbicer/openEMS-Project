@@ -1637,8 +1637,9 @@ Rust binding raises `ValueError`.
 ## Timestep method parity (RM-049, RM-151)
 
 Native `Operator::Operator()` sets `m_TimeStepVar = 3` (`FDTD/operator.cpp:57`),
-i.e. `Rennings_2`, and `openEMS <input> --no-simulation -v` prints both the value
-and the name.
+i.e. `Rennings_2`, and the engine defaults to method 3 as well
+(`openems.rs:140`), so an XML without `TimeStepMethod` takes the same method as
+native.
 
 The Var3 walk was wrong at the domain edge: it reflected an already mirrored
 absolute coordinate, while native keeps the shift relative and reflects it
@@ -1652,12 +1653,36 @@ latter, and three meshes match the native binary:
 | graded x 1/2/3, y 2, z 5 mm | 3.03659e-12 | 3.03659e-12 | < 1e-5 |
 | uniform 0.5 mm, 4 cells | 9.62917e-13 | 9.62917e-13 | < 1e-5 |
 
-The **default is still Var1**. Flipping it makes the Debye analytic test miss
-its 1e-6 bound by 1.07e-6 because the ADE relaxation/drive coefficients are
-`FDTD_FLOAT` (f32), exactly as in native, so the bound itself is at the
-representation limit; changing it needs owner approval. Until then an XML
-without `TimeStepMethod` takes a 13% smaller step than native (1.66782e-12 vs
-1.92583e-12 on 1 mm). Verified runs are unaffected: their XMLs set the method.
+`setup_fdtd` now follows the native order -- EC coefficients first, timestep
+second (`FDTD/operator.cpp:986-1012`) -- and applies the periodic-signal
+adjustment (`:1014-1020`) after the time-step factor.
+
+The bare `Operator::new()` default stays Var1: flipping it makes the Debye
+analytic test miss its 1e-6 bound by 1.07e-6 because the ADE relaxation and
+drive coefficients are `FDTD_FLOAT` (f32), exactly as in native, so the bound
+itself is at the representation limit; moving it needs owner approval. Only
+direct library users see that difference.
+
+## Excitation arrays (RM-037..RM-039)
+
+`scripts/ci/run_excitation_dump_check_wsl.sh` runs the pinned native binary and
+the Rust CLI on byte-identical input and compares the `et` (voltage at `n*dT`)
+and `ht` (current at `(n+0.5)*dT`) dumps element by element. The native dump is
+written with six significant digits, so the bound is 1e-5 of the peak.
+
+| Type | Samples (native/Rust) | `et` | `ht` |
+| --- | --- | --- | --- |
+| Gaussian | 10 / 10 | 8.3e-7 | 8.0e-7 |
+| sinusoidal 1 GHz | 1040 / 1040 | 5.0e-7 | 5.0e-7 |
+| Dirac | 2 / 2 | 0 | 0 |
+| step | 2 / 2 | 0 | 0 |
+| custom `sin(2*pi*1e9*t)` | 10 / 10 | 4.5e-7 | 2.6e-6 |
+| custom `exp(-pow((t-5e-9)/1e-9,2))*sin(2*pi*1e9*t)` | 10 / 10 | 2.7e-6 | 1.6e-6 |
+
+Two fixes made this match: the period adjustment (`FDTD/operator.cpp:1014-1020`)
+gives the 1 GHz sinus 1040 samples instead of 1039, and `build_custom` registers
+the `pi`/`e` constants that native adds before parsing
+(`FDTD/excitation.cpp:227-235`).
 
 ## Boundary conditions, mesh geometry and required input (RM-044..RM-048, RM-064)
 
