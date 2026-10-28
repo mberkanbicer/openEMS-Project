@@ -1634,32 +1634,37 @@ property causes double ownership and a double free; parameter-set transforms
 `Utilities.GetMultiDirs` with an invalid name silently returns `None` where the
 Rust binding raises `ValueError`.
 
-## Install path with `--with-rust` (RM-010, RM-021, open)
+## Install path with `--with-rust` (RM-010, RM-021)
 
-`./update_openEMS.sh $HOME/openems-prefix --with-rust` completes ("build
-successful") with GUI and all Rust crates compiled, but the installed prefix is
-the C++ layout:
+`./update_openEMS.sh $HOME/openems-prefix --with-rust` on 2026-10-28 reports
+`build successful` and installs the advertised layout on a clean prefix:
 
 ```
-bin/   AppCSXCAD  AppCSXCAD.sh  nf2ff  openEMS  openEMS.sh  sar_calc
-lib/   libCSXCAD, libQCSXCAD, libfparser, libnf2ff, libopenEMS (C++ so-versions)
-share/ CSXCAD/matlab, openEMS/matlab
+bin/   AppCSXCAD  ctb  hyp2mat  nf2ff  openEMS  openEMS.sh  sar_calc
+lib/   libcsxcad_matlab.so  libopenems_matlab.so  (+ the C++ libraries)
+share/ CSXCAD/matlab  openEMS/matlab
 ```
 
-- `bin/openEMS --version` prints `openEMS 64bit -- version v0.37.0-61-g9060690`,
-  i.e. the C++ binary; the Rust CLI identifies itself differently.
-- `hyp2mat` and `ctb` are absent, and so are `libcsxcad_matlab.so` /
-  `libopenems_matlab.so`.
-- The script builds and installs fparser, CSXCAD, openEMS, QCSXCAD and AppCSXCAD
-  as separate projects (`build`/`install` helpers), so the root CMake project --
-  the only place with the Rust install rules -- is never configured, built or
-  installed. `--with-rust` only adds `-DBUILD_RUST=YES` to subproject
-  configurations that ignore it.
-- The post-install verification (`bin/openEMS*` present, both M-file trees
-  present) is satisfied by the C++ install, so the gap passes silently.
+`bin/openEMS --help` prints `openEMS - Electromagnetic Field Solver (Rust)`, so
+the native names point at the port. Two integration bugs had to be fixed first:
 
-This is the dual build path RM-021 describes; RM-010 stays `Implemented` until
-the script drives the root project (or the Rust install moves into the loop).
+1. The script built and installed each subproject separately, so the root CMake
+   project -- the only place with the Rust install rules -- never ran. The
+   prefix kept the C++ `openEMS`, `AppCSXCAD`, `nf2ff` and `sar_calc`, had no
+   `hyp2mat`/`ctb` and no MATLAB C-ABI libraries, and the old post-install check
+   only looked for `bin/openEMS*` plus the M-file trees, which the C++ install
+   satisfies. The Rust section now configures the root project, builds its
+   `rust-workspace` target and installs from it, then verifies all six binaries,
+   both libraries, both trees and the Rust banner. It reads `--help`, because
+   `--version` is not a supported flag and its non-zero exit trips `pipefail`.
+2. `Cargo.toml` `default-members` did not include `openEMS/nf2ff-cli` and
+   `openEMS/sar-cli`, which the install rules ship as `nf2ff` and `sar_calc`, so
+   a plain `cargo build` left them unbuilt and the install failed on the missing
+   files.
+
+The resulting `bin/` layout is the same one `scripts/ci/check_cmake_install.sh`
+checks for the root CMake install, which is what RM-021's "single documented
+command produces identical layout" asks for.
 
 ## Operator dump comparison (RM-042, RM-078)
 
