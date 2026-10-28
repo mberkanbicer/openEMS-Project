@@ -1634,6 +1634,29 @@ property causes double ownership and a double free; parameter-set transforms
 `Utilities.GetMultiDirs` with an invalid name silently returns `None` where the
 Rust binding raises `ValueError`.
 
+## Operator dump comparison (RM-042, RM-078, open)
+
+`--debug-operator` now writes what native writes: `vv`, `vi`, `ii` and `iv` as
+three-component point data, in native order, with the VTK point ordering
+corrected to i-fastest (`VTK_File_Writer` iterates k, j, i).
+
+`scripts/ci/compare_operator_dump.py` parses the native `.vtr` (concatenated
+base64 chunks, per-block zlib, Float32) and the Rust legacy `.vtk`, then compares
+node by node. On a 20-cell PML box with `eps=4`, `sigma=0.01`:
+
+| Field | Nodes | Peak | Max relative difference |
+| --- | --- | --- | --- |
+| `ii` | 9261 | 1 | 5.96e-8 |
+| `iv` | 9261 | 3.07e-3 | 4.81e-15 |
+| `vv` | 9261 | 1 | 1.0 (1083 border nodes) |
+| `vi` | 9261 | 108.75 | 1.0 (1083 border nodes) |
+
+`ii`/`iv` agree to f32 precision. `vv`/`vi` disagree exactly at the outermost
+line, where native stores 0 and the port stores the bulk coefficient (native has
+1319 all-zero nodes, the port 236). The simulation never integrates those edges,
+but the arrays differ, so the UPML coefficient comparison (RM-042) and the
+native VTK comparison (RM-078) stay open until the boundary layer is explained.
+
 ## Timestep method parity (RM-049, RM-151)
 
 Native `Operator::Operator()` sets `m_TimeStepVar = 3` (`FDTD/operator.cpp:57`),
