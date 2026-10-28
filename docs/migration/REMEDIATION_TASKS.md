@@ -77,7 +77,7 @@ Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
 ## Remaining backlog (1 tasks) and execution order
 
-The three `Not Started` rows that remain. Everything else is `Verified`,
+The single `Not Started` row that remains. Everything else is `Verified`,
 `Implemented` or a recorded exception.
 
 | ID | Pri | Task | Depends | Why it is left |

@@ -9,11 +9,13 @@ pass, including analytic propagation, UPML absorption, CFL, quarter-cell
 material averaging and native-HDF5 dump reading.
 
 Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
-(80 `Verified`, 55 `Implemented`, 10 `Not Started`, 3 `Blocked` at the last
-update; see the snapshot there for the live count). The largest open areas are the extension
-framework and remaining physics extensions, NF2FF/SAR, the native CLI and
-scripting interfaces, the GUI feature surface, and the differential harness over
-`reference-data/`.
+(91 `Verified`, 55 `Implemented`, 1 `Not Started`, 3 `Blocked` at the last
+update; see the snapshot there for the live count). The solver, the CSXCAD
+depth wave, hyp2mat, CTB, fparser, the Python/Octave/MATLAB surfaces, the
+C-ABI contracts, the CI matrix and the performance baseline are verified.
+The open areas are the cylindrical `FindPath` overrides (RM-148), the
+full-stack acceptance run (RM-125) and the final audit (RM-127), plus the
+verification evidence for the 55 `Implemented` rows.
 
 ### Status and evidence policy
 
@@ -630,13 +632,16 @@ the SAR 1 g/10 g averaging-cube search (RM-145), the end-criteria stop time
 Waves A, C, D and E (CLI, Python, Octave/MATLAB, dumps, SAR, NF2FF,
 QCSXCAD/AppCSXCAD, hyp2mat, CTB), the CSXCAD depth wave (RM-027/028/029/
 034/035/036), the CSXCAD interface contracts (RM-031/032/033), the fparser
-decisions (RM-023/024/025), the MATLAB C-ABI contracts (RM-094) and the CI
-matrix (RM-026/030/120) are verified.
+decisions (RM-023/024/025), the MATLAB C-ABI contracts (RM-094), the CI
+matrix (RM-026/030/120), the curve and metal-curve work (RM-149/RM-150) and
+the performance and memory baseline (RM-121/RM-122) are verified.
 
 | Task | Work | State |
 | --- | --- | --- |
-| RM-121 | Performance baseline vs native | The harness and a first table exist; re-measure on the final solver (the curve-excitation fix and the threading threshold changed both solvers' work) and record it |
-| RM-122 | Memory baseline vs native | Same run; peak RSS is already captured per case |
+| RM-148 | Cylindrical `FindPath`/`SnapLine2Mesh` overrides | Port in progress; unblocks RM-144 |
+| RM-125 | Full-stack acceptance run | Harness ready (`scripts/ci/run_full_acceptance_wsl.sh`); runs after RM-148 lands |
+| RM-127 | Final audit against `AGENTS.md` Section 21 | After the acceptance report |
+| RM-144 | Cylindrical port/line snapping and `--nativeFieldDumps` | Depends on RM-148 and the VTK native-vector mode (RM-078) |
 | RM-124 | Nightly reference run | The schedule and dispatch are in place; the first 03:00 UTC artifact is still pending |
 
 Follow-ups found during the last validation pass, not yet tasks:
@@ -645,9 +650,10 @@ Follow-ups found during the last validation pass, not yet tasks:
   `SetupFDTD` aborts with code 3 (recorded as a deviation in `VALIDATION.md`).
 - `--nativeFieldDumps` (the VTK writer's native-vector mode) has no Rust
   equivalent yet; the CLI now exists, so this part of RM-144 is no longer
-  blocked by a missing binary.
-- The curve-excitation port unblocks the `SnapLine2Mesh` half of RM-144 once a
-  consumer needs it (the GUI seam swap).
+  blocked by a missing binary, only by the VTK writer (RM-078).
+- The curve-excitation port (RM-149) and the metal-curve PEC pass (RM-150) are
+  verified; the cylindrical overrides (RM-148) are the remaining half of the
+  `SnapLine2Mesh` work tracked by RM-144.
 
 ## Session record
 
