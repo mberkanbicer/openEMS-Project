@@ -1634,33 +1634,30 @@ property causes double ownership and a double free; parameter-set transforms
 `Utilities.GetMultiDirs` with an invalid name silently returns `None` where the
 Rust binding raises `ValueError`.
 
-## Timestep method parity (RM-151, open)
+## Timestep method parity (RM-049, RM-151)
 
 Native `Operator::Operator()` sets `m_TimeStepVar = 3` (`FDTD/operator.cpp:57`),
 i.e. `Rennings_2`, and `openEMS <input> --no-simulation -v` prints both the value
-and the name. Measured against the port:
+and the name.
 
-| Mesh | Native `Timestep (s)` | Port | Difference |
+The Var3 walk was wrong at the domain edge: it reflected an already mirrored
+absolute coordinate, while native keeps the shift relative and reflects it
+against the base cell (`AdrOp::GetPos` with `SetReflection2Cell`,
+`tools/AdrOp.cpp:119-160`, `:423-433`). `shift_rel`/`reflected_pos` now do the
+latter, and three meshes match the native binary:
+
+| Mesh | Native `Timestep (s)` | Port (Var3) | Difference |
 | --- | --- | --- | --- |
-| uniform 1 mm, 4 cells | 1.92583e-12 | 1.66782e-12 (Var1, the port default) | 13.4% |
-| graded x 1/2/3, y 2, z 5 mm | 3.03659e-12 | 3.14720e-12 (Var3 forced) | 3.6% |
+| uniform 1 mm, 4 cells | 1.92583e-12 | 1.92583e-12 | < 1e-5 |
+| graded x 1/2/3, y 2, z 5 mm | 3.03659e-12 | 3.03659e-12 | < 1e-5 |
+| uniform 0.5 mm, 4 cells | 9.62917e-13 | 9.62917e-13 | < 1e-5 |
 
-Two separate gaps: the default method is Var1 instead of Var3, and the Var3
-implementation does not reproduce the native loop on a graded mesh. The loop
-difference is localized: native `AdrOp::Shift`/`GetShiftedPos`
-(`tools/AdrOp.cpp:327-381`) add the step to the flat index without a bounds
-check -- the mirroring lines are commented out -- while the port's `shift_node`
-mirrors at the domain edge (`operator.rs:4548`). Uniform meshes hide it because
-the mirrored cell has the same delta; on the graded mesh the port's value is
-3.6% *larger* than native, i.e. less conservative. The same dt
-difference already shows up in the sampled excitation: on a 3-cell 1 mm mesh
-with a 1 GHz sinus the native `et`/`ht` files hold 1040 samples and the port
-1039, the Gaussian trace differs by 7.8e-7 relative, and Dirac/Step are
-bit-identical. Flipping the
-default also exposes an f32 precision limit in the Debye pole test (its static
-ratio misses the analytic 1e-6 bound by 1.07e-6). The verified runs are not
-affected because their XMLs set `TimeStepMethod`; the defect is tracked as
-RM-151 and the default stays Var1 until the Var3 loop matches native.
+The **default is still Var1**. Flipping it makes the Debye analytic test miss
+its 1e-6 bound by 1.07e-6 because the ADE relaxation/drive coefficients are
+`FDTD_FLOAT` (f32), exactly as in native, so the bound itself is at the
+representation limit; changing it needs owner approval. Until then an XML
+without `TimeStepMethod` takes a 13% smaller step than native (1.66782e-12 vs
+1.92583e-12 on 1 mm). Verified runs are unaffected: their XMLs set the method.
 
 ## Boundary conditions, mesh geometry and required input (RM-044..RM-048, RM-064)
 
