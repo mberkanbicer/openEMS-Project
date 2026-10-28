@@ -39,3 +39,7 @@ build-venv/
 # Auxiliary Rust tools linked as native binaries
 /bin/
 
+
+# native excitation sample dumps written next to the solver output
+/et
+/ht
