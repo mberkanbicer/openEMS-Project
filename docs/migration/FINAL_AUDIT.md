@@ -5,8 +5,10 @@ full-stack acceptance run in `ACCEPTANCE.md`.
 
 - Acceptance run: `scripts/ci/run_full_acceptance_wsl.sh` on revision
   `e71b743`, 13/13 checks PASS (`ACCEPTANCE.md` records every check).
-- Register after this audit: 96 `Verified`, 53 `Implemented`, 0 `Not Started`,
-  1 `Blocked` (RM-144) in `REMEDIATION_TASKS.md`.
+- Register at the time of this audit: 96 `Verified`, 53 `Implemented`,
+  0 `Not Started`, 1 `Blocked` (RM-144) in `REMEDIATION_TASKS.md`. Verifying an
+  individual row later does not change the verdict until the whole list is
+  closed; the register is the authoritative running count.
 - Every `Verified` row was checked for recorded evidence: all of them name a
   command, a result and an artefact; none is empty.
 
