@@ -1697,6 +1697,15 @@ restored tree lives on a slower volume and the dump-heavy cases are I/O bound;
 the assertions, sample counts and values are unchanged, so this is a disk
 effect, not a solver change.
 
+## CI and record gates (RM-007, RM-008)
+
+| Check | Command | Result |
+| --- | --- | --- |
+| Placeholder gate self-test | `python scripts/ci/check_placeholders.py --self-test` | `placeholder checker self-test passed` -- a seeded `todo!()` is reported, a file whose only marker is the allowed `unreachable!()` is not, and an allowlisted file is excused |
+| Placeholder gate in CI | `.github/workflows/rust.yml` lines 58-60 (`--changed --base`, then `--changed` for a push) | green on every run since run 40580893146 |
+| Register consistency | `python scripts/ci/check_migration_docs.py` | `migration record check passed`: closed vocabulary, snapshot counts, backlog header, coverage statuses |
+| Session log | `REMEDIATION_PLAN.md` Section 12 and the `REMEDIATION_TASKS.md` progress-evidence table | one entry per session; every status change carries date, evidence path and command |
+
 ## Cylindrical path walk (RM-148)
 
 | Check | Result |
