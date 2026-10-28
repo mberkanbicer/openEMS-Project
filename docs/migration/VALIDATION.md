@@ -1646,7 +1646,13 @@ and the name. Measured against the port:
 | graded x 1/2/3, y 2, z 5 mm | 3.03659e-12 | 3.14720e-12 (Var3 forced) | 3.6% |
 
 Two separate gaps: the default method is Var1 instead of Var3, and the Var3
-implementation does not reproduce the native loop on a graded mesh. The same dt
+implementation does not reproduce the native loop on a graded mesh. The loop
+difference is localized: native `AdrOp::Shift`/`GetShiftedPos`
+(`tools/AdrOp.cpp:327-381`) add the step to the flat index without a bounds
+check -- the mirroring lines are commented out -- while the port's `shift_node`
+mirrors at the domain edge (`operator.rs:4548`). Uniform meshes hide it because
+the mirrored cell has the same delta; on the graded mesh the port's value is
+3.6% *larger* than native, i.e. less conservative. The same dt
 difference already shows up in the sampled excitation: on a 3-cell 1 mm mesh
 with a 1 GHz sinus the native `et`/`ht` files hold 1040 samples and the port
 1039, the Gaussian trace differs by 7.8e-7 relative, and Dirac/Step are
