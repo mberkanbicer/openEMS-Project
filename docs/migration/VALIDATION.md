@@ -1634,6 +1634,15 @@ property causes double ownership and a double free; parameter-set transforms
 `Utilities.GetMultiDirs` with an invalid name silently returns `None` where the
 Rust binding raises `ValueError`.
 
+## Probes and engine interface (RM-066..RM-068)
+
+| Check | Result |
+| --- | --- |
+| Engine interface | `run_fdtd` passes a live `EngineInterface` (mesh metadata, `volt`, `curr`) to every processing step; `probes/fieldprobes` reads a running engine and asserts the field is excited (E 0.006 vs a 0.005 limit, H 1.61e-7 vs 1e-7) |
+| Time-domain sampling | the same case compares the probe against the field dump at the same point: E 5.91e-8, H 5.67e-8 max relative deviation (limit 1e-7), sample counts equal, time base within 1.05e-16 s |
+| Running DFT | `field_probe_accumulates_dft`: a 10 GHz sinus at dt = 1 ps over 1000 steps gives an on-bin magnitude more than 100x the off-bin and within 1e-3 of the native N/2 amplitude; duplicates are ignored and `reset` keeps the frequency list |
+| Dump side | `frequency_domain_accumulates_a_known_tone` covers the frequency-domain dump with the same tone |
+
 ## Full-stack acceptance run (RM-125)
 
 `scripts/ci/run_full_acceptance_wsl.sh` at revision `e71b743`, one session, one
