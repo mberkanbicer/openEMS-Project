@@ -450,24 +450,70 @@ if [ "$BUILD_PY_EXT" -eq 1 ]; then
 fi
 
 #### rust extension build ####
-# The Rust workspace is built and installed by CMake (BUILD_RUST), so the
-# script only verifies the advertised files after `make install`.
+# The subproject loop above installs the C++ binaries under the native names.
+# The Rust install rules live in the root CMake project, which chains the
+# subprojects with ExternalProject_Add, so build only its `rust-workspace`
+# target and install from that build tree: the root install rules then put the
+# Rust binaries, C-ABI libraries and M-files into the prefix, replacing the C++
+# binaries with the port.
 if [ "$BUILD_RUST" -eq 1 ]; then
-  echo "Verifying the Rust installation in $INSTALL_PATH ..."
+  echo "Building and installing the Rust extensions ... please wait"
+  RUST_BUILD_DIR="$TMPDIR/rust-root"
+  RUST_CMAKE_ARGS=(-DBUILD_RUST=YES -DCMAKE_INSTALL_PREFIX="$INSTALL_PATH")
+  if [ "$BUILD_PY_EXT" -eq 1 ]; then
+    RUST_CMAKE_ARGS+=(-DBUILD_RUST_PYTHON=YES)
+  fi
+  if ! cmake -S "$BASEDIR" -B "$RUST_BUILD_DIR" "${RUST_CMAKE_ARGS[@]}" \
+       2>&1 | tee -a "$LOG_FILE" >> "$STDOUT";
+  then
+    echo "cmake for the Rust workspace failed, please see logfile for more details... $LOG_FILE"
+    exit 1
+  fi
+  if ! cmake --build "$RUST_BUILD_DIR" --target rust-workspace -j "$NJOBS" \
+       2>&1 | tee -a "$LOG_FILE" >> "$STDOUT";
+  then
+    echo "Rust workspace build failed, please see logfile for more details... $LOG_FILE"
+    exit 1
+  fi
+  if ! cmake --install "$RUST_BUILD_DIR" \
+       2>&1 | tee -a "$LOG_FILE" >> "$STDOUT";
+  then
+    echo "Rust install failed, please see logfile for more details... $LOG_FILE"
+    exit 1
+  fi
 
+  echo "Verifying the Rust installation in $INSTALL_PATH ..."
   RUST_MISSING=0
-  if ! compgen -G "$INSTALL_PATH/bin/openEMS*" > /dev/null; then
-    echo "missing: bin/openEMS"
-    RUST_MISSING=1
+  for f in bin/openEMS bin/AppCSXCAD bin/hyp2mat bin/nf2ff bin/sar_calc bin/ctb; do
+    if [ ! -x "$INSTALL_PATH/$f" ]; then
+      echo "missing: $f"
+      RUST_MISSING=1
+    fi
+  done
+  if [ "$RUST_MISSING" -eq 0 ]; then
+    # `--version` is not a supported flag and exits non-zero, which would trip
+    # `pipefail`; read `--help` instead and match the banner text.
+    RUST_BANNER=$("$INSTALL_PATH/bin/openEMS" --help 2>&1 || true)
+    case "$RUST_BANNER" in
+      *Rust*) ;;
+      *)
+        echo "bin/openEMS is not the Rust build"
+        RUST_MISSING=1
+        ;;
+    esac
   fi
-  if [ ! -d "$INSTALL_PATH/share/openEMS/matlab" ]; then
-    echo "missing: share/openEMS/matlab"
-    RUST_MISSING=1
-  fi
-  if [ ! -d "$INSTALL_PATH/share/CSXCAD/matlab" ]; then
-    echo "missing: share/CSXCAD/matlab"
-    RUST_MISSING=1
-  fi
+  for f in lib/libcsxcad_matlab.so lib/libopenems_matlab.so; do
+    if [ ! -f "$INSTALL_PATH/$f" ]; then
+      echo "missing: $f"
+      RUST_MISSING=1
+    fi
+  done
+  for d in share/openEMS/matlab share/CSXCAD/matlab; do
+    if [ ! -d "$INSTALL_PATH/$d" ]; then
+      echo "missing: $d"
+      RUST_MISSING=1
+    fi
+  done
   if [ "$RUST_MISSING" -ne 0 ]; then
     echo "Rust installation is incomplete, please see logfile for more details... $LOG_FILE"
     exit 1

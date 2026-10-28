@@ -28,6 +28,8 @@ default-members = [
     "openEMS/rust",
     "openEMS/rust-matlab",
     "openEMS/rust-cli",
+    "openEMS/nf2ff-cli",
+    "openEMS/sar-cli",
     "QCSXCAD/rust",
     "QCSXCAD/rust-egui",
     "AppCSXCAD/rust",
