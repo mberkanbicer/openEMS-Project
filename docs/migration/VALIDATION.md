@@ -1634,6 +1634,33 @@ property causes double ownership and a double free; parameter-set transforms
 `Utilities.GetMultiDirs` with an invalid name silently returns `None` where the
 Rust binding raises `ValueError`.
 
+## Install path with `--with-rust` (RM-010, RM-021, open)
+
+`./update_openEMS.sh $HOME/openems-prefix --with-rust` completes ("build
+successful") with GUI and all Rust crates compiled, but the installed prefix is
+the C++ layout:
+
+```
+bin/   AppCSXCAD  AppCSXCAD.sh  nf2ff  openEMS  openEMS.sh  sar_calc
+lib/   libCSXCAD, libQCSXCAD, libfparser, libnf2ff, libopenEMS (C++ so-versions)
+share/ CSXCAD/matlab, openEMS/matlab
+```
+
+- `bin/openEMS --version` prints `openEMS 64bit -- version v0.37.0-61-g9060690`,
+  i.e. the C++ binary; the Rust CLI identifies itself differently.
+- `hyp2mat` and `ctb` are absent, and so are `libcsxcad_matlab.so` /
+  `libopenems_matlab.so`.
+- The script builds and installs fparser, CSXCAD, openEMS, QCSXCAD and AppCSXCAD
+  as separate projects (`build`/`install` helpers), so the root CMake project --
+  the only place with the Rust install rules -- is never configured, built or
+  installed. `--with-rust` only adds `-DBUILD_RUST=YES` to subproject
+  configurations that ignore it.
+- The post-install verification (`bin/openEMS*` present, both M-file trees
+  present) is satisfied by the C++ install, so the gap passes silently.
+
+This is the dual build path RM-021 describes; RM-010 stays `Implemented` until
+the script drives the root project (or the Rust install moves into the loop).
+
 ## Operator dump comparison (RM-042, RM-078)
 
 `--debug-operator` writes `vv`, `vi`, `ii` and `iv` as three-component point
