@@ -1697,6 +1697,24 @@ restored tree lives on a slower volume and the dump-heavy cases are I/O bound;
 the assertions, sample counts and values are unchanged, so this is a disk
 effect, not a solver change.
 
+## Cylindrical path walk (RM-148)
+
+| Check | Result |
+| --- | --- |
+| Ported | `fit_to_alpha_range` (`operator_cylinder.cpp:226-250`), the `SnapToMeshLine` azimuth fold (`:277-282`), the two `SnapLine2Mesh` seam remaps (`:307-317`), `find_path_cylindrical` (`:320-475`), and `line_plane_intersection`/`determinant3`/`invert3` (`tools/useful.cpp:272-328`) |
+| Dispatch | `find_path` chooses the cylindrical walk from the mesh type, so the excitation curve branch and `calc_pec_curves` take it with no call-site change (native virtual call) |
+| Decreasing azimuth | 90 deg -> 0 deg returns exactly the increasing path `(0,[3,0,3]), (1,[3,0,3]), (1,[3,1,3]), (1,[3,2,3]), (0,[3,3,3])`, because native swaps the endpoints (`:339-348`) |
+| Span above pi | 90 deg -> 300 deg folds to -60 deg -> 90 deg (`:331-337`); the base walk then clamps -60 deg to alpha line 0 and yields `(1,[4,0,2])` |
+| Seam crossing | closed 6-sector mesh, `(rho 2, 300 deg) -> (rho 5, 10 deg)`: `(1,[2,5,2]), (0,[2,6,2]), (0,[3,6,2]), (0,[4,6,2])`, including the closed-alpha remap `0 -> numLines[1]-2` (`:467-472`) |
+| Native internals | both native binaries (`~/openems-exact` and the pinned v0.37.0) print `A path was leaving the alpha-direction mesh...`, `Intersection top: 3.6138,6.28319,2`, `Intersection bottom: 3.6138,0,2`, `Voltage excitations: 4 (3, 1, 0)` on the same input XML -- the port reproduces the split, the reused upper intersection on a closed azimuth and the 3 radial + 1 alpha distribution |
+| Probe agreement | cylindrical seam probes differ from native by 4.7e-7 / 2.1e-7 / 2.2e-7 (Ex/Ey/Ez); further probes at (rho 2, 60 deg) and (rho 5, 60 deg) agree to 1e-6, a constant-rho seam curve to 1e-6, a Cartesian curve control to 1e-6 and a `Box` excitation of the same cell to 1e-7 |
+| Regression | `openems-core` 250 + 2 tests; the Cartesian cavity curve gate reproduces 4.8e-5 / 9.2e-6 / 2.9e-5 on the peaks; `run_cylindrical_r0_check_wsl.sh` passes (4.2e-5) |
+
+Not reproduced: the native verbose `FindPath` diagnostics beyond the
+intersection error (semantics unaffected), and the unused `dist` out-parameter
+of `LinePlaneIntersection`. `Operator_Cylinder::SnapBox2Mesh` (`:284-305`) is
+still unported and belongs to RM-144.
+
 ## Metal curves are PEC (RM-150)
 
 | Check | Result |
