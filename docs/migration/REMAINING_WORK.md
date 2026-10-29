@@ -190,6 +190,8 @@ measurement work; **Blocked on** = the real prerequisite.
 
 ### RM-076 -- HDF5 writer / native readers
 
+**Closed 2026-10-29** -- see the status update above.
+
 | | |
 | --- | --- |
 | Current | Layout, attributes and dtypes match native; native `nf2ff` parses the dump; values differ by one constant |
@@ -240,6 +242,8 @@ measurement work; **Blocked on** = the real prerequisite.
 | Effort | 1-2 days |
 
 ### RM-151 -- default timestep and Var3 parity
+
+**Closed 2026-10-29** -- see the status update above.
 
 | | |
 | --- | --- |
