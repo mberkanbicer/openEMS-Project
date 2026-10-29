@@ -66,6 +66,10 @@ The first functional slice is implemented:
   `DumpBox` property and a `Box`/`MultiBox`/`Sphere`/`Cylinder`/`Polygon`/
   `User Defined` primitive on the selected property;
 * `CollapseAll`/`ExpandAll` and the `YZ`/`ZX`/`2D`/`3D` view presets;
+* clicking the viewport selects the nearest primitive (projected bounding
+  box), expands its property and opens the primitive editor;
+* the axis gizmo in the lower-left corner and the `Vis` checkbox in its
+  right-hand column;
 * `Properties and Structures` with the `Properties / Primitives` and `Vis`
   headers, the `Rectilinear Grid` dock (mesh and parameters), the coordinate
   status bar and a white viewport.
@@ -89,6 +93,7 @@ with `YZ`/`ZX`/`2D`/`3D` and export through `File > Export`.
 `toolbar_creates_a_property_and_a_primitive` exercises create → undo, and
 `a_created_box_is_visible_and_exported` checks the non-degenerate bounds, the
 default grid, the XML export and the re-parsed 10 mm cube (nine app tests
-pass). Remaining parity work: move the `Vis` checkbox into its column, split
-the `Parameter` dock from the grid editor, add the axis gizmo and adopt the
-native toolbar icons/metrics.
+pass), and `clicking_the_viewport_selects_the_primitive` covers the viewport
+hit test and the empty-space miss. Remaining parity work: split the
+`Parameter` dock from the grid editor, add viewport move/rotate handles and
+adopt the native toolbar icons/metrics.
