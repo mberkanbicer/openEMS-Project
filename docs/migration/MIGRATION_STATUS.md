@@ -1,24 +1,22 @@
 # Rust Migration Status
 
-**Status (2026-10-25):** The canonical tree is
+**Status (2026-10-29):** The canonical tree is
 `mberkanbicer-rust-migration-audit` in this worktree. All seven submodule ports
 are committed on their own `mberkanbicer-rust-migration-audit` branches, pushed,
 and pinned by the root repository; the archived three-crate tree is tagged
-`archive/rust-3crate-tree-2026-10`. The numerical core builds and its 375 tests
-pass, including analytic propagation, UPML absorption, CFL, quarter-cell
-material averaging and native-HDF5 dump reading.
+`archive/rust-3crate-tree-2026-10`. The register is closed: **151 `Verified`,
+0 `Implemented`, 0 `Blocked`**.
 
-Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
-(143 `Verified`, 7 `Implemented`, 0 `Not Started`, 1 `Blocked` at the last
-update; see the snapshot there for the live count). The solver, the CSXCAD
-depth wave, hyp2mat, CTB, fparser, the Python/Octave/MATLAB surfaces, the
-C-ABI contracts, the CI matrix, the performance baseline, the cylindrical
-path walk (RM-148), the full-stack acceptance run (RM-125) and the final
-audit (RM-127) are verified. `FINAL_AUDIT.md` finds the migration **not
-complete**: 7 rows are still `Implemented` and RM-144 is blocked, so the
-remaining work is their verification evidence, not new architecture.
-`REMAINING_WORK.md` lists those rows with the work each one needs, the grey
-areas and the decisions that only the owner can make.
+The full-stack acceptance run at revision `cce4905` is 13/13 PASS (release
+workspace build, 764 crate tests, 475 HDF5 tests, 448 native Python cases, the
+unmodified Octave testsuite 10/10, the 51-case differential harness, the
+cylindrical SAR and curve-excitation gates, CTB, the install layout, the
+records check and the placeholder self-test). `FINAL_AUDIT.md` was re-run
+against that revision and finds the migration **complete for the verified
+scope**; the two recorded limitations are exception E-005 (the hosted platform
+matrix and nightly run are unavailable, replaced by the local job) and E-006
+(native Qt GUI parity and the macOS/Linux-X11 matrix are not measured).
+Performance has a recorded baseline but no agreed threshold.
 
 ### Status and evidence policy
 

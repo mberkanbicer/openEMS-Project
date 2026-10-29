@@ -1,8 +1,7 @@
 # Remaining work: tasks, decisions and grey areas
 
 **Date:** 2026-10-28, updated 2026-10-29
-**Scope:** the rows still open in `REMEDIATION_TASKS.md`
-(none) at snapshot
+**Scope:** no rows remain open in `REMEDIATION_TASKS.md` at snapshot
 **151 `Verified` · 0 `Implemented` · 0 `Blocked`**.
 **Method:** each row was re-checked against the pinned native sources under
 `openEMS/`, `CSXCAD/` and `QCSXCAD/`; the original implementation is the
