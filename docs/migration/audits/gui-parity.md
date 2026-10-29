@@ -104,5 +104,7 @@ hit test and the empty-space miss; the geometry move and its single-step undo
 are covered by `a_viewport_gesture_moves_a_primitive_and_undo_restores_it`.
 The CAD workflow is complete: create, edit, pick, move (drag), rotate
 (Alt-drag), orbit, zoom, grid/parameters, visibility, undo and export. The
-remaining difference is styling, tracked as RM-153: the native toolbar icons
-and the Qt widget metrics/fonts.
+toolbar uses the native QCSXCAD PNG icons for the file, collapse/expand and
+exit actions (embedded from `QCSXCAD/images`), and the widget metrics follow
+the Qt row rhythm and 14 px text. The object-type buttons stay text, as in
+the native toolbar.
