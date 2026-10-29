@@ -73,7 +73,7 @@ The first functional slice is implemented:
 * Alt-drag (or the Rotate tool) rotates the selected primitive around the
   world z axis; the Scale tool scales it; each gesture is one undo step;
 * the right dock shows the Property, Primitive and Transform editors when a
-  node is selected, with numeric dX/dY/dZ, X/Y/Z degrees, scale and reset;
+  node is selected, with numeric dX/dY/dZ, X/Y/Z degrees, per-axis sX/sY/sZ scale and reset;
   every primitive type can be moved (boxes/spheres by coordinates, the rest
   through the transform);
 * dragging the selected primitive moves it in the camera plane (one undo
