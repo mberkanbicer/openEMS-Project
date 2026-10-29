@@ -1,9 +1,9 @@
 # Remaining work: tasks, decisions and grey areas
 
-**Date:** 2026-10-28
-**Scope:** the eight rows still open in `REMEDIATION_TASKS.md`
-(`RM-006`, `RM-043`, `RM-054`, `RM-076`, `RM-106`, `RM-124`, `RM-144`,
-`RM-151`) at snapshot **143 `Verified` · 7 `Implemented` · 1 `Blocked`**.
+**Date:** 2026-10-28, updated 2026-10-29
+**Scope:** the rows still open in `REMEDIATION_TASKS.md`
+(`RM-006`, `RM-043`, `RM-054`, `RM-106`, `RM-124`, `RM-144`) at snapshot
+**145 `Verified` · 5 `Implemented` · 1 `Blocked`**.
 **Method:** each row was re-checked against the pinned native sources under
 `openEMS/`, `CSXCAD/` and `QCSXCAD/`; the original implementation is the
 authority wherever the port could be read either way. The findings below are
@@ -12,6 +12,25 @@ source-level facts unless a measurement is quoted.
 This document decides *what is left and what must be chosen*; it does not
 change any status. Every close still needs the evidence rule from
 `REMEDIATION_PLAN.md` Section 0.
+
+## Status update 2026-10-29
+
+`RM-076` and `RM-151` are now `Verified`.
+
+* `RM-076`: the native `nf2ff` reads a Rust dump and every far-field dataset
+  matches within `1.6e-5` of the peak. The missing factor was the native DFT
+  weight `2 * recorded_interval`; the writer now also matches the native `f64`
+  datasets and the `float32` `Frequency` attribute.
+* `RM-151`: bare `Operator::new()` defaults to Var3 like native; the Debye
+  identity is asserted on the f32-rounded coefficients (bit-exact) so no bound
+  changed.
+* `RM-042`/`RM-054`: the operator dump fixture now carries `Kappa=0.05`, so
+  `EC_G` is compared against native for the first time (vv `9.8e-15`,
+  vi `4.3e-13`). A parallel-plate TEM test with `Kappa` attenuates, but its
+  ~4% lossless standing-wave residue is too large for the 3% analytic bound;
+  the fixture still needs tightening, so `RM-054` stays `Implemented`.
+
+Decision `D-R4` and `D-R8(a)` are therefore applied; `D-R7` is still open.
 
 ---
 

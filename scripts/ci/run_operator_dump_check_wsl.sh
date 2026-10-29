@@ -29,7 +29,10 @@ cat > "$WORK/pml.xml" <<EOF
       <YLines>$LINES</YLines>
       <ZLines>$LINES</ZLines>
     </RectilinearGrid>
-    <BackgroundMaterial Epsilon="4" Mue="1" Sigma="0.01" Kappa="0.0"/>
+    <!-- Kappa exercises EC_G (electric loss); Sigma exercises EC_R
+         (magnetic loss). Keep both so a units regression in either path
+         changes the dump. -->
+    <BackgroundMaterial Epsilon="4" Mue="1" Sigma="0.01" Kappa="0.05"/>
     <Properties/>
   </ContinuousStructure>
 </openEMS>

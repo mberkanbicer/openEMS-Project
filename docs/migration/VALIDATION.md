@@ -2354,3 +2354,65 @@ so the two opposite faces of the probe were evaluated on the same line and the
 expansion `port_it_1A/1B` match to 1.5e-6/1.9e-6. All four reference cases pass,
 which closes RM-118; the remaining step (RM-119) is owner approval of the
 recorded bounds.
+
+## nf2ff native round-trip and the DFT weight (RM-076, 2026-10-29)
+
+Command: `scripts/ci` build of `nf2ff-cli` plus the native `nf2ff` from the
+pinned v0.37.0 build, both run on the time-domain dumps that the Rust solver
+wrote for `combinedtests/nf2ff_dipole`.
+
+The native reader rejected the dump before the `uint8` flag fix
+(`dual_mesh`, `legacy_fmt` are `H5T_NATIVE_UCHAR` in
+`HDF5_File_Writer`). After the fix both runs produce a result file with the
+same layout:
+
+| Dataset | native peak | Rust peak | max relative difference |
+| --- | --- | --- | --- |
+| `nf2ff/E_phi/FD/f0_real` | 1.2890e-17 | 1.2890e-17 | 4.97e-6 |
+| `nf2ff/E_phi/FD/f0_imag` | 7.7707e-18 | 7.7707e-18 | 1.57e-5 |
+| `nf2ff/E_theta/FD/f0_real` | 4.3114e-16 | 4.3114e-16 | 4.62e-6 |
+| `nf2ff/E_theta/FD/f0_imag` | 1.5597e-15 | 1.5597e-15 | 1.67e-7 |
+| `nf2ff/P_rad/FD/f0` | 3.4747e-33 | 3.4747e-33 | 8.73e-7 |
+
+Datasets are `f8`, the `Frequency` attribute is `f4` and the mesh datasets are
+`f4`, matching native. The factor that had made the Rust field `1.08e10` too
+small was the DFT weight: native `HDF5_File_Reader::CalcFDVectorData`
+multiplies the sum by `2 * time_diff` (`tools/hdf5_file_reader.cpp:938-945`),
+with `time_diff` the last recorded sample interval. The dump interval is
+`4.6188022e-11 s` and `1 / (2 * 4.6188022e-11) = 1.0825e10`.
+`time_domain_dft_applies_the_native_trapezoidal_weight` pins the factor with the
+exact three-sample sequence `1, 0, -1`.
+
+## Lossy medium (RM-054, 2026-10-29)
+
+The operator dump fixture (`scripts/ci/run_operator_dump_check_wsl.sh`) now
+uses `BackgroundMaterial Epsilon="4" Kappa="0.05" Sigma="0.01"`, so `EC_G`
+(electric loss) and `EC_R` (magnetic loss) are both compared node by node
+against the native `--debug-operator` dump:
+
+| Coefficient | peak | max relative difference |
+| --- | --- | --- |
+| `vv` | 0.994577 | 9.8e-15 |
+| `vi` | 108.458 | 4.3e-13 |
+| `ii` | 1 | 5.96e-8 |
+| `iv` | 0.00306506 | 4.8e-15 |
+
+A parallel-plate TEM fixture (PEC plates, PMC walls, `Kappa=0.05`, 8 GHz,
+probes 40 mm apart) attenuates, but the measured `alpha` is 8.7-9.5 Np/m against
+the exact 6.65 Np/m; the lossless control still shows a 4% amplitude residue
+from the finite PML, so the fixture is not yet tight enough to carry the 3%
+analytic bound. The earlier attempt in the register used `Sigma`, the magnetic
+conductivity, whose low-loss attenuation is ~6.6e-5 Np/m over the same path,
+which is why it showed no loss. `RM-054` therefore stays `Implemented` with the
+coefficient half verified.
+
+## Var3 default and the Debye identity (RM-151, 2026-10-29)
+
+Native `Operator::Operator()` sets `m_TimeStepVar = 3` (`operator.cpp:57`); the
+port now does the same in `OperatorBaseImpl::new()`.
+`var1_and_var3_match_the_uniform_mesh_analytic_values` asserts the default. The
+Debye test now asserts the stored `v_relax_ADE`/`v_drive_ADE` values are the
+correctly rounded f32 analytic coefficients (bit-exact equality) instead of
+checking the exact identity `2 d / (1 - a) = delta_eps`, which the native
+`FDTD_FLOAT` storage limits to a few 1e-7 at Var3. `openems-core --features
+hdf5`: 266 + 2 tests pass.
