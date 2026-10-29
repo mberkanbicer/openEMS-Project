@@ -1,51 +1,53 @@
-# ADR 0009: Qt Widgets GUI parity for AppCSXCAD
+# ADR 0009: GUI parity for AppCSXCAD (all-Rust)
 
-**Status:** accepted 2026-10-29 (supersedes the toolkit part of ADR 0004)
+**Status:** accepted 2026-10-29, revised 2026-10-29 (all-Rust requirement)
 **Context:** RM-152, E-006, `docs/migration/audits/gui-parity.md`
 
 ## Context
 
-ADR 0004 chose `egui` + `wgpu` for the GUI and accepted a toolkit change. The
-owner has rejected that trade-off: the Rust application must match the native
-Qt Widgets AppCSXCAD in design and usability, not merely in function.
+ADR 0004 chose `egui` + `wgpu` and accepted a toolkit change. The owner
+rejected that: the Rust application must match the native Qt Widgets
+AppCSXCAD in design and usability. The owner also requires the result to stay
+**all-Rust**.
 
-The native application is Qt Widgets (`QMainWindow`, `QMenuBar`, `QToolBar`,
-`QDockWidget`, `QTreeWidget`, a VTK viewport). `cxx-qt` is the natural
-Rust/Qt bridge, but `cxx-qt-lib` 0.10 exposes only `qt_gui`, `qt_qml` and
-`qt_quickcontrols`; it has no `QWidget`/`QMainWindow` bindings. A Qt Quick
-application via `cxx-qt` would be all-Rust but would not reproduce the Widgets
-layout, metrics or interaction model.
+The native application is Qt Widgets. `cxx-qt-lib` 0.10 exposes only
+`qt_gui`, `qt_qml` and `qt_quickcontrols`; it has no `QWidget`/`QMainWindow`
+bindings. A C++ Qt shell or a QML application would either leave C++ in the
+product or change the widget model, so neither satisfies both constraints.
 
 ## Decision
 
-Build the parity GUI as a **thin Qt Widgets front-end in C++ over the Rust
-model**, bridged with `cxx`. The C++ layer owns only the widget tree and the
-event wiring; the structure, materials, grid, operators, engine and file I/O
-stay in `csxcad-core`/`openems-core`.
+Reproduce the native layout, palette and workflow in the existing **egui/wgpu**
+application, all-Rust, and accept the residual differences that come from the
+toolkit (fonts, widget metrics, native dialogs). The target layout is fixed by
+`AppCSXCAD/qt-prototype/` and `audits/gui-qt-prototype.png`; the Rust
+implementation is:
 
-The layout prototype in `AppCSXCAD/qt-prototype/` fixes the target: menus
-`File`/`Info`, the text object toolbar, the `Properties and Structures` dock
-with the `Properties / Primitives` and `Vis` columns, the `Rectilinear Grid`
-dock, the `Parameter` dock and the coordinate status bar
-(`audits/gui-qt-prototype.png`).
+* light Fusion-like palette and a white viewport;
+* `File`/`Info` menus and the native text toolbar (`New`, `Load`, `Save`,
+  `Export`, `CollapseAll`, `ExpandAll`, `Material`, `Metal`, `Electrode`,
+  `ProbeBox`, `ResBox`, `DumpBox`, `Box`, `MultiBox`, `Sphere`, `Cylinder`,
+  `Polygon`, `User Defined`, `YZ`, `ZX`, `2D`, `3D`);
+* the `Properties and Structures` dock with the `Properties / Primitives` and
+  `Vis` columns;
+* the `Rectilinear Grid` dock including the parameter list;
+* the coordinate status bar and the supported view presets.
 
 ## Consequences
 
-* The GUI shell is C++. This narrows ADR 0008: no C++ API surface is exposed
-  for the solver, but the GUI front-end is accepted as C++ code driven by the
-  Rust model.
-* The build gains a Qt6 Widgets target next to the Rust workspace. It is built
-  only when the GUI is requested, so headless/server builds do not need Qt.
-* The egui application remains until the Qt shell reaches feature parity, then
-  it is retired.
-* `RM-152` stays `Analyzed` until the shell loads and edits a real structure
-  through the bridge; the prototype alone is not the migration.
+* No C++ GUI and no QML: the product stays all-Rust.
+* Pixel identity with Qt is not claimed. The recorded limitation is the widget
+  toolkit, not the workflow: creation, editing, visibility, undo, grid,
+  parameters and exports all run through the Rust model.
+* The Qt prototype remains as the layout reference only; it is not built or
+  shipped.
+* `RM-152` moves to `Implemented` when the workflow slice is reachable; the
+  remaining parity items (dock split, `Vis` column placement, axis gizmo,
+  native metrics) are listed in the audit.
 
 ## Alternatives rejected
 
-* **Qt Quick via cxx-qt**: all-Rust, but not the Widgets layout; cannot meet
-  "birebir".
-* **ritual / generated QWidget bindings**: no maintained QWidget binding set
-  for Qt6; the build risk is higher than the thin shell.
-* **egui restyle**: explicitly rejected by the owner; it cannot be
-  pixel-identical.
+* **Thin C++ Qt Widgets shell + Rust model via cxx**: exact widgets, but the
+  owner requires all-Rust.
+* **Qt Quick via cxx-qt**: all-Rust logic but QML, and not the Widgets model.
+* **egui left as-is**: rejected by the owner; the design differed.

@@ -50,17 +50,36 @@ close most of the usability gap but cannot claim identity.
 The work should not start before this choice is recorded as a new ADR that
 supersedes D-04 (and, for B, D-08).
 
-## Tool constraint and the path chosen
+## Tool constraint and the all-Rust path
 
-cxx-qt-lib 0.10 has no QWidget/QMainWindow bindings (only qt_gui,
-qt_qml and qt_quickcontrols), so a literal Qt Widgets port cannot be written
-with cxx-qt alone. ADR 0009 records the decision: a **thin Qt Widgets
-front-end in C++ over the Rust model, bridged with cxx**. The prototype in
-AppCSXCAD/qt-prototype/ fixes the layout:
+`cxx-qt-lib` 0.10 has no `QWidget`/`QMainWindow` bindings (only `qt_gui`,
+`qt_qml`, `qt_quickcontrols`), and the owner requires an **all-Rust** product.
+ADR 0009 therefore reproduces the native layout in the existing egui/wgpu
+application and accepts the toolkit residual (fonts, native dialogs, widget
+metrics). The Qt prototype in `AppCSXCAD/qt-prototype/` is the layout
+reference only; it is not shipped.
 
-![Qt prototype](gui-qt-prototype.png)
+The first functional slice is implemented:
 
-It builds with Qt 6.10 and renders through the offscreen platform, so the
-design can be compared with the native screenshot before the model bridge is
-wired. The remaining work in RM-152 is the bridge and the feature port, not
-the layout.
+* light Fusion-like palette, white viewport, native text toolbar;
+* toolbar actions create a `Material`/`Metal`/`Electrode`/`ProbeBox`/`ResBox`/
+  `DumpBox` property and a `Box`/`MultiBox`/`Sphere`/`Cylinder`/`Polygon`/
+  `User Defined` primitive on the selected property;
+* `CollapseAll`/`ExpandAll` and the `YZ`/`ZX`/`2D`/`3D` view presets;
+* `Properties and Structures` with the `Properties / Primitives` and `Vis`
+  headers, the `Rectilinear Grid` dock (mesh and parameters), the coordinate
+  status bar and a white viewport.
+
+![Rust layout](gui-windows-light.png)
+
+Usage as a CAD editor: load or create a project, pick a property (or create
+one with `Material`), add a primitive with the object buttons, edit its
+geometry and priority in the right-hand primitive editor, edit the material in
+the property editor, toggle visibility in the tree, use `Undo`/`Redo`, adjust
+the grid/parameters in the left dock, switch the view with `YZ`/`ZX`/`2D`/`3D`
+and export through `File > Export`.
+
+`toolbar_creates_a_property_and_a_primitive` exercises the create → undo
+path. Remaining parity work: move the `Vis` checkbox into its column, split
+the `Parameter` dock from the grid editor, add the axis gizmo and adopt the
+native toolbar icons/metrics.
