@@ -72,14 +72,23 @@ The first functional slice is implemented:
 
 ![Rust layout](gui-windows-light.png)
 
-Usage as a CAD editor: load or create a project, pick a property (or create
-one with `Material`), add a primitive with the object buttons, edit its
-geometry and priority in the right-hand primitive editor, edit the material in
-the property editor, toggle visibility in the tree, use `Undo`/`Redo`, adjust
-the grid/parameters in the left dock, switch the view with `YZ`/`ZX`/`2D`/`3D`
-and export through `File > Export`.
+A created model renders immediately: the demo below is a loaded
+`Material` box on a `Metal` ground plane, with the tree, the grid dock and
+the status bar:
 
-`toolbar_creates_a_property_and_a_primitive` exercises the create → undo
-path. Remaining parity work: move the `Vis` checkbox into its column, split
+![Rust demo](gui-demo.png)
+
+Usage as a CAD editor: load or create a project (new projects start with a
+20 mm grid), pick a property (or create one with `Material`), add a primitive
+with the object buttons (Box and Sphere start as a visible 10 mm shape), edit
+its geometry and priority in the right-hand primitive editor, edit the
+material in the property editor, toggle visibility in the tree, use
+`Undo`/`Redo`, adjust the grid/parameters in the left dock, switch the view
+with `YZ`/`ZX`/`2D`/`3D` and export through `File > Export`.
+
+`toolbar_creates_a_property_and_a_primitive` exercises create → undo, and
+`a_created_box_is_visible_and_exported` checks the non-degenerate bounds, the
+default grid, the XML export and the re-parsed 10 mm cube (nine app tests
+pass). Remaining parity work: move the `Vis` checkbox into its column, split
 the `Parameter` dock from the grid editor, add the axis gizmo and adopt the
 native toolbar icons/metrics.
