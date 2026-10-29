@@ -68,6 +68,7 @@ The first functional slice is implemented:
 * `CollapseAll`/`ExpandAll` and the `YZ`/`ZX`/`2D`/`3D` view presets;
 * clicking the viewport selects the nearest primitive (projected bounding
   box), expands its property and opens the primitive editor;
+* middle-drag orbits the camera and the wheel zooms;
 * the axis gizmo in the lower-left corner and the `Vis` checkbox in its
   right-hand column;
 * `Properties and Structures` with the `Properties / Primitives` and `Vis`
