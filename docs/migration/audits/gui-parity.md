@@ -69,8 +69,11 @@ The first functional slice is implemented:
 * clicking the viewport selects the nearest primitive (projected bounding
   box), expands its property and opens the primitive editor;
 * middle-drag orbits the camera and the wheel zooms;
+* dragging the selected primitive moves it in the camera plane (one undo
+  step for the whole drag);
 * the axis gizmo in the lower-left corner and the `Vis` checkbox in its
   right-hand column;
+* the `Rectilinear Grid` and `Parameter` docks are separate sections.
 * `Properties and Structures` with the `Properties / Primitives` and `Vis`
   headers, the `Rectilinear Grid` dock (mesh and parameters), the coordinate
   status bar and a white viewport.
@@ -95,6 +98,7 @@ with `YZ`/`ZX`/`2D`/`3D` and export through `File > Export`.
 `a_created_box_is_visible_and_exported` checks the non-degenerate bounds, the
 default grid, the XML export and the re-parsed 10 mm cube (nine app tests
 pass), and `clicking_the_viewport_selects_the_primitive` covers the viewport
-hit test and the empty-space miss. Remaining parity work: split the
-`Parameter` dock from the grid editor, add viewport move/rotate handles and
-adopt the native toolbar icons/metrics.
+hit test and the empty-space miss; the geometry move and its single-step undo
+are covered by `a_viewport_gesture_moves_a_primitive_and_undo_restores_it`.
+Remaining parity work: the rotate handle, the native toolbar icons and the
+widget metrics.
