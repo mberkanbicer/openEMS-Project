@@ -62,7 +62,7 @@ reference only; it is not shipped.
 The first functional slice is implemented:
 
 * light Fusion-like palette, white viewport, native text toolbar;
-* toolbar actions create a `Material`/`Metal`/`Electrode`/`ProbeBox`/`ResBox`/
+* toolbar actions create a `Material`/`Metal`/`Excitation`/`ProbeBox`/`ResBox`/
   `DumpBox` property and a `Box`/`MultiBox`/`Sphere`/`Cylinder`/`Polygon`/
   `User Defined` primitive on the selected property;
 * `CollapseAll`/`ExpandAll` and the `YZ`/`ZX`/`2D`/`3D` view presets;
@@ -115,3 +115,57 @@ toolbar uses the native QCSXCAD PNG icons for the file, collapse/expand and
 exit actions (embedded from `QCSXCAD/images`), and the widget metrics follow
 the Qt row rhythm and 14 px text. The object-type buttons stay text, as in
 the native toolbar.
+
+## Mouse input verification (2026-10-29)
+
+The viewport was driven with **real mouse input** on the running Windows
+build (`target/release/appcsxcad.exe`, maximized, demo project
+`Material` box + `Metal` ground plane, screenshot
+`gui-mouse-baseline.jpg`). The helper moves the cursor with
+`SetCursorPos` and clicks with `mouse_event` after forcing the window to the
+foreground; the application records the gesture in the file named by
+`QCSXCAD_INPUT_TRACE` (`qcsxcad_egui::trace_input`). The captured trace:
+
+```text
+pick id=1 at=(940,480)          <- click selects Box - ID: 1
+drag_start id=1 mode=Move
+move id=1 dx=1.48053e-1 dy=-1.39077e-1 dz=-5.07671e-2   (x15)
+drag_start id=1 mode=Rotate     <- after clicking the Rotate tool
+rotate id=1 angle_rad=0.07000   (x16)
+drag_start id=1 mode=Scale      <- after clicking the Scale tool
+scale id=1 factor=1.16000       (x30)
+orbit dx=-5.0 dy=-4.0 yaw=-1.5208 pitch=1.1808          (x15)
+zoom distance=36.43122 / 40.07434
+```
+
+| Interaction | Evidence |
+| --- | --- |
+| Click the 3D viewport | `pick id=1 at=(940,480)`; the tree highlights `Box - ID: 1` and the right dock opens the Primitive/Transform editors (`gui-mouse-select.jpg`) |
+| Left-drag the selected box | 15 `move` lines; the primitive coordinates change from `(2,2,2)-(12,12,6)` to `(4.44,0.02,1.27)-(14.44,10.01,5.28)` and the box moves (`gui-mouse-move.jpg`) |
+| `Rotate` tool + drag | 16 `rotate` lines; the box rotates about its centre while its coordinates stay unchanged (`gui-mouse-rotate.jpg`) |
+| `Scale` tool + drag | 30 `scale` lines; the box grows about its centre (`gui-mouse-scale.jpg`) |
+| Middle-drag (orbit) | 15 `orbit` lines; `yaw`/`pitch` change and the view rotates (`gui-mouse-orbit.jpg`) |
+| Wheel | `zoom distance` changes and the view moves closer/further (`gui-mouse-zoom.jpg`) |
+| Transform `Apply` (1.25) and `Reset transform` | the box grows by 1.25 and the reset removes the transform (`gui-mouse-transform-apply.jpg`) |
+
+Every gesture starting with a click takes exactly one undo snapshot
+(`Document::begin_gesture`), so `Undo` reverts a whole drag.
+
+Four defects blocked this and were fixed:
+
+* `AppCSXCAD/rust/src/main.rs` dropped every window event except
+  close/resize/redraw, so egui never received mouse or keyboard input;
+  events are now forwarded before the match.
+* The surface was never reconfigured on `Outdated`/`Lost`, so maximizing
+  the window froze the last frame; it is now reconfigured and the acquire
+  retried, while `Timeout`/`Occluded` skip the frame.
+* The camera uniform was only uploaded when the geometry changed, so
+  orbiting/zooming had no visible effect; it is written every frame.
+* The event loop requested a redraw unconditionally (a busy loop); redraws
+  now follow input events and `egui` repaint requests, and a queued menu
+  action requests one more frame.
+
+Automated coverage: 52 `qcsxcad-core`, 13 `qcsxcad-egui` (including
+`wheel_zooms_and_middle_drag_orbits` and
+`cursor_without_the_middle_button_does_not_orbit`) and 12 `appcsxcad`
+tests pass.

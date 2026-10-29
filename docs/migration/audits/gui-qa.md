@@ -1,8 +1,9 @@
 # QCSXCAD / AppCSXCAD GUI QA checklist
 
-**Status:** automated and offscreen items executed on 2026-10-27; the
-interactive desktop items are still open, so RM-106 stays `Implemented`
-(not `Verified`).
+**Status:** automated, offscreen and Windows desktop items executed through
+2026-10-29, including real mouse input on the 3D viewport. `Export PNG`
+with a live window surface, the macOS/Linux desktop matrix and the native
+side-by-side remain open (E-006).
 
 Evidence artifact: [`gui-screenshot.png`](gui-screenshot.png) — a 1280x800
 frame rendered through the real wgpu pipelines and the real egui widgets by
@@ -87,14 +88,34 @@ Executed on the real display:
 | E | viewport | PASS: the three boxes render as depth-tested wires in the 3D view |
 | 18 | full layout | PASS: menu bar, toolbar, tree and viewport are laid out without the ID collisions or missing glyphs of the offscreen run |
 
-Not re-executed in this session: B (keyboard focus in a text field), C
-(dialogs), the mouse/keyboard interaction half of D and the orbit camera in E.
-Synthetic input (`SetCursorPos` + `mouse_event`, `PostMessage` and
-`SendKeys`) did not reach the egui widgets on this host even though the window
-was foreground and the hit test returned the application window; the
-interactive behaviour is covered by the widget tests listed above. A human
-five-minute pass on this desktop is still the strongest evidence for those
-items.
+### Mouse session (Windows, 2026-10-29, same day)
+
+The earlier note that synthetic input did not reach the widgets was a bug in
+the application, not in the automation: `AppCSXCAD/rust/src/main.rs` discarded
+every window event except close/resize/redraw, so egui never saw a mouse or
+keyboard event. With the forwarding fixed, real mouse input
+(`SetCursorPos` + `mouse_event`, window brought to the foreground) drives the
+GUI and the application records each gesture through `QCSXCAD_INPUT_TRACE`.
+
+| # | Check | Result |
+| --- | --- | --- |
+| D | mouse interaction | PASS: viewport click selects `Box - ID: 1` (`pick id=1 at=(940,480)`), the tree row highlights and the right dock opens; tree, visibility, drag values and the toolbar buttons respond to real clicks |
+| D | transform buttons | PASS: `Translate`, `Rotate`, `Scale Apply` (1.25) and `Reset transform` change the model from the mouse (`gui-mouse-transform-apply.jpg`) |
+| E | viewport drag | PASS: left-drag moves the primitive (`move` trace, coordinates change); the `Rotate` tool rotates and the `Scale` tool scales about the primitive centre |
+| E | orbit camera | PASS: middle-drag changes `yaw`/`pitch` (`orbit` trace) and the rendered view rotates |
+| E | zoom | PASS: the wheel changes the camera distance and the rendered view |
+
+![mouse selection](gui-mouse-select.jpg)
+![mouse move](gui-mouse-move.jpg)
+![mouse rotate](gui-mouse-rotate.jpg)
+![mouse scale](gui-mouse-scale.jpg)
+![mouse orbit](gui-mouse-orbit.jpg)
+![mouse zoom](gui-mouse-zoom.jpg)
+![transform apply](gui-mouse-transform-apply.jpg)
+
+Still open: B (keyboard focus in a text field), C (dialogs, including the
+`Export PNG` path with a live window surface) and a human five-minute pass over
+the native side-by-side.
 
 Limits:
 
