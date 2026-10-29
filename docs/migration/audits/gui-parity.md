@@ -69,13 +69,20 @@ The first functional slice is implemented:
 * clicking the viewport selects the nearest primitive (projected bounding
   box), expands its property and opens the primitive editor;
 * middle-drag orbits the camera and the wheel zooms;
-* Alt-drag rotates the selected primitive around the world z axis (one undo
-  step);
+* the Move/Rotate/Scale toolbar tools choose what a viewport drag does;
+* Alt-drag (or the Rotate tool) rotates the selected primitive around the
+  world z axis; the Scale tool scales it; each gesture is one undo step;
+* the right dock shows the Property, Primitive and Transform editors when a
+  node is selected, with numeric dX/dY/dZ, X/Y/Z degrees, scale and reset;
+  every primitive type can be moved (boxes/spheres by coordinates, the rest
+  through the transform);
 * dragging the selected primitive moves it in the camera plane (one undo
   step for the whole drag);
 * the axis gizmo in the lower-left corner and the `Vis` checkbox in its
   right-hand column;
-* the `Rectilinear Grid` and `Parameter` docks are separate sections.
+* the `Rectilinear Grid` and `Parameter` docks are separate sections;
+* the dock order is fixed (the editors were previously created after the
+  central panel and therefore never reserved their width).
 * `Properties and Structures` with the `Properties / Primitives` and `Vis`
   headers, the `Rectilinear Grid` dock (mesh and parameters), the coordinate
   status bar and a white viewport.
