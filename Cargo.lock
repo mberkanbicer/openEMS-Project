@@ -157,6 +157,7 @@ dependencies = [
  "egui-winit",
  "env_logger",
  "log",
+ "png 0.17.16",
  "pollster",
  "qcsxcad-core",
  "qcsxcad-egui",
