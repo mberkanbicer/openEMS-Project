@@ -3,7 +3,7 @@
 **Date:** 2026-10-28, updated 2026-10-29
 **Scope:** the rows still open in `REMEDIATION_TASKS.md`
 (`RM-006`, `RM-043`, `RM-054`, `RM-106`, `RM-124`, `RM-144`) at snapshot
-**145 `Verified` · 5 `Implemented` · 1 `Blocked`**.
+**145 `Verified` · 6 `Implemented` · 0 `Blocked`**.
 **Method:** each row was re-checked against the pinned native sources under
 `openEMS/`, `CSXCAD/` and `QCSXCAD/`; the original implementation is the
 authority wherever the port could be read either way. The findings below are
@@ -30,7 +30,8 @@ change any status. Every close still needs the evidence rule from
   ~4% lossless standing-wave residue is too large for the 3% analytic bound;
   the fixture still needs tightening, so `RM-054` stays `Implemented`.
 
-Decision `D-R4` and `D-R8(a)` are therefore applied; `D-R7` is still open.
+Decision `D-R4`, `D-R7` and `D-R8(a)` are therefore applied: `RM-144` is now
+`Implemented` and no row is `Blocked`.
 
 ---
 
