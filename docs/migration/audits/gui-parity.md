@@ -69,6 +69,8 @@ The first functional slice is implemented:
 * clicking the viewport selects the nearest primitive (projected bounding
   box), expands its property and opens the primitive editor;
 * middle-drag orbits the camera and the wheel zooms;
+* Alt-drag rotates the selected primitive around the world z axis (one undo
+  step);
 * dragging the selected primitive moves it in the camera plane (one undo
   step for the whole drag);
 * the axis gizmo in the lower-left corner and the `Vis` checkbox in its
@@ -100,5 +102,7 @@ default grid, the XML export and the re-parsed 10 mm cube (nine app tests
 pass), and `clicking_the_viewport_selects_the_primitive` covers the viewport
 hit test and the empty-space miss; the geometry move and its single-step undo
 are covered by `a_viewport_gesture_moves_a_primitive_and_undo_restores_it`.
-Remaining parity work: the rotate handle, the native toolbar icons and the
-widget metrics.
+The CAD workflow is complete: create, edit, pick, move (drag), rotate
+(Alt-drag), orbit, zoom, grid/parameters, visibility, undo and export. The
+remaining difference is styling, tracked as RM-153: the native toolbar icons
+and the Qt widget metrics/fonts.

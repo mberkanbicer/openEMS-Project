@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-28, updated 2026-10-29
 **Scope:** no rows remain open in `REMEDIATION_TASKS.md` at snapshot
-**151 `Verified` · 0 `Implemented` · 0 `Blocked`**.
+**152 `Verified` · 0 `Implemented` · 1 `Analyzed` (RM-153) · 0 `Blocked`**.
 **Method:** each row was re-checked against the pinned native sources under
 `openEMS/`, `CSXCAD/` and `QCSXCAD/`; the original implementation is the
 authority wherever the port could be read either way. The findings below are
