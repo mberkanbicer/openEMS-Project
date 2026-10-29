@@ -68,3 +68,38 @@ Defects found and fixed while producing the artifact:
 
 Run these on a workstation with a display, record the results here and sign the
 table; only then can RM-015, RM-097…RM-106 move to `Verified`.
+
+## Real-display session (Windows, 2026-10-29)
+
+The Windows build (`target/release/appcsxcad.exe`, MSVC, HDF5 from the
+`openems-gui` conda environment) was launched on the physical desktop with
+`CSXCAD/rust/tests/fixtures/xml/06_excitation_probe_dump.xml`, maximized, and
+captured with `CopyFromScreen`:
+
+![real display](gui-windows.png)
+
+Executed on the real display:
+
+| # | Check | Result |
+| --- | --- | --- |
+| A | window presents frames, maximize/resize | PASS: 1936x1048 frame, no compositor errors |
+| D | structure tree | PASS: five properties, native labels (`Excitation::excitation`, `Box - ID: 1` ...), expand arrows and visibility checkboxes rendered |
+| E | viewport | PASS: the three boxes render as depth-tested wires in the 3D view |
+| 18 | full layout | PASS: menu bar, toolbar, tree and viewport are laid out without the ID collisions or missing glyphs of the offscreen run |
+
+Not re-executed in this session: B (keyboard focus in a text field), C
+(dialogs), the mouse/keyboard interaction half of D and the orbit camera in E.
+Synthetic input (`SetCursorPos` + `mouse_event`, `PostMessage` and
+`SendKeys`) did not reach the egui widgets on this host even though the window
+was foreground and the hit test returned the application window; the
+interactive behaviour is covered by the widget tests listed above. A human
+five-minute pass on this desktop is still the strongest evidence for those
+items.
+
+Limits:
+
+* F (native Qt side-by-side): the native QCSXCAD/AppCSXCAD is not built here
+  (`~/openems-exact/bin` has no GUI and `~/opt/openEMS/bin/AppCSXCAD` is the
+  port); recorded as E-006.
+* G (platform matrix): only Windows was exercised; no macOS host and no Linux
+  X server with a display are available here; recorded as E-006.

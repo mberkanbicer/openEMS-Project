@@ -17,6 +17,11 @@ criteria are met, five are partly met and three are not met. The blockers are
 the 53 `Implemented` rows, RM-144, and the platform/GUI evidence that this host
 cannot produce; they are listed in Section 3.
 
+> **2026-10-29 note:** the register is now fully `Verified` (151 rows, no
+> `Implemented`, no `Blocked`). This audit is still the record of the
+> `e71b743` revision and must be re-run before the migration is declared
+> complete.
+>
 > **2026-10-28 note:** the counts above are those of the audit revision
 > (`e71b743`). The live counts are in `REMEDIATION_TASKS.md`
 > (143 `Verified`, 7 `Implemented`, 1 `Blocked`); `REMAINING_WORK.md` carries

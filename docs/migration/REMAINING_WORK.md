@@ -2,8 +2,8 @@
 
 **Date:** 2026-10-28, updated 2026-10-29
 **Scope:** the rows still open in `REMEDIATION_TASKS.md`
-(`RM-106`, `RM-124`, `RM-144`) at snapshot
-**148 `Verified` · 3 `Implemented` · 0 `Blocked`**.
+(none) at snapshot
+**151 `Verified` · 0 `Implemented` · 0 `Blocked`**.
 **Method:** each row was re-checked against the pinned native sources under
 `openEMS/`, `CSXCAD/` and `QCSXCAD/`; the original implementation is the
 authority wherever the port could be read either way. The findings below are
@@ -42,8 +42,11 @@ Decision `D-R4`, `D-R7` and `D-R8(a)` are therefore applied: `RM-144` is now
 * `RM-054`: the lossy guide probes match native to `7.5e-6` / `1.1e-5` with
   the same `0.6802` attenuation, and `EC_G` matches in the operator dump.
 
-Only `RM-106` (display), `RM-124` (Actions account) and `RM-144` (native dump
-byte comparison) remain.
+`RM-106` and `RM-124` were closed the same day: a real-display Windows
+session with a maximized screenshot, and a daily 03:00 Windows task running
+`scripts/ci/run_nightly_wsl.sh` with a dated artifact. The register now has
+**151 `Verified`, 0 `Implemented`, 0 `Blocked`**; the remaining step is a
+fresh `FINAL_AUDIT.md` against the current revision.
 
 ---
 

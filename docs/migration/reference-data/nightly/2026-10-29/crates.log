@@ -1,0 +1,615 @@
+warning: constant `ParseErrorMessage` should have an upper case name
+  --> fparser/rust/src/lib.rs:68:7
+   |
+68 | const ParseErrorMessage: &[&str; 14] = &[
+   |       ^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(non_upper_case_globals)]` (part of `#[warn(nonstandard_style)]`) on by default
+help: convert the identifier to upper case
+   |
+68 - const ParseErrorMessage: &[&str; 14] = &[
+68 + const PARSE_ERROR_MESSAGE: &[&str; 14] = &[
+   |
+
+warning: `fparser-rs` (lib) generated 1 warning (run `cargo fix --lib -p fparser-rs` to apply 1 suggestion)
+warning: unused variable: `b`
+   --> openEMS/rust/src/debug_dump.rs:146:9
+    |
+146 |     for b in 0..boxes.len() {
+    |         ^ help: if this is intentional, prefix it with an underscore: `_b`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+   --> openEMS/rust/src/nf2ff.rs:331:13
+    |
+331 |         let mut edge_pp = Self::edge_lengths(lines[n_pp]);
+    |             ----^^^^^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `op`
+   --> openEMS/rust/src/openems.rs:620:17
+    |
+620 |             let op = &eng.op;
+    |                 ^^ help: if this is intentional, prefix it with an underscore: `_op`
+
+warning: unused variable: `started`
+    --> openEMS/rust/src/openems.rs:1741:13
+     |
+1741 |         let started = std::time::Instant::now();
+     |             ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_started`
+
+warning: variable does not need to be mutable
+    --> openEMS/rust/src/operator.rs:2766:13
+     |
+2766 |         let mut vv = self
+     |             ----^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> openEMS/rust/src/operator.rs:2770:13
+     |
+2770 |         let mut vi = self
+     |             ----^^
+     |             |
+     |             help: remove this `mut`
+
+warning: field `priority` is never read
+    --> openEMS/rust/src/operator.rs:3963:13
+     |
+3962 |         struct ElementSpec {
+     |                ----------- field in this struct
+3963 |             priority: i32,
+     |             ^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `extract_field` is never used
+    --> openEMS/rust/src/processing.rs:3499:4
+     |
+3499 | fn extract_field(values: &FieldArray, indices: &[Vec<usize>; 3]) -> FieldArray {
+     |    ^^^^^^^^^^^^^
+
+warning: field `stop` is never read
+   --> openEMS/rust/src/processing_integral.rs:979:5
+    |
+976 | struct SnappedSurface {
+    |        -------------- field in this struct
+...
+979 |     stop: [usize; 3],
+    |     ^^^^
+
+warning: unnecessary parentheses around index expression
+   --> openEMS/rust/src/nf2ff_hdf5.rs:636:20
+    |
+636 |                 re[((1 * 3 + i) * 3 + j)] = 1.0;
+    |                    ^                   ^
+    |
+    = note: `#[warn(unused_parens)]` (part of `#[warn(unused)]`) on by default
+help: remove these parentheses
+    |
+636 -                 re[((1 * 3 + i) * 3 + j)] = 1.0;
+636 +                 re[(1 * 3 + i) * 3 + j] = 1.0;
+    |
+
+warning: variable does not need to be mutable
+   --> openEMS/rust/src/nf2ff_hdf5.rs:631:13
+    |
+631 |         let mut im = vec![0.0f32; count];
+    |             ----^^
+    |             |
+    |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> openEMS/rust/src/processing.rs:5129:13
+     |
+5129 |         let mut meta = EngineMeta {
+     |             ----^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> openEMS/rust/src/processing.rs:5244:13
+     |
+5244 |         let mut volt = FieldArray::new("volt", [2, 6, 2]);
+     |             ----^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: `openems-core` (lib) generated 9 warnings (run `cargo fix --lib -p openems-core` to apply 6 suggestions)
+warning: `openems-core` (lib test) generated 13 warnings (9 duplicates) (run `cargo fix --lib -p openems-core --tests` to apply 4 suggestions)
+warning: unused import: `BC_PEC`
+  --> openEMS/rust/tests/analytic_validation.rs:12:20
+   |
+12 | use openems_core::{BC_PEC, BC_PML};
+   |                    ^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `add_sheet_source` is never used
+  --> openEMS/rust/tests/analytic_validation.rs:94:4
+   |
+94 | fn add_sheet_source(
+   |    ^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `openems-core` (test "analytic_validation") generated 2 warnings (run `cargo fix --test "analytic_validation" -p openems-core` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 6.53s
+     Running unittests src/lib.rs (target/release/deps/openems_core-367f8906c6abcfd0)
+
+running 267 tests
+test array_nijk::tests::test_get_set ... ok
+test array_nijk::tests::test_linear_index ... ok
+test excitation::tests::unbuilt_signal_reads_zero ... ok
+test array_nijk::tests::test_array_creation_and_access ... ok
+test excitation::tests::gaussian_respects_max_timestep_cap ... ok
+test excitation::tests::sinusoidal_waveform_matches_native_formula ... ok
+test excitation::tests::dirac_and_step_follow_native_samples ... ok
+test excitation::tests::nyquist_matches_native_formula ... ok
+test excitation::tests::gaussian_waveform_matches_native_formula ... ok
+test engine::tests::fast_energy_matches_the_native_formula ... ok
+test conducting_sheet::tests::coefficients_are_finite_and_stable ... ok
+test conducting_sheet::tests::rejects_invalid_input ... ok
+test conducting_sheet::tests::a_thicker_or_more_conductive_sheet_lowers_the_loss_coefficient ... ok
+test engine::tests::test_engine_creation ... ok
+test extensions::conducting_sheet_tests::test_conducting_sheet_creation ... ok
+test extensions::conducting_sheet_tests::test_conducting_sheet_apply2_voltages ... ok
+test debug_dump::tests::box_vtk_writes_twelve_edges_per_box ... ok
+test debug_dump::tests::scalar_vtk_has_the_expected_header_and_values ... ok
+test excitation::tests::custom_expression_is_sampled_at_both_phases ... ok
+test excitation::tests::invalid_inputs_are_reported ... ok
+test extensions::conducting_sheet_tests::test_conducting_sheet_full_ade_cycle ... ok
+test extensions::conducting_sheet_tests::test_conducting_sheet_pre_voltage_ade ... ok
+test extensions::conducting_sheet_tests::test_conducting_sheet_set_position ... ok
+test extensions::debye_tests::test_debye_apply2_voltages ... ok
+test extensions::debye_tests::test_debye_creation ... ok
+test extensions::debye_tests::test_debye_pre_post_voltage ... ok
+test extensions::debye_tests::test_debye_set_position ... ok
+test extensions::excitation_period_tests::excitation_delay_skips_earlier_steps ... ok
+test extensions::excitation_period_tests::periodic_sources_repeat_every_period ... ok
+test extensions::excitation_tests::test_add_voltage_excitation ... ok
+test extensions::excitation_tests::test_excitation_creation ... ok
+test extensions::excitation_tests::test_signal_value_dirac ... ok
+test extensions::excitation_tests::test_signal_value_gauss ... ok
+test extensions::lorentz_tests::test_lorentz_apply2_current ... ok
+test extensions::lorentz_tests::test_lorentz_apply2_voltages ... ok
+test extensions::lorentz_tests::test_lorentz_creation ... ok
+test extensions::lorentz_tests::test_lorentz_pre_current ... ok
+test extensions::lorentz_tests::test_lorentz_pre_voltage ... ok
+test extensions::lorentz_tests::test_lorentz_set_position ... ok
+test extensions::mur_abc_tests::test_mur_abc_creation ... ok
+test extensions::mur_abc_tests::test_mur_three_phase_update_matches_native_sequence ... ok
+test extensions::steadystate_energy_tests::energy_term_detects_a_decaying_field ... ok
+test extensions::steadystate_energy_tests::probes_are_bounds_checked_when_the_mesh_is_known ... ok
+test extensions::tests::test_extension_priorities ... ok
+test extensions::tests_cylinder::test_cylinder_close_alpha_current ... ok
+test extensions::tests_cylinder::test_cylinder_close_alpha_voltage ... ok
+test extensions::tests_cylinder::test_cylinder_new ... ok
+test extensions::tests_cylinder::test_cylinder_no_closed_alpha_no_op ... ok
+test extensions::tests_cylinder::test_cylinder_set_flags ... ok
+test extensions::tests_cylinder::test_cylinder_set_r0_coeffs ... ok
+test extensions::tests_lumped_rlc::native_recurrence_matches_a_hand_computed_step ... ok
+test extensions::tests_lumped_rlc::parallel_inductor_current_advances_from_the_previous_voltage ... ok
+test extensions::tests_lumped_rlc::series_rlc_impedance_matches_the_analytic_admittance ... HDF5-DIAG: Error detected in HDF5 (1.14.6)ok
+ thread 1test extensions::tests_steadystate::test_steadystate_add_e_probe ... :
+ok  #000: ../../../src/H5L.c line 1554 in H5Lget_name_by_idx(): unable to get link name
+
+    major: Links
+    minor: Can't get value
+test extensions::tests_steadystate::test_steadystate_new ...   #001: ../../../src/H5VLcallback.c line 5216 in H5VL_link_get(): link get failed
+ok    major: Virtual Object Layer
+
+    minor: Can't get value
+test extensions::tests_steadystate::test_steadystate_not_converged ...   #002: ../../../src/H5VLcallback.c line 5184 in H5VL__link_get(): link get failed
+    major: Virtual Object Layer
+ok    minor: Can't get value
+
+  #003: ../../../src/H5VLnative_link.c line 283 in H5VL__native_link_get(): unable to get link info
+    major: Links
+test extensions::tests_steadystate::test_steadystate_record_and_diff ...     minor: Object not found
+ok  #004: ../../../src/H5Lint.c line 1979 in H5L__get_name_by_idx(): can't get name
+    major: Links
+
+    minor: Can't get value
+test extensions::tfsf_tests::a_zero_amplitude_leaves_the_field_untouched ...   #005: ../../../src/H5Gtraverse.c line 824 in H5G_traverse(): internal path traversal failed
+ok    major: Symbol table
+
+    minor: Object not found
+test extensions::tfsf_tests::delay_lookup_matches_native_semantics ...   #006: ../../../src/H5Gtraverse.c line 744 in H5G__traverse_real(): traversal operator failed
+ok    major: Symbol table
+
+    minor: Can't move to next iterator location
+test extensions::tfsf_tests::test_tfsf_activate_face ... ok  #007: ../../../src/H5Lint.c line 1934 in H5L__get_name_by_idx_cb(): link not found
+    major: Links
+
+    minor: Object not found
+test extensions::tfsf_tests::test_tfsf_creation ...   #008: ../../../src/H5Gobj.c line 799 in H5G_obj_get_name_by_idx(): can't locate name
+ok
+    major: Symbol table
+    minor: Object not found
+test extensions::tfsf_tests::test_tfsf_set_region ...   #009: ../../../src/H5Gstab.c line 727 in H5G__stab_get_name_by_idx(): index out of bound
+ok    major: Invalid arguments to routine
+    minor: Bad value
+
+test extensions::upml_tests::test_upml_creation ... ok
+test extensions::upml_tests::upml_flux_sequence_changes_fields ... ok
+test fdtd_options::tests::a_file_without_fdtd_keeps_the_defaults ... ok
+test fdtd_options::tests::parses_the_native_fdtd_attributes ... okHDF5-DIAG: Error detected in HDF5 (1.14.6)
+ thread 1:
+test fdtd_options::tests::single_quotes_and_case_insensitive_names_are_accepted ...   #000: ../../../src/H5L.c line 1554 in H5Lget_name_by_idx(): unable to get link name
+    major: Links
+ok
+    minor: Can't get value
+test hdf5::ordering_tests::nxyz_order_is_component_major_then_xyz ...   #001: ../../../src/H5VLcallback.c line 5216 in H5VL_link_get(): link get failed
+ok
+    major: Virtual Object Layer
+    minor: Can't get value
+test hdf5::ordering_tests::nzyx_order_is_component_major_then_zyx ...   #002: ../../../src/H5VLcallback.c line 5184 in H5VL__link_get(): link get failed
+    major: Virtual Object Layer
+ok
+    minor: Can't get value
+test hdf5::ordering_tests::ordering_handles_short_input_without_panicking ...   #003: ../../../src/H5VLnative_link.c line 283 in H5VL__native_link_get(): unable to get link info
+ok    major: Links
+
+    minor: Object not found
+test lumped_rlc::tests::absent_components_become_zero ... ok  #004: ../../../src/H5Lint.c line 1979 in H5L__get_name_by_idx(): can't get name
+
+    major: Links
+    minor: Can't get value
+test lumped_rlc::tests::capacitance_floor_keeps_the_update_stable ...   #005: ../../../src/H5Gtraverse.c line 824 in H5G_traverse(): internal path traversal failed
+    major: Symbol table
+ok    minor: Object not found
+
+  #006: ../../../src/H5Gtraverse.c line 744 in H5G__traverse_real(): traversal operator failed
+    major: Symbol table
+test lumped_rlc::tests::per_cell_scaling_matches_native ... ok    minor: Can't move to next iterator location
+
+  #007: ../../../src/H5Lint.c line 1934 in H5L__get_name_by_idx_cb(): link not found
+test lumped_rlc::tests::series_coefficients_reproduce_a_known_damped_oscillator ... ok    major: Links
+    minor: Object not found
+
+  #008: ../../../src/H5Gobj.c line 799 in H5G_obj_get_name_by_idx(): can't locate name
+test lumped_rlc::tests::series_rl_without_capacitance_uses_the_reduced_form ...     major: Symbol table
+ok
+    minor: Object not found
+test lumped_rlc::tests::series_update_coefficients_are_finite_and_stable ... ok  #009: ../../../src/H5Gstab.c line 727 in H5G__stab_get_name_by_idx(): index out of bound
+    major: Invalid arguments to routine
+
+    minor: Bad value
+test nf2ff::tests::a_non_flat_box_is_rejected ... ok
+test nf2ff::tests::a_uniform_plane_matches_the_analytic_radiation_integral ... ok
+test nf2ff_hdf5::tests::time_domain_dft_applies_the_native_trapezoidal_weight ... okHDF5-DIAG: Error detected in HDF5 (1.14.6)
+ thread 1:
+test openems::option_wiring_tests::over_sampling_must_be_positive ... ok  #000: ../../../src/H5O.c line 158 in H5Oopen(): unable to synchronously open object
+
+    major: Object header
+    minor: Can't open object
+test openems::option_wiring_tests::abort_before_the_run_executes_no_timestep ...   #001: ../../../src/H5O.c line 119 in H5O__open_api_common(): unable to open object
+    major: Object header
+ok
+    minor: Can't open object
+test openems::option_wiring_tests::max_time_stops_the_run_before_the_requested_timesteps ... ok  #002: ../../../src/H5VLcallback.c line 5577 in H5VL_object_open(): object open failed
+
+    major: Virtual Object Layer
+test openems::lumped_rlc_wiring_tests::lumped_element_is_registered_and_the_run_stays_finite ... ok    minor: Can't open object
+
+  #003: ../../../src/H5VLcallback.c line 5544 in H5VL__object_open(): object open failed
+    major: Virtual Object Layer
+test openems::option_wiring_tests::over_sampling_sets_the_default_probe_interval ... ok    minor: Can't open object
+
+  #004: ../../../src/H5VLnative_object.c line 88 in H5VL__native_object_open(): unable to open object by name
+    major: Object header
+test openems::pml_setup_tests::setup_fdtd_rejects_a_pml_larger_than_the_mesh ...     minor: Can't open object
+ok  #005: ../../../src/H5Oint.c line 593 in H5O_open_name(): object not found
+
+    major: Object header
+    minor: Object not found
+test openems::processing_wiring_tests::run_fdtd_drives_processing_fields ...   #006: ../../../src/H5Gloc.c line 424 in H5G_loc_find(): can't find object
+    major: Symbol table
+ok    minor: Object not found
+
+  #007: ../../../src/H5Gtraverse.c line 824 in H5G_traverse(): internal path traversal failed
+    major: Symbol table
+test openems::steady_state_wiring_tests::a_negative_end_criteria_disables_the_criterion ...     minor: Object not found
+ok
+  #008: ../../../src/H5Gtraverse.c line 596 in H5G__traverse_real(): traversal operator failed
+test openems::pml_setup_tests::setup_fdtd_accepts_pml_and_defaults_to_eight_cells ... ok    major: Symbol table
+    minor: Callback failed
+
+  #009: ../../../src/H5Gloc.c line 381 in H5G__loc_find_cb(): object 'Nothing' doesn't exist
+test openems::option_wiring_tests::threaded_update_matches_the_serial_kernel_bit_for_bit ...     major: Symbol table
+ok    minor: Object not found
+
+HDF5-DIAG: Error detected in HDF5 (1.14.6) thread 1test hdf5::native_reader_tests::reads_a_native_openems_dump ... :
+ok
+  #000: ../../../src/H5D.c line 398 in H5Dopen2(): unable to synchronously open dataset
+test hdf5::native_reader_tests::round_trips_the_native_field_layout ...     major: Dataset
+ok
+    minor: Can't open object
+test openems::steady_state_wiring_tests::the_end_criteria_cadence_matches_native ... ok  #001: ../../../src/H5D.c line 360 in H5D__open_api_common(): unable to open dataset
+
+    major: Dataset
+    minor: Can't open object
+test openems::steady_state_wiring_tests::a_fast_default_run_reaches_the_timestep_limit ...   #002: ../../../src/H5VLcallback.c line 1967 in H5VL_dataset_open(): dataset open failed
+ok    major: Virtual Object Layer
+
+    minor: Can't open object
+test openems::steady_state_wiring_tests::periodic_excitation_registers_steady_state_detection ...   #003: ../../../src/H5VLcallback.c line 1934 in H5VL__dataset_open(): dataset open failed
+    major: Virtual Object Layer
+ok
+    minor: Can't open object
+test openems::tests::setup_requires_a_csx_geometry ... ok  #004: ../../../src/H5VLnative_dataset.c line 332 in H5VL__native_dataset_open(): unable to open dataset
+
+    major: Dataset
+    minor: Can't open object
+test openems::tests::excitation_property_injects_field_end_to_end ... ok  #005: ../../../src/H5Dint.c line 1426 in H5D__open_name(): not found
+
+    major: Dataset
+    minor: Object not found
+test openems::tests::test_add_processing ...   #006: ../../../src/H5Gloc.c line 424 in H5G_loc_find(): can't find object
+ok
+    major: Symbol table
+    minor: Object not found
+test openems::tests::max_time_limits_the_run ...   #007: ../../../src/H5Gtraverse.c line 824 in H5G_traverse(): internal path traversal failed
+    major: Symbol table
+ok    minor: Object not found
+
+  #008: ../../../src/H5Gtraverse.c line 596 in H5G__traverse_real(): traversal operator failed
+    major: Symbol table
+test openems::tests::test_openems_creation ... ok    minor: Callback failed
+
+  #009: ../../../src/H5Gloc.c line 381 in H5G__loc_find_cb(): object 'Nothing' doesn't exist
+    major: Symbol table
+test openems::tests::setup_registers_extensions_for_a_pml_fixture ...     minor: Object not found
+ok
+HDF5-DIAG: Error detected in HDF5 (1.14.6) thread 1test openems::tests::test_run_without_setup ... ok:
+
+  #000: ../../../src/H5L.c line 1554 in H5Lget_name_by_idx(): unable to get link name
+    major: Links
+test openems::tests::test_set_bc_type ... ok    minor: Can't get value
+
+  #001: ../../../src/H5VLcallback.c line 5216 in H5VL_link_get(): link get failed
+    major: Virtual Object Layer
+test openems::tests::test_set_cylinder_coords ... ok    minor: Can't get value
+
+  #002: ../../../src/H5VLcallback.c line 5184 in H5VL__link_get(): link get failed
+    major: Virtual Object Layer
+test openems::steady_state_wiring_tests::steady_state_end_criteria_stops_a_periodic_run_early ... ok    minor: Can't get value
+  #003: ../../../src/H5VLnative_link.c line 283 in H5VL__native_link_get(): unable to get link info
+
+    major: Links
+test openems::tests::test_set_end_criteria ... ok    minor: Object not found
+
+  #004: ../../../src/H5Lint.c line 1979 in H5L__get_name_by_idx(): can't get name
+test openems::steady_state_wiring_tests::aperiodic_excitation_uses_the_energy_end_criteria ... ok    major: Links
+    minor: Can't get value
+
+  #005: ../../../src/H5Gtraverse.c line 824 in H5G_traverse(): internal path traversal failed
+test openems::tests::test_set_number_of_time_steps ... ok    major: Symbol table
+    minor: Object not found
+
+  #006: ../../../src/H5Gtraverse.c line 744 in H5G__traverse_real(): traversal operator failed
+    major: Symbol table
+test openems::tests::test_set_pml_size ... ok    minor: Can't move to next iterator location
+  #007: ../../../src/H5Lint.c line 1934 in H5L__get_name_by_idx_cb(): link not found
+
+    major: Links
+test openems::tests::test_setup_and_run ...     minor: Object not found
+ok
+  #008: ../../../src/H5Gobj.c line 799 in H5G_obj_get_name_by_idx(): can't locate name
+    major: Symbol table
+test operator::anisotropy_tests::anisotropic_epsilon_scales_each_edge_direction ... ok    minor: Object not found
+
+  #009: ../../../src/H5Gstab.c line 727 in H5G__stab_get_name_by_idx(): index out of bound
+    major: Invalid arguments to routine
+test openems::tests::timestep_factor_scales_the_cfl_step ... ok    minor: Bad value
+
+HDF5-DIAG: Error detected in HDF5 (1.14.6) thread 1test operator::conducting_sheet_tests::boundary_layer_edges_fall_back_to_pec ... ok:
+  #000: ../../../src/H5L.c line 1554 in H5Lget_name_by_idx(): unable to get link name
+
+    major: Links
+test operator::conducting_sheet_tests::two_dimensional_sheet_gets_the_ade_model ... ok    minor: Can't get value
+
+  #001: ../../../src/H5VLcallback.c line 5216 in H5VL_link_get(): link get failed
+test operator::conducting_sheet_tests::volume_primitive_falls_back_to_pec_and_is_not_registered ...     major: Virtual Object Layer
+    minor: Can't get value
+ok
+  #002: ../../../src/H5VLcallback.c line 5184 in H5VL__link_get(): link get failed
+test hdf5::roundtrip_tests::reports_missing_objects_and_bad_paths ...     major: Virtual Object Layer
+    minor: Can't get value
+ok  #003: ../../../src/H5VLnative_link.c line 283 in H5VL__native_link_get(): unable to get link info
+    major: Links
+
+    minor: Object not found
+test operator::coordinate_system_tests::cartesian_find_path_ignores_the_cylindrical_override ... ok  #004: ../../../src/H5Lint.c line 1979 in H5L__get_name_by_idx(): can't get name
+
+    major: Links
+    minor: Can't get value
+test operator::coordinate_system_tests::closed_cylindrical_post_processing_hides_the_seam_lines ... ok  #005: ../../../src/H5Gtraverse.c line 824 in H5G_traverse(): internal path traversal failed
+
+    major: Symbol table
+test operator::coordinate_system_tests::curve_excitation_maps_onto_the_wire_path ...     minor: Object not found
+ok  #006: ../../../src/H5Gtraverse.c line 744 in H5G__traverse_real(): traversal operator failed
+    major: Symbol table
+
+    minor: Can't move to next iterator location
+test operator::coordinate_system_tests::cylindrical_curve_excitation_crosses_the_azimuth_seam ... ok  #007: ../../../src/H5Lint.c line 1934 in H5L__get_name_by_idx_cb(): link not found
+
+    major: Links
+    minor: Object not found
+test operator::coordinate_system_tests::cylindrical_find_path_folds_an_azimuth_span_above_pi ...   #008: ../../../src/H5Gobj.c line 799 in H5G_obj_get_name_by_idx(): can't locate name
+    major: Symbol table
+ok
+    minor: Object not found
+test operator::coordinate_system_tests::cylindrical_find_path_splits_a_seam_crossing_segment ...   #009: ../../../src/H5Gstab.c line 727 in H5G__stab_get_name_by_idx(): index out of bound
+ok
+    major: Invalid arguments to routine
+    minor: Bad value
+test operator::coordinate_system_tests::cylindrical_find_path_swaps_a_decreasing_azimuth ... ok
+test operator::coordinate_system_tests::cylindrical_full_turn_is_accepted_and_padded ... ok
+test operator::coordinate_system_tests::cylindrical_metric_uses_rho_and_annulus_areas ... ok
+test operator::coordinate_system_tests::cylindrical_negative_rho_is_rejected ... ok
+test operator::coordinate_system_tests::cylindrical_open_alpha_is_not_padded ... ok
+test operator::coordinate_system_tests::cylindrical_r0_timestep_includes_the_dielectric ... ok
+test operator::coordinate_system_tests::cylindrical_r0_uses_the_conservative_timestep ... ok
+test operator::coordinate_system_tests::cylindrical_rho_zero_axis_is_accepted ... ok
+test operator::coordinate_system_tests::find_path_diagonal_ties_resolve_towards_the_lowest_axis ... ok
+test operator::coordinate_system_tests::find_path_follows_an_axis_aligned_segment ... ok
+test operator::coordinate_system_tests::find_path_on_a_cylindrical_mesh_uses_the_cartesian_metric ... ok
+test operator::coordinate_system_tests::find_path_outside_the_domain_is_empty ... ok
+test operator::coordinate_system_tests::metal_curve_marks_the_path_as_pec ... ok
+test operator::coordinate_system_tests::wire_excitation_is_not_walked_as_a_curve ... ok
+test operator::debye_tests::a_short_relaxation_time_is_rejected ... ok
+test hdf5::roundtrip_tests::writes_and_reads_the_native_layout ... ok
+test nf2ff_hdf5::tests::analyses_planes_and_writes_the_native_result_layout ... ok
+test operator::debye_tests::debye_pole_relaxes_to_the_static_permittivity ... ok
+test operator::lorentz_tests::lorentz_coefficients_follow_the_native_drude_lorentz_model ... ok
+test operator::lorentz_tests::lorentz_pole_rings_at_the_pole_frequency ... ok
+test operator::lumped_rlc_tests::a_parallel_rc_without_inductance_is_left_to_the_plain_engine ... ok
+test operator::lumped_rlc_tests::invalid_direction_and_zero_length_are_skipped ... ok
+test operator::lumped_rlc_tests::metallic_caps_short_both_element_ends ... ok
+test operator::lumped_rlc_tests::parallel_element_with_inductance_gets_the_parallel_branch ... ok
+test operator::lumped_rlc_tests::series_element_rewrites_the_ec_capacitance_on_every_cell ... ok
+test operator::steady_state_layout_tests::steady_state_extension_uses_the_native_probe_layout ... ok
+test operator::tests::ec_coefficients_use_native_conductivity_units ... ok
+test operator::tests::material_priority_and_containment_select_the_right_edge ... ok
+test operator::tests::metal_edges_zero_the_electric_update ... ok
+test operator::tests::mur_extension_builds_six_faces ... ok
+test operator::tests::mur_uses_the_local_face_delta_on_a_graded_mesh ... ok
+test operator::tests::nonuniform_mesh_edge_lengths_and_ec_coefficients ... ok
+test operator::tests::pec_boundary_zeroes_only_tangential_components ... ok
+test operator::tests::pmc_boundary_matches_the_native_magnetic_bc ... ok
+test operator::tests::quarter_cell_averaging_matches_the_analytic_half_space ... ok
+test operator::tests::test_load_csx_grid_and_background ... ok
+test operator::tests::test_load_csx_invalid_xml ... ok
+test operator::tests::test_load_csx_material_grid_populated ... ok
+test operator::tests::test_operator_creation ... ok
+test operator::tests::upml_builds_six_regions_with_finite_coefficients ... ok
+test operator::tfsf_tests::a_parallel_polarization_is_disabled ... ok
+test operator::tfsf_tests::numeric_phase_velocity_is_below_c_for_a_cartesian_axis ... ok
+test operator::timestep_tests::var1_and_var3_match_the_uniform_mesh_analytic_values ... ok
+test operator::timestep_tests::var3_is_larger_than_var1_on_a_nonuniform_mesh ... ok
+test operator::tfsf_tests::plane_wave_builds_delays_and_amplitudes_on_the_open_faces ... ok
+test operator::timestep_tests::var3_matches_native_on_uniform_and_graded_meshes ... ok
+test operator::yee_convention_tests::capacitance_uses_the_dual_area_on_a_nonuniform_mesh ... ok
+test operator::yee_convention_tests::yee_coordinates_use_nodes_transverse_and_dual_along_the_edge ... ok
+test operator_base::tests::test_default_background_material ... ok
+test operator_base::tests::test_get_dir_name ... ok
+test operator_base::tests::test_set_boundary_condition ... ok
+test operator_extension::tests::engine_extensions_are_forwarded_in_order ... ok
+test operator_extension::tests::extensions_build_in_priority_order ... ok
+test operator_extension::tests::inactive_extensions_are_skipped_and_errors_propagate ... ok
+test operator_extension::tests::upml_is_inactive_without_sizes ... ok
+test processing::cylindrical_dump_tests::closed_alpha_dump_box_covers_the_full_ring ... ok
+test processing::cylindrical_dump_tests::cylindrical_alpha_lengths_carry_the_rho_factor ... ok
+test processing::cylindrical_dump_tests::cylindrical_areas_use_the_native_cylinder_metric ... ok
+test processing::cylindrical_dump_tests::fd_cylindrical_dump_writes_a_structured_grid ... ok
+test processing::cylindrical_dump_tests::fit_alpha_wraps_into_the_mesh_range ... ok
+test processing::cylindrical_dump_tests::hdf5_cylindrical_mesh_uses_the_native_names ... ok
+test processing::cylindrical_dump_tests::native_field_dumps_keep_the_cylindrical_components ... ok
+test processing::cylindrical_dump_tests::seam_mapping_wraps_node_and_cell_interpolation ... ok
+test processing::cylindrical_dump_tests::time_domain_cylindrical_dump_rotates_the_vectors ... ok
+test processing::dump_scheduling_tests::sub_sampling_and_optical_resolution_reduce_the_dump_mesh ... ok
+test processing::dump_scheduling_tests::time_domain_dump_sub_sampling_changes_the_written_grid ... ok
+test processing::dump_scheduling_tests::time_domain_dump_writes_the_native_timestep_sequence ... ok
+test processing::engine_interface_tests::field_probe_accumulates_dft ... ok
+test processing::engine_interface_tests::field_probe_samples_engine_fields ... ok
+test processing::fd_dump_tests::fd_interval_follows_nyquist_and_oversampling ... ok
+test openems::tfsf_wiring_tests::plane_wave_tfsf_propagates_at_the_numeric_phase_velocity ... ok
+test processing::fd_dump_tests::fd_vtk_dump_writes_magnitude_phase_and_snapshots ... ok
+test processing::fd_dump_tests::frequency_domain_accumulates_a_known_tone ... ok
+test processing::fd_dump_tests::frequency_labels_match_native_formatting ... ok
+test processing::hdf5_dump_tests::frequency_domain_dump_crops_to_the_box ... ok
+test processing::hdf5_dump_tests::frequency_domain_dump_writes_native_hdf5_layout ... ok
+test processing::hdf5_dump_tests::material_field_conversions_match_the_native_formulas ... ok
+test processing::hdf5_dump_tests::time_domain_dump_writes_native_hdf5_layout ... ok
+test processing::tests::test_field_probe_add_step ... ok
+test processing::tests::test_field_probe_add_steps_batch ... ok
+test processing::tests::test_field_probe_add_steps_duplicate_ignored ... ok
+test processing::tests::test_field_probe_creation ... ok
+test processing::tests::test_field_probe_default ... ok
+test processing::tests::test_field_probe_dual_mesh_dual_time ... ok
+test processing::tests::test_field_probe_dump_box_to_file ... ok
+test processing::tests::test_field_probe_enable_disable ... ok
+test processing::tests::test_field_probe_flush_next ... ok
+test processing::tests::test_field_probe_mesh_type ... ok
+test processing::tests::test_field_probe_precision ... ok
+test processing::tests::test_field_probe_process_interval ... ok
+test processing::tests::test_field_probe_process_interval_zero_disabled ... ok
+test processing::tests::test_field_probe_process_no_panic ... ok
+test processing::tests::test_field_probe_set_name ... ok
+test processing::tests::test_field_probe_start_stop_invalid ... ok
+test processing::tests::test_field_probe_start_stop_time ... ok
+test processing::tests::test_field_probe_weight ... ok
+test processing::tests::test_hdf5_file_writer ... ok
+test processing::tests::test_nf2ff_center_radius ... ok
+test processing::tests::test_nf2ff_creation ... ok
+test processing::tests::test_process_current_creation ... ok
+test processing::tests::test_process_fields_calc_total_energy ... ok
+test processing::tests::test_process_fields_conductivity_needs ... ok
+test processing::tests::test_process_fields_creation ... ok
+test processing::tests::test_process_fields_dump_mode ... ok
+test processing::tests::test_process_fields_dump_type ... ok
+test processing::tests::test_process_fields_fd_creation ... ok
+test processing::tests::test_process_fields_fd_frequency ... ok
+test processing::tests::test_process_fields_field_name_by_type ... ok
+test processing::tests::test_process_fields_file_type ... ok
+test processing::tests::test_process_fields_sar_creation ... ok
+test processing::tests::test_process_fields_sub_sampling ... ok
+test processing::tests::test_process_fields_td_creation ... ok
+test processing::tests::test_process_fields_td_dump_type ... ok
+test processing::tests::test_process_integral_calc ... ok
+test processing::tests::test_process_integral_creation ... ok
+test openems::upml_absorption_tests::upml_absorbs_a_gaussian_pulse ... ok
+test processing::tests::test_process_integral_normal_dir ... ok
+test processing::tests::test_process_mode_match_creation ... ok
+test processing::tests::test_process_mode_match_modes ... ok
+test processing::tests::test_processing_array_add_processing ... ok
+test processing::tests::test_processing_array_creation ... ok
+test processing::tests::test_processing_array_dump_boxes_to_file ... ok
+test processing::tests::test_processing_array_flush_next_reset ... ok
+test processing::tests::test_processing_array_get_processing ... ok
+test processing::tests::test_processing_array_init_pre_post ... ok
+test processing::tests::test_processing_array_process ... ok
+test processing::tests::test_processing_array_process_with_interval ... ok
+test processing::tests::test_processing_trait_default_methods ... ok
+test processing::tests::test_sar_averaging_cube ... ok
+test processing::tests::test_sar_creation ... ok
+test processing::vtk_tests::process_fields_td_writes_real_vtk ... ok
+test processing_integral::mode_match_tests::a_box_without_a_flat_surface_is_disabled ... ok
+test processing_integral::mode_match_tests::a_field_proportional_to_the_mode_has_unit_purity ... ok
+test processing_integral::port_integral_tests::current_integral_walks_the_surface_perimeter ... ok
+test processing_integral::port_integral_tests::current_probe_expands_a_zero_extent_tangential_axis ... ok
+test processing_integral::port_integral_tests::snapping_reproduces_the_native_coax_indices ... ok
+test processing::tests::test_vtk_file_writer ... ok
+test processing_integral::port_integral_tests::voltage_integral_sums_the_line_voltages ... ok
+test processing_integral::tests::integral_streams_analytic_td_rows_and_matches_the_dft_sum ... ok
+test sar::tests::air_cells_are_skipped_and_marked_zero ... ok
+test sar::tests::air_cells_have_no_power_density ... ok
+test sar::tests::averaged_sar_of_a_uniform_block_equals_the_local_value ... ok
+test sar::tests::local_sar_matches_the_definition ... ok
+test sar::tests::the_cube_counters_partition_the_grid ... ok
+test sar::tests::the_cube_search_uses_the_native_full_edge_convention ... ok
+test sar_hdf5::tests::direct_result_dump_matches_the_local_sar_formula ... ok
+
+test result: ok. 267 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.71s
+
+     Running tests/analytic_validation.rs (target/release/deps/analytic_validation-3f26202061d03bd1)
+
+running 2 tests
+test vacuum_propagation_speed_matches_c ... ok
+test dielectric_propagation_speed_matches_c_over_sqrt_eps ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.25s
+
+   Doc-tests openems_core
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
