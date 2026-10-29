@@ -16,7 +16,7 @@ side-by-side would confirm; the design is different.
 | --- | --- |
 | Light Qt theme, native menu and toolbar metrics | Dark egui theme, custom top bar |
 | `File`, `Info` menus | `File`, `Info` menus (different contents) |
-| Text toolbar: `homo`, `inhomo`, `increase Disc`, `detect edges`, `CollapseAll`, `ExpandAll`, `Material`, `Metal`, `Electrode`, `ProbeBox`, `ResBox`, `DumpBox`, `Box`, `MultiBox`, `Sphere`, `Cylinder`, `Polygon`, `User Defined`, `YZ`, `ZX`, `2D`, `3D` | No object/view toolbar; a `QCSXCAD 5 properties / 5 primitives` strip and `Undo`/`Redo`/`+ Property`/`Delete` |
+| Text toolbar: `homo`, `inhomo`, `increase Disc`, `detect edges`, `CollapseAll`, `ExpandAll`, `Material`, `Metal`, `Excitation`, `ProbeBox`, `ResBox`, `DumpBox`, `Box`, `MultiBox`, `Sphere`, `Cylinder`, `Polygon`, `User Defined`, `YZ`, `ZX`, `2D`, `3D` | No object/view toolbar; a `QCSXCAD 5 properties / 5 primitives` strip and `Undo`/`Redo`/`+ Property`/`Delete` |
 | Dock **Properties and Structures** with the columns `Properties / Primitives` and `Vis` | Tree with native row labels but no column headers and a different row metric |
 | Dock **Rectilinear Grid**: X/Y/Z `Min`/`Max Lines`, `Edit`, `Drawing unit [m]`, `Grid opacity` | Absent; grid editing is a separate panel |
 | Dock **Parameter**: list plus `New` | Absent as a dock |
