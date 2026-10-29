@@ -49,3 +49,18 @@ close most of the usability gap but cannot claim identity.
 
 The work should not start before this choice is recorded as a new ADR that
 supersedes D-04 (and, for B, D-08).
+
+## Tool constraint and the path chosen
+
+cxx-qt-lib 0.10 has no QWidget/QMainWindow bindings (only qt_gui,
+qt_qml and qt_quickcontrols), so a literal Qt Widgets port cannot be written
+with cxx-qt alone. ADR 0009 records the decision: a **thin Qt Widgets
+front-end in C++ over the Rust model, bridged with cxx**. The prototype in
+AppCSXCAD/qt-prototype/ fixes the layout:
+
+![Qt prototype](gui-qt-prototype.png)
+
+It builds with Qt 6.10 and renders through the offscreen platform, so the
+design can be compared with the native screenshot before the model bridge is
+wired. The remaining work in RM-152 is the bridge and the feature port, not
+the layout.
