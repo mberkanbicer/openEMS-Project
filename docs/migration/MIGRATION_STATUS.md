@@ -1,21 +1,24 @@
 # Rust Migration Status
 
-**Status (2026-10-29):** The canonical tree is
+**Status (2026-10-29):** The numerical, format and interface scope is complete
+(151 `Verified`); the GUI design-parity row `RM-152` is `Analyzed`, so the
+migration is **not complete** until the GUI decision is implemented. The
+canonical tree is
 `mberkanbicer-rust-migration-audit` in this worktree. All seven submodule ports
 are committed on their own `mberkanbicer-rust-migration-audit` branches, pushed,
 and pinned by the root repository; the archived three-crate tree is tagged
-`archive/rust-3crate-tree-2026-10`. The register is closed: **151 `Verified`,
-0 `Implemented`, 0 `Blocked`**.
+`archive/rust-3crate-tree-2026-10`. The register has **151 `Verified`** rows
+and one open row: **RM-152** (GUI design parity, `Analyzed`).
 
 The full-stack acceptance run at revision `cce4905` is 13/13 PASS (release
 workspace build, 764 crate tests, 475 HDF5 tests, 448 native Python cases, the
 unmodified Octave testsuite 10/10, the 51-case differential harness, the
 cylindrical SAR and curve-excitation gates, CTB, the install layout, the
 records check and the placeholder self-test). `FINAL_AUDIT.md` was re-run
-against that revision and finds the migration **complete for the verified
-scope**; the two recorded limitations are exception E-005 (the hosted platform
-matrix and nightly run are unavailable, replaced by the local job) and E-006
-(native Qt GUI parity and the macOS/Linux-X11 matrix are not measured).
+against that revision and finds the numerical, format and interface scope
+complete. Two items remain: exception E-005 (the hosted platform matrix and
+nightly run are unavailable, replaced by the local job) and the rejected
+E-006 (the GUI is not native-identical; open as RM-152).
 Performance has a recorded baseline but no agreed threshold.
 
 ### Status and evidence policy

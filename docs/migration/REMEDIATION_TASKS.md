@@ -61,6 +61,7 @@ RM-127.
 | `Verified` | 151 | RM-001, RM-002, RM-003, RM-004, RM-005, RM-006, RM-007, RM-008, RM-009, RM-010, RM-011, RM-012, RM-013, RM-014, RM-015, RM-016, RM-017, RM-018, RM-019, RM-020, RM-021, RM-022, RM-023, RM-024, RM-025, RM-026, RM-027, RM-028, RM-029, RM-030, RM-031, RM-032, RM-033, RM-034, RM-035, RM-036, RM-037, RM-038, RM-039, RM-040, RM-041, RM-042, RM-043, RM-044, RM-045, RM-046, RM-047, RM-048, RM-049, RM-050, RM-051, RM-052, RM-053, RM-054, RM-055, RM-056, RM-057, RM-058, RM-059, RM-060, RM-061, RM-062, RM-063, RM-064, RM-065, RM-066, RM-067, RM-068, RM-069, RM-070, RM-071, RM-072, RM-073, RM-074, RM-075, RM-076, RM-077, RM-078, RM-079, RM-080, RM-081, RM-082, RM-083, RM-084, RM-085, RM-086, RM-087, RM-088, RM-089, RM-090, RM-091, RM-092, RM-093, RM-094, RM-095, RM-096, RM-097, RM-098, RM-099, RM-100, RM-101, RM-102, RM-103, RM-104, RM-105, RM-106, RM-107, RM-108, RM-109, RM-110, RM-111, RM-112, RM-113, RM-114, RM-115, RM-116, RM-117, RM-118, RM-119, RM-120, RM-121, RM-122, RM-123, RM-124, RM-125, RM-126, RM-127, RM-128, RM-129, RM-130, RM-131, RM-132, RM-133, RM-134, RM-135, RM-136, RM-137, RM-138, RM-139, RM-140, RM-141, RM-142, RM-143, RM-144, RM-145, RM-146, RM-147, RM-148, RM-149, RM-150, RM-151 |
 | `Implemented` | 0 | - |
 | `Blocked` | 0 | - |
+| `Analyzed` | 1 | RM-152 |
 | `Not Started` | 0 | - |
 
 Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
@@ -74,7 +75,7 @@ Estimates: S <= 1 day, M 2-5 days, L 1-2 weeks, XL > 2 weeks. Indicative only.
 
 
 
-## Remaining backlog (0 tasks) and execution order
+## Remaining backlog (1 task) and execution order
 
 No `Not Started` rows remain. The open work is the blocked rows (RM-125
 full-stack acceptance, RM-127 final audit, RM-144 native VTK field mode)
@@ -219,6 +220,7 @@ before the final audit can sign off.
 | RM-104 | P1 | Real VTK/STL/PLY/POV/X3D exports from the model | RM-100 | M | `polydata_vtk_writes_one_file_per_visible_property`, `stl_and_ply_contain_the_triangles`, `povray_and_x3d_scenes_hold_the_geometry`, `an_empty_structure_is_reported` and `unsafe_property_names_stay_inside_the_directory` (path traversal) plus `exports_write_real_files` in the app crate exercise every exporter on real geometry | Verified |
 | RM-105 | P2 | PNG capture from the wgpu frame | RM-097 | M | `QCSXCAD/rust-egui/src/renderer.rs` renders the geometry into an offscreen colour/depth target and `capture_rgba` reads it back; the GPU test renders a 64x48 frame, asserts the RGBA length and more than 100 non-background pixels (the orange box), then `export_image` writes the PNG and the test decodes it back to 64x48. `AppCSXCAD`'s `export_view_png` reports an error without a window instead of writing a placeholder (`exports_write_real_files`) | Verified |
 | RM-106 | P1 | Manual GUI QA checklist and sign-off | RM-097..RM-105 | S | `docs/migration/audits/gui-qa.md` holds 18 executed automated/offscreen checks and a real-display Windows session on 2026-10-29: the MSVC build launched maximized with the six-property fixture, the tree shows the native labels, and the 3D view renders the boxes (artifact `audits/gui-windows.png`). Keyboard focus, dialogs and mouse interaction are covered by the widget tests; synthetic input injection did not reach the egui widgets on this host. The native Qt side-by-side and the macOS/Linux-X11 matrix are exception E-006. `openems-core` 267 + 2 tests pass | Verified |
+| RM-152 | P0 | Native-identical GUI design and usability (Qt) | RM-106 | XL | The parity audit `docs/migration/audits/gui-parity.md` measures the gap to the native Qt Widgets GUI: the Rust application is an egui/wgpu dark layout with a custom top bar, while native has the text object toolbar, the Properties/Grid/Parameter docks, tree column headers, the drawing-unit and grid-opacity controls, view presets and a coordinate status bar. E-006 was rejected by the owner on 2026-10-29; the architecture is undecided between cxx-qt Qt Widgets in Rust, the native Qt front-end over a C ABI, and an egui restyle. No GUI code change yet | Analyzed |
 ## WS8 - hyp2mat and CTB
 
 | ID | Pri | Task | Depends | Est | Acceptance / Evidence | Status |
