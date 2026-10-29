@@ -2416,3 +2416,36 @@ correctly rounded f32 analytic coefficients (bit-exact equality) instead of
 checking the exact identity `2 d / (1 - a) = delta_eps`, which the native
 `FDTD_FLOAT` storage limits to a few 1e-7 at Var3. `openems-core --features
 hdf5`: 266 + 2 tests pass.
+
+## Native differential: lossy guide and UPML (RM-043, RM-054, 2026-10-29)
+
+Two dedicated gates now run the same XML through the pinned native binary and
+the Rust CLI and compare the E-field probe traces. Both use the approved 1 %
+probe bound.
+
+`scripts/ci/run_lossy_medium_check_wsl.sh` - parallel-plate TEM guide (PEC
+plates in z, PMC walls in y, PML in x), 1 mm cells, `Kappa = 0.05 S/m`
+everywhere, 8 GHz Gaussian, probes at x = 60 mm and 100 mm, 200 steps:
+
+| Probe | max relative difference | native peak |
+| --- | --- | --- |
+| x = 60 mm | 7.5e-6 | 0.6240 |
+| x = 100 mm | 1.1e-5 | 0.4244 |
+
+Native probe ratio `p2/p1 = 0.6802`, i.e. the loss attenuates, and the port
+reproduces it. The analytic `exp(-alpha d)` from the exact lossy-medium formula
+is 0.7665, so the 11 % gap is a property of the native discretisation, not a
+port difference; the native comparison is therefore the acceptance and no
+analytic bound is used.
+
+`scripts/ci/run_upml_reflection_check_wsl.sh` - 41x21x21 at 1 mm, eight-cell
+UPML on all six faces, hard E_z 6 GHz Gaussian at the centre, probes at the
+centre and 6 mm off-centre, 900 steps:
+
+| Probe | max relative difference | absorbed tail |
+| --- | --- | --- |
+| centre | 6.0e-8 | 8.9e-8 native, 7.6e-8 Rust (-141 / -142 dB) |
+| 6 mm | 1.0e-8 | - |
+
+The library test `upml_absorbs_a_gaussian_pulse` reports -117 dB for the same
+setup, consistent with the differential tail.

@@ -2,8 +2,8 @@
 
 **Date:** 2026-10-28, updated 2026-10-29
 **Scope:** the rows still open in `REMEDIATION_TASKS.md`
-(`RM-006`, `RM-043`, `RM-054`, `RM-106`, `RM-124`, `RM-144`) at snapshot
-**145 `Verified` · 6 `Implemented` · 0 `Blocked`**.
+(`RM-106`, `RM-124`, `RM-144`) at snapshot
+**148 `Verified` · 3 `Implemented` · 0 `Blocked`**.
 **Method:** each row was re-checked against the pinned native sources under
 `openEMS/`, `CSXCAD/` and `QCSXCAD/`; the original implementation is the
 authority wherever the port could be read either way. The findings below are
@@ -32,6 +32,18 @@ change any status. Every close still needs the evidence rule from
 
 Decision `D-R4`, `D-R7` and `D-R8(a)` are therefore applied: `RM-144` is now
 `Implemented` and no row is `Blocked`.
+
+`RM-006`, `RM-043` and `RM-054` were closed later the same day:
+
+* `RM-006`: `STATUS_POLICY.md` with the closed vocabulary and the owner
+  acknowledgement.
+* `RM-043`: the UPML probes match native to `6.0e-8` / `1.0e-8` and the tail is
+  -141 dB natively, -142 dB in the port.
+* `RM-054`: the lossy guide probes match native to `7.5e-6` / `1.1e-5` with
+  the same `0.6802` attenuation, and `EC_G` matches in the operator dump.
+
+Only `RM-106` (display), `RM-124` (Actions account) and `RM-144` (native dump
+byte comparison) remain.
 
 ---
 
