@@ -13,6 +13,7 @@ All commands ran in `C:\Users\mberkanbicer\Projects\openEMS-Project-rust` with
 | 4 | `cargo test -p qcsxcad-core -p qcsxcad-egui -p appcsxcad` | 52 + 24 + 13 passed | subset of #1, run separately |
 | 5 | `scripts/ci/run_full_acceptance_wsl.sh` (WSL2, native openEMS v0.37.0) | **13/13 PASS** (section 5) | `docs/migration/ACCEPTANCE.md`; `%TEMP%\opencode\acceptance_run3.log` |
 | 6 | `cargo test --workspace --all-targets --no-fail-fast` (final tree) | **882 passed, 0 failed, 0 ignored**, 32 binaries | `%TEMP%\opencode\workspace_test_final.log` |
+| 7 | `scripts/ci/run_convergence_check_wsl.sh` | cavity TE101 order 2.05 / 2.03; errors 1.770e-3 / 4.270e-4 / 1.047e-4 | `docs/migration/reference-data/convergence/cavity.json` |
 
 The workspace test run used default features. The HDF5 feature suite is a
 separate run inside the acceptance script (475 tests at the last recorded

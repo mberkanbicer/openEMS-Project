@@ -27,7 +27,7 @@ CST-validated or production-ready replacement.
 
 | Item | Status |
 |---|---|
-| Mesh/time convergence | **not run** (`numerics/CONVERGENCE.md`) |
+| Mesh/time convergence | **partly measured**: cavity TE101 order 2.05/2.03; slab/MSL/dt not run (`numerics/CONVERGENCE.md`) |
 | CST MWS comparison | **blocked**, no data (`cst/`) |
 | GPU compute | **not implemented** (scope, ADR 0002) |
 | macOS/FreeBSD/Windows run at this HEAD | **blocked** (E-005; no hosted CI) |
@@ -48,7 +48,7 @@ CST-validated or production-ready replacement.
 | Missing/partial high-priority paths completed | Partly: Python façade and P0 guards fixed; multi-grid/GPU remain out of scope |
 | No unreported C++ runtime | Met (`legacy_dependency_register.md`) |
 | CPU reference passes analytic/regression | Met for the recorded corpus |
-| Mesh/time convergence | **Not met** |
+| Mesh/time convergence | **Partly met**: cavity only |
 | Physical conventions validated | Partly: wave speed, ports, SAR gate; no analytic SAR |
 | Immutable reference provenance | Met (`GOLD_REGISTRY.json`), no self-generation |
 | SIMD/thread backends compared | Not met (no SIMD variant) |
@@ -64,7 +64,7 @@ CST-validated or production-ready replacement.
 
 1. ~~A clean 13/13 acceptance run at the release commit.~~ Met for this
    working tree; re-run at the final tagged commit.
-2. Convergence study for cavity, dielectric slab, MSL notch and SAR.
+2. Convergence study for the dielectric slab, MSL notch, SAR and dt refinement (the cavity is recorded).
 3. Hosted or local macOS/FreeBSD/Windows runs at the release commit.
 4. An agreed performance gate, with the release commit measured.
 5. The sRGB material-colour fix (or a recorded acceptance of the difference).

@@ -50,6 +50,27 @@
       "provenance": "analytic wave-speed oracles"
     },
     {
+      "category": "A",
+      "path": "docs/migration/reference-data/convergence/cavity.json",
+      "sha256": "d7be1fe63cb6ecc0e3880f7533a0d7923e65b12e6c77e920bf83dd3deca48d53",
+      "bytes": 1352,
+      "provenance": "cavity TE101 mesh-refinement record"
+    },
+    {
+      "category": "A",
+      "path": "scripts/ci/convergence_study.py",
+      "sha256": "1cc8b4f2c8a8ebe8f2462f36583a2a3dbdb5e210f871951af3eef64ad6be89b8",
+      "bytes": 6436,
+      "provenance": "cavity refinement harness"
+    },
+    {
+      "category": "A",
+      "path": "scripts/ci/run_convergence_check_wsl.sh",
+      "sha256": "740ab23685a7694cd56d12d3c6409347069b7f3441e38aec42935aa7f0dd1fcd",
+      "bytes": 740,
+      "provenance": "refinement harness wrapper"
+    },
+    {
       "category": "D",
       "path": "scripts/ci/reference_harness.py",
       "sha256": "c2894eb0775fb46818b8df165f4b113c3a2fafd9d6fd4a184eb4e3ad539b3baf",

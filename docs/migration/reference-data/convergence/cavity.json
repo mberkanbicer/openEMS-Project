@@ -1,0 +1,61 @@
+{
+  "case": "PEC cavity, TE101",
+  "geometry_m": [
+    0.05,
+    0.02,
+    0.06
+  ],
+  "analytic_hz": 3902423246.556266,
+  "levels": [
+    {
+      "mesh": [
+        10,
+        5,
+        12
+      ],
+      "cells": 600,
+      "steps": 8000,
+      "sample_interval": 1.02448028185875e-11,
+      "te101_hz": 3895517508.303637,
+      "relative_error": 0.0017696025818631652,
+      "window_s": 7.2526954462456e-08,
+      "fft_bin_hz": 13787977.275643855
+    },
+    {
+      "mesh": [
+        20,
+        10,
+        24
+      ],
+      "cells": 4800,
+      "steps": 16000,
+      "sample_interval": 9.4932344503e-12,
+      "te101_hz": 3900757058.410334,
+      "relative_error": 0.0004269624386340118,
+      "window_s": 7.2526954462456e-08,
+      "fft_bin_hz": 13787977.275643855
+    },
+    {
+      "mesh": [
+        40,
+        20,
+        48
+      ],
+      "cells": 38400,
+      "steps": 32000,
+      "sample_interval": 1.3730964494974686e-11,
+      "te101_hz": 3902014621.313819,
+      "relative_error": 0.00010471064172946772,
+      "window_s": 7.2526954462456e-08,
+      "fft_bin_hz": 13787977.275643855
+    }
+  ],
+  "observed_order": [
+    2.0512443339331443,
+    2.0277010859067275
+  ],
+  "engine": "Rust openEMS Python bindings",
+  "probe": "ut1y",
+  "window": "common window, Hann, 32x zero-padding, quadratic peak interpolation",
+  "samples": 65536
+}

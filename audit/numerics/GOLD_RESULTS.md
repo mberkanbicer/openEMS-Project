@@ -11,6 +11,16 @@ Categories: **A** analytic, **D** pinned native parity, **E** backend-to-backend
 | Dielectric slab | speed `c/sqrt(eps_r)` | error < 2 % | 2 % |
 | Uniform-field SAR | `sigma|E|²/(2 rho)` | `local_sar_matches_the_definition` (unit case) | exact |
 
+## Convergence (category A, measured)
+
+| Case | h | h/2 | h/4 | Observed order |
+|---|---|---|---|---|
+| PEC cavity TE101 | 1.770e-3 | 4.270e-4 | 1.047e-4 | 2.05, 2.03 |
+
+Common 72.53 ns window, 65 536 points, Hann, 32x zero-padding. Record:
+`docs/migration/reference-data/convergence/cavity.json`. Slab/MSL/dt refinement
+is still open.
+
 ## D — native parity (recorded)
 
 | Gate | Result |

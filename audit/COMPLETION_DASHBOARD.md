@@ -76,7 +76,7 @@ convergence evidence exists.
 
 | ID | Finding | Evidence | Next action |
 |---|---|---|---|
-| VAL-001 | Independent validation is thin: two analytic tests (vacuum/εr wave speed) plus native-parity differential cases. No h/h2/h4 convergence table and no CST data. | `openEMS/rust/tests/analytic_validation.rs`; `VALIDATION.md` explicitly calls several cases "capped, not converged" | Refinement study on cavity, dielectric slab and MSL notch; publish observed order |
+| VAL-001 | Independent validation was thin; the cavity is now covered. Two analytic wave-speed tests plus native-parity cases, and a **cavity TE101 refinement study (order 2.05/2.03)**; slab, MSL and dt refinement still missing, no CST data. | `audit/numerics/CONVERGENCE.md`; `reference-data/convergence/cavity.json` | Add slab, MSL notch and dt refinement |
 | PERF-001 | Baseline exists (wall 3.78x / 2.14x / 2.92x native; RSS 0.32x / 2.96x / 0.39x) but no accepted threshold. | `reference-data/perf/performance-baseline.md` | Agree per-case gate: median of 5, ≤4x wall, ≤20 % regression, RSS ≤3.25x or absolute cap |
 | GUI-001 | Materials render lighter than native because stored sRGB colours are written as linear on an sRGB surface. | `audits/gui-modernization-audit.md` §9 | Linearise vertex colours; visual + numeric check on one fixture |
 | GUI-002 | Theme persists; panel sizes/layout do not (egui panel state is session-only). | `qcsxcad-egui/src/app.rs` | Persist panel geometry with the settings file |

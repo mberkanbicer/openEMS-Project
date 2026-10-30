@@ -19,7 +19,8 @@
 
 ## Not tested (do not claim)
 
-- No mesh-refinement convergence (see `CONVERGENCE.md`).
+- Mesh refinement is recorded for the PEC cavity TE101 only (order 2.03-2.05);
+  slab, MSL and dt refinement remain open (`CONVERGENCE.md`).
 - No independent solver (CST/other) comparison.
 - No adversarial model corpus (degenerate solids, overlapping priorities,
   source on boundary, sub-cell PEC, OOM).
