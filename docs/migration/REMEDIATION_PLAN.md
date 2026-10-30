@@ -47,7 +47,7 @@ Rust implementations exist in the same repository:
 
 | Tree | Branch / commit | Content | Verified test count |
 | --- | --- | --- | --- |
-| `D:/openEMS-Project` | `modernization/integration` / `a56e922` | 3 crates under `rust/`: `fparser-rs`, `csxcad-core` (811 lines), `openems-core` (basic FDTD only) | 52 + 3 + 6 = 61 |
+| `C:/Users/mberkanbicer/Projects/openEMS-Project` | `modernization/integration` / `a56e922` | 3 crates under `rust/`: `fparser-rs`, `csxcad-core` (811 lines), `openems-core` (basic FDTD only) | 52 + 3 + 6 = 61 |
 | Worktree `mberkanbicer-potential-garbanzo` | `mberkanbicer-rust-migration-audit` / `205769d` | 13 crates: submodule ports `CSXCAD/rust`, `openEMS/rust`, `QCSXCAD`, `AppCSXCAD`, `hyp2mat/rust`, `CTB/rust`, plus Python/MATLAB bindings | fparser 52, CSXCAD 145, openEMS 117, hyp2mat 14 = 328; CTB 0 |
 
 Commands actually run during the audit:
@@ -169,7 +169,8 @@ hyp2mat/rust            hyp2mat-rs        (lib + bin)
 CTB/rust                ctb-rs            (lib + bin or MEX gateway; see D-05)
 ```
 
-The duplicate `D:/openEMS-Project/rust/` tree is archived, not maintained in
+The duplicate `D:/openEMS-Project/rust/` tree (now under
+`C:/Users/mberkanbicer/Projects/`) is archived, not maintained in
 parallel.
 
 ### 4.2 Dependency direction
