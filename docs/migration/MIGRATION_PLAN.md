@@ -96,7 +96,10 @@ blocker, not an implicit pass.
    | Deferred | not yet ported; the reason and the verification it needs are recorded |
 
    A behavioural upstream change may only be marked Present/Ported after an
-   executed Rust test; Deferred rows are open work, not passes.
+   executed Rust test; Deferred rows are open work, not passes. Non-`master`
+   upstream branches are scanned at the same time and recorded in
+   `audits/upstream-branches-<date>.md`; only work that is not already on
+   `master` is classified, and obsolete branches are named as such.
 
 ## Acceptance criteria
 

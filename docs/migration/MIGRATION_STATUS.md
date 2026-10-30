@@ -47,6 +47,13 @@ Everything else is classified as already present, not applicable (GPU engine,
 packaging, CI) or deferred with a reason in
 `audits/upstream-sync-2026-10-30.md`.
 
+A scan of every upstream branch (2026-10-30) found that only
+`CSXCAD/WIP`, `openEMS/WIP` and `openEMS/memory-stats` carry work beyond
+`master`; `audits/upstream-branches-2026-10-30.md` classifies all of it. The
+portable parts are now in Rust: the nested `ContinuousStructure` lookup, the
+black default edge colour and `--debug-memory`; the Python viewer/`Results`
+work is not applicable to the Rust product.
+
 The worktree moved from `D:\openEMS-Project-rust` to
 `C:\Users\mberkanbicer\Projects\openEMS-Project-rust`; the historical
 path in `REMEDIATION_PLAN.md` is the old location of the same tree.
