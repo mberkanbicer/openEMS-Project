@@ -53,14 +53,15 @@ When the background acceptance run finishes, this section is replaced with its
 13-row table and the report path. A failure is recorded as FAIL; a check that
 cannot run is recorded with its blocker, never as a pass.
 
-The acceptance completed on 2026-10-30 at `ff95333` + the audit changes
+The acceptance completed on 2026-10-30 at **`676c8e7`** (dirty: the previous
+`ACCEPTANCE.md` only), with every check executed fresh in a new log directory
 (`ACCEPTANCE.md`): **13/13 PASS**.
 
 | Check | Result | Evidence |
 |---|---|---|
 | workspace build (release) | PASS | 1 build |
-| crate unit + integration tests | PASS | 804 tests (fresh, includes RM-169) |
-| HDF5 feature tests | PASS | 504 tests (cached from the same tree) |
+| crate unit + integration tests | PASS | 806 tests (fresh, includes RM-169/RM-172) |
+| HDF5 feature tests | PASS | 506 tests (fresh) |
 | Python packages build + imports | PASS | 2 packages |
 | native Python suites | PASS | 459 cases; **SKIPPED: 2 GPU plugin tests** (no GPU engine; ADR 0002) |
 | native Octave testsuite | PASS | 10 passed, 0 failed, 0 errors |
@@ -74,10 +75,9 @@ The acceptance completed on 2026-10-30 at `ff95333` + the audit changes
 
 Two notes on honesty:
 
-- The suite reuses a check's cached PASS for the same revision and log
-  directory (`run()` / `ACCEPTANCE_RESUME`). The cached checks were produced
-  from this tree after the Python/Rust fixes; the crate tests were re-run fresh
-  after the CTB target clean. The report does not hide a cached row.
+- This run used a new log directory for `676c8e7`, so no check was served from
+  an older revision's cache. The report pins the full tested SHA and the dirty
+  state at startup (the dirty file was the previous acceptance report).
 - The earlier attempts failed for two reasons that are fixed, not suppressed: a
   stale `CARGO_MANIFEST_DIR` baked into the CTB differential test binary when
   the tree moved from `D:` (fixed by `cargo clean -p ctb-rs`; the source uses
