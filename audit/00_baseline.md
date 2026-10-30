@@ -57,14 +57,15 @@ When the background acceptance run finishes, this section is replaced with its
 13-row table and the report path. A failure is recorded as FAIL; a check that
 cannot run is recorded with its blocker, never as a pass.
 
-The acceptance completed on 2026-10-30 at **`676c8e7`** (dirty: the previous
-`ACCEPTANCE.md` only), with every check executed fresh in a new log directory
+The acceptance completed on 2026-10-30 at **`cf3d226`** with a clean worktree
+(the provenance check now compares with the Windows `core.autocrlf=true`
+checkout policy), every check executed fresh in a new log directory
 (`ACCEPTANCE.md`): **13/13 PASS**.
 
 | Check | Result | Evidence |
 |---|---|---|
 | workspace build (release) | PASS | 1 build |
-| crate unit + integration tests | PASS | 806 tests (fresh, includes RM-169/RM-172) |
+| crate unit + integration tests | PASS | 810 tests (fresh, includes RM-169..RM-177) |
 | HDF5 feature tests | PASS | 506 tests (fresh) |
 | Python packages build + imports | PASS | 2 packages |
 | native Python suites | PASS | 459 cases; **SKIPPED: 2 GPU plugin tests** (no GPU engine; ADR 0002) |
@@ -79,9 +80,9 @@ The acceptance completed on 2026-10-30 at **`676c8e7`** (dirty: the previous
 
 Two notes on honesty:
 
-- This run used a new log directory for `676c8e7`, so no check was served from
-  an older revision's cache. The report pins the full tested SHA and the dirty
-  state at startup (the dirty file was the previous acceptance report).
+- This run used a new log directory for `cf3d226`, so no check was served from
+  an older revision's cache. The report pins the full tested SHA and states that
+  the worktree was clean at startup.
 - The earlier attempts failed for two reasons that are fixed, not suppressed: a
   stale `CARGO_MANIFEST_DIR` baked into the CTB differential test binary when
   the tree moved from `D:` (fixed by `cargo clean -p ctb-rs`; the source uses
