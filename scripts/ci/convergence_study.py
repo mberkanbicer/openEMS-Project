@@ -37,7 +37,9 @@ def analytic_te101() -> float:
     return C0 / 2.0 * math.sqrt((1.0 / A) ** 2 + (1.0 / D) ** 2)
 
 
-def build_and_run(nx: int, ny: int, nz: int, steps: int) -> dict:
+def build_and_run(
+    nx: int, ny: int, nz: int, steps: int, time_step_factor: float = 1.0
+) -> dict:
     x = np.linspace(0.0, A, nx)
     y = np.linspace(0.0, B, ny)
     z = np.linspace(0.0, D, nz)
@@ -62,12 +64,15 @@ def build_and_run(nx: int, ny: int, nz: int, steps: int) -> dict:
     )
 
     fdtd = openEMS(NrTS=steps, EndCriteria=0)
+    if time_step_factor != 1.0:
+        fdtd.SetTimeStepFactor(time_step_factor)
     fdtd.SetGaussExcite((F_STOP - F_START) / 2.0, (F_STOP - F_START) / 2.0)
     fdtd.SetBoundaryCond(["PEC"] * 6)
     fdtd.SetCSX(csx)
 
     sim = tempfile.mkdtemp(prefix="openems-convergence-")
     fdtd.Run(sim, verbose=0)
+    solver_dt = float(fdtd.GetTimeStep())
 
     with open(os.path.join(sim, "ut1y"), encoding="utf-8") as handle:
         lines = handle.read().splitlines()
@@ -85,6 +90,8 @@ def build_and_run(nx: int, ny: int, nz: int, steps: int) -> dict:
         "mesh": [nx, ny, nz],
         "cells": nx * ny * nz,
         "steps": steps,
+        "time_step_factor": time_step_factor,
+        "solver_dt": solver_dt,
         "sample_interval": float(np.mean(np.diff(raw_t))),
         "duration": float(raw_t[-1] - raw_t[keep][0]),
         "t": raw_t[keep],
@@ -124,18 +131,32 @@ def peak_frequency(run: dict, window_s: float, samples: int) -> dict:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--json",
-        default="docs/migration/reference-data/convergence/cavity.json",
-    )
+    parser.add_argument("--mode", choices=["mesh", "dt"], default="mesh")
+    parser.add_argument("--json", default=None)
     args = parser.parse_args()
-    # fdtd.Run() changes the process working directory; resolve now.
-    args.json = os.path.abspath(args.json)
+    args.json = os.path.abspath(
+        args.json
+        or (
+            "docs/migration/reference-data/convergence/cavity.json"
+            if args.mode == "mesh"
+            else "docs/migration/reference-data/convergence/cavity_dt.json"
+        )
+    )
 
-    # Longer runs than the first attempt so every level covers the same
-    # physical window; the common window is then the shortest of them.
-    levels = [(10, 5, 12, 8000), (20, 10, 24, 16000), (40, 20, 48, 32000)]
-    runs = [build_and_run(*level) for level in levels]
+    if args.mode == "mesh":
+        levels = [(10, 5, 12, 8000), (20, 10, 24, 16000), (40, 20, 48, 32000)]
+        runs = [build_and_run(*level) for level in levels]
+        label = "PEC cavity, TE101, mesh refinement"
+    else:
+        # Fixed mesh; halve dt and double the step count to keep the physical
+        # window. dt error should fall while the spatial floor remains.
+        settings = [(1.0, 16000), (0.5, 32000), (0.25, 64000)]
+        runs = [
+            build_and_run(20, 10, 24, steps, factor)
+            for factor, steps in settings
+        ]
+        label = "PEC cavity, TE101, time-step refinement"
+
     window_s = min(run["duration"] for run in runs)
     samples = 1 << 16
 
@@ -146,13 +167,16 @@ def main() -> int:
             "mesh": run["mesh"],
             "cells": run["cells"],
             "steps": run["steps"],
+            "time_step_factor": run["time_step_factor"],
+            "solver_dt": run["solver_dt"],
             "sample_interval": run["sample_interval"],
             **peak,
         }
         rows.append(row)
         print(
-            "mesh {mesh[0]}x{mesh[1]}x{mesh[2]} ({cells} cells, {steps} steps): "
-            "TE101 {te101_hz:.6e} Hz, rel err {relative_error:.3e}".format(**row)
+            "mesh {mesh[0]}x{mesh[1]}x{mesh[2]} ({cells} cells, {steps} steps, "
+            "dt factor {time_step_factor}): TE101 {te101_hz:.6e} Hz, "
+            "rel err {relative_error:.3e}".format(**row)
         )
 
     exact = analytic_te101()
@@ -163,17 +187,26 @@ def main() -> int:
         if errors[i] <= 0.0 or errors[i - 1] <= 0.0:
             orders.append(None)
             continue
-        ratio = rows[i]["mesh"][0] / rows[i - 1]["mesh"][0]
+        if args.mode == "mesh":
+            ratio = rows[i]["mesh"][0] / rows[i - 1]["mesh"][0]
+        else:
+            ratio = rows[i - 1]["time_step_factor"] / rows[i]["time_step_factor"]
         order = math.log(errors[i - 1] / errors[i]) / math.log(ratio)
         orders.append(order)
-        print(f"observed order {rows[i-1]['mesh'][0]}->{rows[i]['mesh'][0]}: {order:.2f}")
+        print(f"observed order step {i}: {order:.2f}")
 
     record = {
-        "case": "PEC cavity, TE101",
+        "case": label,
+        "mode": args.mode,
         "geometry_m": [A, B, D],
         "analytic_hz": exact,
         "levels": rows,
         "observed_order": orders,
+        "note": (
+            "dt variation is below the raw FFT bin (13.3 MHz); no temporal order is claimed"
+            if args.mode == "dt"
+            else "mesh refinement supports the reported order"
+        ),
         "engine": "Rust openEMS Python bindings",
         "probe": "ut1y",
         "window": "common window, Hann, 32x zero-padding, quadratic peak interpolation",

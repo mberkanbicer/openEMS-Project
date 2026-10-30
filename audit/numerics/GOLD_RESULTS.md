@@ -17,6 +17,9 @@ Categories: **A** analytic, **D** pinned native parity, **E** backend-to-backend
 |---|---|---|---|---|
 | PEC cavity TE101 | 1.770e-3 | 4.270e-4 | 1.047e-4 | 2.05, 2.03 |
 
+Time-step refinement at 4.75/2.37/1.19 ps moved the estimate by only 2.1 MHz,
+below the 13.3 MHz raw bin: **no temporal order claimed**.
+
 Common 72.53 ns window, 65 536 points, Hann, 32x zero-padding. Record:
 `docs/migration/reference-data/convergence/cavity.json`. Slab/MSL/dt refinement
 is still open.

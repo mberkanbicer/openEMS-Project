@@ -59,8 +59,8 @@
     {
       "category": "A",
       "path": "scripts/ci/convergence_study.py",
-      "sha256": "1cc8b4f2c8a8ebe8f2462f36583a2a3dbdb5e210f871951af3eef64ad6be89b8",
-      "bytes": 6436,
+      "sha256": "c2dd31005ba24f314e99b1c24d76cc3de6a143fd4dfe59cc5dc39d5ed5e655b2",
+      "bytes": 7676,
       "provenance": "cavity refinement harness"
     },
     {
