@@ -469,6 +469,11 @@ Additional suites exist in subprojects, including:
 - `openEMS/TESTSUITE/`
 - `CSXCAD/python/tests/`
 
+CI (`.github/workflows/ci.yml`) covers Linux from AlmaLinux 8 to Alpine, macOS on
+ARM and FreeBSD, each with both `--python-venv-mode=disable` and a venv install.
+A change to `update_openEMS.sh` or to dependency handling affects all of them —
+assume nothing about the host's package manager, compiler version or Python.
+
 Inspect the current repository before relying on exact paths.
 
 Use these tests as part of the reference validation strategy.
