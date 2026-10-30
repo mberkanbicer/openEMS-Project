@@ -95,8 +95,8 @@ No module above is to be replaced while closing the two P0 rows.
 1. **P0 correctness (this change):** NUM-001, NUM-002 — fail loudly, record
    exceptions, correct RM-061, add regression tests. Re-run the solver suite.
 2. **P1 records/platform:** REC-001, REC-002, CI-001/PKG-001. No code risk.
-3. **P2 validation:** analytic SAR, convergence study, then the performance
-   gate. Each needs its own recorded run.
+3. **P2 validation:** convergence study, then the performance gate (analytic SAR
+   done, RM-178). Each needs its own recorded run.
 4. **P2 GUI:** colour management, layout persistence.
 5. **Deferred/blocked:** CST (no data), GPU (scope), multi-grid implementation
    (feature, not a patch), macOS/FreeBSD desktop sessions.

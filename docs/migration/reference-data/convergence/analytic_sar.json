@@ -1,0 +1,28 @@
+{
+  "case": "homogeneous lossy TEM line, 2 GHz",
+  "analytic": {
+    "alpha_np_per_m": 9.36009767368639,
+    "beta_rad_per_m": 84.35471295739247,
+    "epsilon_r": 4.0,
+    "sigma_s_per_m": 0.1,
+    "density_kg_per_m3": 1000.0
+  },
+  "measured": {
+    "alpha_np_per_m": 9.351324516025745,
+    "beta_rad_per_m": 84.36506093341121,
+    "sar_slope_per_m": 18.70265062237418
+  },
+  "relative_error": {
+    "alpha": 0.0009372933880069113,
+    "beta": 0.00012267217391844442,
+    "sar_slope": 0.0009372084357582821,
+    "sar_formula": 1.6518888688459705e-07
+  },
+  "tolerance": 0.02,
+  "fit_window_mm": [
+    50.0,
+    200.0
+  ],
+  "result": "PASS",
+  "command": "scripts/ci/run_analytic_sar_check_wsl.sh"
+}

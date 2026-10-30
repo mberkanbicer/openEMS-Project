@@ -70,7 +70,14 @@ implements it.
 - Averaging uses cell masses and the native region logic
   (`processing.rs`, `sar.rs`); the cylindrical SAR differential gate compares
   per-cell SAR (2.6e-3 vs a 1e-2 bound) and peak/counters.
-- **Gap:** no analytic uniform-field SAR test yet (`VAL-002`).
+- **Analytic case (VAL-002, RM-178):** a homogeneous lossy TEM line
+  (`eps_r=4`, `sigma=0.1 S/m`, 2 GHz) is compared with the exact
+  `alpha + j beta`; see `VALIDATION.md` and
+  `reference-data/convergence/analytic_sar.json`. Measured `alpha`
+  9.3513 vs 9.3601 Np/m, `beta` 84.3651 vs 84.3547 rad/m, and the SAR
+  slope 18.7027 vs 2*alpha 18.7202 1/m (relative 9.4e-4). The absolute
+  SAR scale is the DFT convention (validated pointwise against the dump,
+  1.7e-7); the analytic comparison is the spatial decay and phase.
 
 ## 7. Units and conventions
 

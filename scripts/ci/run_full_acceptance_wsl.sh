@@ -134,6 +134,10 @@ record "cylindrical SAR differential" "$log" "$(grep -E 'gates:' "$log" | tail -
 log=$(run "curve excitation" bash scripts/ci/run_curve_excitation_check_wsl.sh)
 record "curve-excitation differential" "$log" "$(grep -E 'ut1x:' "$log" | tail -1)"
 
+echo "== analytic SAR"
+log=$(run "analytic SAR" bash scripts/ci/run_analytic_sar_check_wsl.sh)
+record "analytic SAR (lossy line)" "$log" "$(grep -E 'measured alpha' "$log" | tail -1)"
+
 echo "== CTB Octave delivery"
 log=$(run "ctb build" cargo build -p ctb-rs)
 log=$(run "ctb octave" env CTB_BIN="$REPO_ROOT/target/debug/ctb" octave --no-gui --quiet "$REPO_ROOT/CTB/rust/tests/octave/cli_exercise.m")

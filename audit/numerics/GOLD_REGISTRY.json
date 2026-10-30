@@ -17,8 +17,8 @@
     {
       "category": "D",
       "path": "docs/migration/VALIDATION.md",
-      "sha256": "28d2ca3cb7f1112819341e03d4e2ab8ba406d684a00463065250ed2aa4ad74a5",
-      "bytes": 150616,
+      "sha256": "d830557e5807c0628e3785376e738e933e7f029268e58c730673e66050183696",
+      "bytes": 151579,
       "provenance": "recorded validation sections"
     },
     {
@@ -55,6 +55,27 @@
       "sha256": "3f4de286761cde6a3d7243848881c4dd82eef3b4aa1753e5fd051b175ad791f9",
       "bytes": 1713,
       "provenance": "cavity TE101 mesh-refinement record"
+    },
+    {
+      "category": "A",
+      "path": "docs/migration/reference-data/convergence/analytic_sar.json",
+      "sha256": "2e38eec98b2a7103c2cb1a9eeb013558ef3cffb42cf56e10b590e34537203aa5",
+      "bytes": 701,
+      "provenance": "analytic SAR lossy-line record"
+    },
+    {
+      "category": "A",
+      "path": "scripts/ci/analytic_sar_check.py",
+      "sha256": "82e5d8268c5c52d57de2d516094355b90c71c98e0c5f33114e14adcb105b9daa",
+      "bytes": 7665,
+      "provenance": "analytic SAR harness"
+    },
+    {
+      "category": "A",
+      "path": "scripts/ci/run_analytic_sar_check_wsl.sh",
+      "sha256": "d8d7d4fb9635821bc93c6ba3d34a6492ac448c3c55777728cfdfe6a1e75fc0d7",
+      "bytes": 744,
+      "provenance": "analytic SAR harness wrapper"
     },
     {
       "category": "A",
@@ -115,8 +136,8 @@
     {
       "category": "D",
       "path": "scripts/ci/run_full_acceptance_wsl.sh",
-      "sha256": "0ab241fab14abae4874acdea4a8df11893c4df629714f1fc38ef651a54df2aa9",
-      "bytes": 6788,
+      "sha256": "ebacb5be56b1fa4225f8096dd7438271f1bf0a1d066dacbb231e6bceadf1b788",
+      "bytes": 6973,
       "provenance": "acceptance driver"
     },
     {

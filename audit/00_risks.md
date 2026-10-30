@@ -46,6 +46,6 @@ reach the operator/engine or the writer.
 1. NUM-001/NUM-002 guards + tests (done; rerun the solver suite).
 2. PY-001 rebuild and native Python suites (in progress).
 3. Records E-005/FINAL_AUDIT (E-005 corrected; FINAL_AUDIT to re-issue).
-4. Validation: analytic SAR, convergence study, performance gate.
+4. Validation: convergence study and performance gate (analytic SAR done, RM-178).
 5. GUI arrow-key navigation and visible focus rings (done, RM-176).
 6. Platform matrix when Actions or hosts are available.

@@ -2465,3 +2465,21 @@ JSON under `reference-data/convergence/`:
 These are studies, not CI gates. The MSL result says the smoke model is not a
 converged notch design; it is not evidence of a solver defect.
 
+## Analytic SAR (VAL-002, RM-178)
+
+`scripts/ci/run_analytic_sar_check_wsl.sh` drives a homogeneous lossy TEM line
+(`eps_r=4`, `sigma=0.1 S/m`, `rho=1000 kg/m3`, 2 GHz) and compares the complex
+field and the SAR output with the exact lossy-medium solution over 50-200 mm:
+
+| Quantity | Analytic | Measured | Relative error |
+|---|---:|---:|---:|
+| attenuation `alpha` | 9.360098 Np/m | 9.351325 Np/m | 9.37e-4 |
+| phase constant `beta` | 84.354713 rad/m | 84.365061 rad/m | 1.23e-4 |
+| SAR slope | 18.720195 1/m | 18.702651 1/m | 9.37e-4 |
+
+The SAR output also matches `0.5 sigma |E|^2 / rho` pointwise to 1.65e-7 of
+the peak. Record: `reference-data/convergence/analytic_sar.json`. Tolerance is
+2 % for each fitted quantity; the measured values are 0.01-0.1 %. The absolute
+SAR scale is the engine's DFT convention (validated pointwise), so the analytic
+claim is the spatial decay and phase, not an independent W/kg calibration.
+

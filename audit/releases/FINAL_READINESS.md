@@ -37,7 +37,7 @@ as a complete, CST-validated or production-ready replacement.
 | Windows installer | workflow present, no run at this HEAD (`PKG-001`) |
 | GUI drag-docking | ADR 0010 proposed (`egui_tiles 0.18`, egui-0.37 compatible); owner decision required |
 | Performance threshold | refreshed baseline; proposed 4.0x/3.25x gate passes; approval pending (`PERF-001`) |
-| Analytic SAR | missing (`VAL-002`) |
+| Analytic SAR | **PASS** (`VAL-002`): lossy line alpha 9.3513 vs 9.3601 Np/m, beta 84.3651 vs 84.3547 rad/m, SAR slope rel 9.4e-4 |
 | MATLAB (as opposed to Octave) | smoke PASS (R2025b: XML write, setup, 50-step run) |
 | Fuzzing/Miri/sanitizers | not run |
 
@@ -52,7 +52,7 @@ as a complete, CST-validated or production-ready replacement.
 | No unreported C++ runtime | Met (`legacy_dependency_register.md`) |
 | CPU reference passes analytic/regression | Met for the recorded corpus |
 | Mesh/time convergence | **Partly met**: cavity mesh (2.05/2.03) and time step (2.32 vs the dt->0 limit), dielectric speed monotone; MSL/SAR not established |
-| Physical conventions validated | Partly: wave speed, ports, SAR gate; no analytic SAR |
+| Physical conventions validated | Met for wave speed, ports, and SAR (analytic lossy line); absolute SAR scale follows the validated DFT convention |
 | Immutable reference provenance | Met (`GOLD_REGISTRY.json`), no self-generation |
 | SIMD/thread backends compared | Not met (no SIMD variant) |
 | GPU parity | N/A (no backend) |
@@ -67,7 +67,7 @@ as a complete, CST-validated or production-ready replacement.
 
 1. ~~A clean 13/13 acceptance run at the release commit.~~ Met at `cf3d226`;
    re-run at the final tagged commit.
-2. Convergence for SAR and a converged MSL notch model (cavity mesh/time and dielectric speed are recorded; the smoke MSL model has no interior notch).
+2. A converged MSL notch model (cavity mesh/time, dielectric speed and analytic SAR are recorded; the smoke MSL model has no interior notch).
 3. Hosted or local macOS/FreeBSD/Windows runs at the release commit.
 4. Owner approval of the proposed performance gate (the release-tree run already passes it).
 5. ~~The sRGB material-colour fix.~~ Met (RM-171).
