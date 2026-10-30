@@ -27,9 +27,14 @@ submodules' `rust/` trees and did not conflict with the C++ changes.
 | Timesteps limited to `INT_MAX` (openEMS `7badca4`) | `openems.rs::set_number_of_time_steps` | `the_timestep_count_is_limited_to_int_max` |
 | Unknown `--engine` is an error (openEMS `c971899`) | `openems.rs::set_engine` returns `Result`; `rust-cli` exits non-zero | `an_unknown_engine_is_an_error` |
 | Polyhedron vertices in double precision (CSXCAD `a61f740`) | `CSXCAD/rust/src/model.rs` (`PolyhedronPrimitive` stores `[f64; 3]`) | `polyhedron_vertices_keep_double_precision` |
+| Drawing tolerance for every primitive and the tolerant polyhedron inside test (CSXCAD `4a2d385`, `33ab8ab`) | `Structure::drawing_tolerance`, `Primitive::is_inside_with_tolerance`, per-shape tolerance (box, multi-box, sphere, shell, cylinder, wire, polygon, rotational polygon), robust solid-angle polyhedron test | `drawing_tolerance_tests` (4), `polyhedron_vertices_keep_double_precision` |
+| Operator drawing tolerance from the mesh (openEMS `db68e62`) | `Operator::drawing_tolerance` = `1e-3 * min mesh step`, used by the material lookup | `test_the_operator_sets_the_drawing_tolerance_from_the_mesh` |
 
-Test counts after the port: `csxcad-core` 158 lib + 24 integration,
-`openems-core` 267 lib, workspace `cargo check` clean.
+Test counts after the port: `csxcad-core` 162 lib + 24 integration,
+`openems-core` 265 lib, workspace `cargo check` clean. The existing boundary
+assertions of the containment tests were updated to the new native semantics
+(the surface counts as inside; nested and overlapping closed components are
+the union).
 
 ## Already present before the sync
 
@@ -52,7 +57,6 @@ Test counts after the port: `csxcad-core` 158 lib + 24 integration,
 
 | Upstream change | Why it is deferred |
 | --- | --- |
-| Drawing tolerance for every primitive and the tolerant polyhedron inside test (CSXCAD `4a2d385`, `33ab8ab`) | changes the mesh-to-material mapping in the engine; it needs a differential run against the native operator (the tolerance comes from the mesh lines) before it can be called verified |
 | Disc-material surface as plain arrays (CSXCAD `3861b71`, QCSXCAD `6a22e41`) | the Rust GUI renders structures itself (no VTK/QVTK); the array API is only needed by a VTK viewer |
 | `python/openEMS/compare.py`, the option-order fix, the HDF5 read performance work | Python convenience/packaging surface, not engine behaviour |
 | `RunFDTD` end-criteria cadence and abort reporting (`eb1c5ee`, `d2e6a12`-class changes) | the Rust runner has its own end-criteria implementation; a differential check is required before adopting the cadence |

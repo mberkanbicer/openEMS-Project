@@ -40,10 +40,12 @@ The fork was rebased onto `thliebig/openEMS-Project` master
 branches merged the same commits without conflicts outside the changelogs.
 
 Ported to Rust in this pass: the DC-free Gaussian pulse (`DCFree`) end to
-end, the `INT_MAX` timestep clamp, the unknown-engine error and double
-precision polyhedron vertices. Everything else is classified as already
-present, not applicable (GPU engine, packaging, CI) or deferred with a
-reason in `audits/upstream-sync-2026-10-30.md`.
+end, the `INT_MAX` timestep clamp, the unknown-engine error, double precision
+polyhedron vertices, and the drawing tolerance (every primitive's containment,
+the robust polyhedron inside test and the operator tolerance from the mesh).
+Everything else is classified as already present, not applicable (GPU engine,
+packaging, CI) or deferred with a reason in
+`audits/upstream-sync-2026-10-30.md`.
 
 The worktree moved from `D:\openEMS-Project-rust` to
 `C:\Users\mberkanbicer\Projects\openEMS-Project-rust`; the historical

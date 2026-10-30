@@ -82,6 +82,22 @@ Each gate must leave traceable evidence in `MIGRATION_STATUS.md`,
 `COVERAGE_MATRIX.csv`, and `VALIDATION.md`. A failed or unavailable gate is a
 blocker, not an implicit pass.
 
+6. **Track upstream continuously.** The fork follows
+   `thliebig/openEMS-Project`. The main project merges upstream into
+   `modernization/integration`; the Rust audit branches merge the same commits
+   in each submodule. Every upstream commit since the last pin is classified in
+   `audits/upstream-sync-<date>.md` as one of:
+
+   | Class | Meaning |
+   | --- | --- |
+   | Ported | the behaviour exists in Rust, with a test in the same change |
+   | Present | the Rust port already implemented it (evidence named) |
+   | Not applicable | C++/GPU/packaging/CI-only change |
+   | Deferred | not yet ported; the reason and the verification it needs are recorded |
+
+   A behavioural upstream change may only be marked Present/Ported after an
+   executed Rust test; Deferred rows are open work, not passes.
+
 ## Acceptance criteria
 
 Completion requires every coverage-matrix row to have a mapped implementation
