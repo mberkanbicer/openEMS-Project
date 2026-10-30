@@ -266,3 +266,31 @@ evidence limitations, not permission to relax acceptance criteria.
 - `VALIDATION.md` records the captured original-stack evidence and distinguishes
   provisional criteria from approved Rust tolerances; no final Rust tolerances
   have been approved.
+
+## Upstream tracking (2026-10-30)
+
+The fork now follows `thliebig/openEMS-Project` master (`38da98d`,
+2026-10-24). `modernization/integration` merges the root history and
+fast-forwards the submodules to the upstream commits:
+
+| Submodule | Pinned | Commits since `v0.7.0`/`v0.37.0` |
+| --- | --- | --- |
+| CSXCAD | `626b99f` | 8 |
+| openEMS | `d686f1d` | 38 |
+| QCSXCAD | `6a22e41` | 2 |
+| AppCSXCAD | `bcbc0ad` | 3 |
+| fparser, CTB, hyp2mat | unchanged | 0 |
+
+The Rust audit branches (`openEMS-Project-rust`) merge the same commits and
+port the behavioural changes; each upstream commit is classified as Ported,
+Present, Not applicable or Deferred in
+`docs/migration/audits/upstream-sync-2026-10-30.md` of the Rust tree. Ported
+in this pass: the DC-free Gaussian pulse, the `INT_MAX` timestep clamp, the
+unknown-engine error, double precision polyhedron vertices and the drawing
+tolerance for every primitive plus the operator tolerance from the mesh.
+
+Deferred rows stay open work: the disc-material polydata arrays (a VTK-viewer
+API; the Rust GUI builds its own geometry), the Python `compare` module and
+HDF5 read-performance work, and the RunFDTD end-criteria cadence. The GPU
+engine and packaging/CI changes are not applicable to the Rust port.
+
