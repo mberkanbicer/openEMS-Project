@@ -32,7 +32,8 @@ CST-validated or production-ready replacement.
 | CST MWS comparison | **blocked**, no data (`cst/`) |
 | GPU compute | **not implemented** (scope, ADR 0002) |
 | macOS/FreeBSD/Windows run at this HEAD | **blocked** (E-005; no hosted CI) |
-| Windows installer | workflow present, no run at this HEAD |
+| Windows installer | workflow present, no run at this HEAD (`PKG-001`) |
+| GUI drag-docking | ADR 0010 proposed (`egui_tiles 0.18`, egui-0.37 compatible); owner decision required |
 | Performance threshold | refreshed baseline; proposed 4.0x/3.25x gate passes; approval pending (`PERF-001`) |
 | Analytic SAR | missing (`VAL-002`) |
 | MATLAB (as opposed to Octave) | smoke PASS (R2025b: XML write, setup, 50-step run) |

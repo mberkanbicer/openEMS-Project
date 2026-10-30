@@ -203,4 +203,6 @@ linearised in the same phase.
 
 Dock sizes, arrow-key navigation with focus rings, and the `Ctrl+K` command
 registry are implemented (RM-173/RM-176). The remaining GUI limitation is true
-drag-docking, deferred until an ADR approves an egui-0.37-compatible crate.
+drag-docking; ADR 0010 (Proposed) records that `egui_tiles 0.18` is compatible
+with egui 0.37 and awaits the owner decision, while `egui_dock 0.21` requires
+0.36 and is not usable here.
