@@ -1,5 +1,12 @@
 # Rust Migration Status
 
+> **Superseded 2026-10-30.** The canonical migration records live in the
+> `openEMS-Project-rust` worktree (`mberkanbicer-rust-migration-audit`):
+> `REMEDIATION_TASKS.md` there has 162 `Verified` rows and no open row, and
+> `audits/upstream-sync-2026-10-30.md` / `audits/upstream-branches-2026-10-30.md`
+> record the upstream sync and the branch ports. This file remains the
+> historical status of the archived three-crate tree and its 133-row register.
+
 **Status (2026-10-25):** The canonical tree is
 `mberkanbicer-rust-migration-audit` in this worktree. All seven submodule ports
 are committed on their own `mberkanbicer-rust-migration-audit` branches, pushed,

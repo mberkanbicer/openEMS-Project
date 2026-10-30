@@ -1,5 +1,12 @@
 # Rust Migration Remediation Task List
 
+> **Superseded 2026-10-30.** The canonical register is
+> `docs/migration/REMEDIATION_TASKS.md` in the `openEMS-Project-rust` worktree
+> (`mberkanbicer-rust-migration-audit`): 162 `Verified` rows, no `Implemented`,
+> `Not Started`, `Blocked` or `Analyzed` row. This file is the historical
+> 133-row register of the archived three-crate tree; its counts are not the
+> current project status and must not be used for a completion claim.
+
 Companion to `docs/migration/REMEDIATION_PLAN.md`.
 Created 2026-10-24. Supersedes the "Done" claims for Tasks 17-19 in
 `docs/migration/TASKS.md` until the acceptance evidence below exists.
