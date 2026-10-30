@@ -24,7 +24,7 @@
     {
       "category": "D",
       "path": "docs/migration/ACCEPTANCE.md",
-      "sha256": "102e9aea196ced1c219dbc437cf3013b40c3a0cf8f1f698f80c0743f4b444931",
+      "sha256": "ad4a6f797d06b5d70dafdd946160a33124dbdb714131333ff0ce22d167699d7b",
       "bytes": 1661,
       "provenance": "last full acceptance report"
     },
@@ -66,8 +66,8 @@
     {
       "category": "A",
       "path": "docs/migration/reference-data/convergence/msl_notch.json",
-      "sha256": "41af921864c2604b8d8189aea19a4ed31c2d053f1c56df8fff0e3c5640d9e040",
-      "bytes": 225910,
+      "sha256": "7f8aa93142d23e5aec637f599ffc9a56263c82e32f8ac07339cba93eef5eaaec",
+      "bytes": 225954,
       "provenance": "MSL notch mesh-refinement record"
     },
     {
