@@ -169,3 +169,36 @@ Automated coverage: 52 `qcsxcad-core`, 13 `qcsxcad-egui` (including
 `wheel_zooms_and_middle_drag_orbits` and
 `cursor_without_the_middle_button_does_not_orbit`) and 12 `appcsxcad`
 tests pass.
+
+---
+
+## Update 2026-10-30: Precision Workbench shell
+
+The table above records the state before the DESIGN.md redesign and is kept for
+history. The current shell differs on every point it lists:
+
+| Area | Current state |
+| --- | --- |
+| Theme | Three complete palettes (`Dark` default, `Light`, `High contrast`) from DESIGN.md §3.1, one spacing/typography scale, viewport clear colour follows the theme. |
+| Menu | `File`, `Edit`, `View`, `Info`; Edit exposes enabled-only Undo/Redo; View carries Fit All/Selection, standard views, parallel projection, theme, and panel visibility. |
+| Command strip | Grouped file/history/structure/create/fit/tool/view commands; creation moved into `+ Property`/`+ Primitive` menus; whole groups wrap at 1280 px and fit one row at 1440/1920 px. |
+| Docks | `Structure` (tree + grid + parameters, tree bounded so the lower sections stay reachable) and `Inspector` (property/primitive/transform), both clamped and padded; Ctrl+B / Ctrl+I toggle them. |
+| Tree | Title, action row, `PROPERTIES / PRIMITIVES` + `VIS` header, full-width selected/hover rows with an accent bar, context menu and Delete. |
+| Viewport | Dark/light viewport matching the theme, theme-coloured axis triad, hover label, navigation hint, Fit All/Selection, confined wheel/orbit. |
+| Status bar | Coordinates in the drawing unit (e.g. `mm`), active tool, selection summary, projection, property/primitive counts, unsaved marker. |
+
+Evidence: `docs/migration/audits/gui-dark-1280.png`,
+`gui-dark-1440.png`, `gui-dark-1920.png`, `gui-light-1440.png`,
+`gui-high-contrast-1440.png`, `gui-selection-1440.png` (real click:
+tree -> inspector -> status). Tests: 52 `qcsxcad-core`, 24 `qcsxcad-egui`,
+13 `appcsxcad`.
+
+Two findings recorded rather than changed silently:
+
+- The wgpu surface is an sRGB target and the renderer's vertex colours are
+  written as if they were linear, so stored material colours render lighter
+  than the native application. Data and shaders were not modified; this is a
+  renderer-colour-management task for the viewport phase.
+- The Qt icon set's `viewmag-`/`viewmag+` are used for collapse/expand because
+  they are the only matching icons available; they carry tooltips and will be
+  replaced when an outline icon family is approved (ADR required).

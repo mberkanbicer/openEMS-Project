@@ -1,9 +1,10 @@
 # Rust Migration Status
 
-**Status (2026-10-29): Complete.** The register has **153 `Verified` rows and
+**Status (2026-10-30): Complete.** The register has **166 `Verified` rows and
 no open row** (`REMEDIATION_TASKS.md`); the GUI design-parity work (`RM-152`)
-and the native icons/metrics (`RM-153`) are closed, and exception E-006 is
-resolved. The canonical tree is
+and the native icons/metrics (`RM-153`) are closed, and the `Precision
+Workbench` redesign adds RM-164..RM-166 (theme tokens, shell, viewport
+navigation). The canonical tree is
 `mberkanbicer-rust-migration-audit` in this worktree. All seven submodule ports
 are committed on their own `mberkanbicer-rust-migration-audit` branches, pushed,
 and pinned by the root repository; the archived three-crate tree is tagged
@@ -48,7 +49,8 @@ polydata surface, `--debug-memory`, the first-minute end-criteria cadence and
 the denormal flush, the PEC-edge `.vtp` dump and the FDTD-child scoping fix.
 The register grows to 163 `Verified` rows (RM-154..RM-163); the new APIs are
 wired into the GUI renderer and the Python bindings, and the full workspace
-suite is 865 passed / 0 failed.
+suite is 865 passed / 0 failed. The GUI redesign adds RM-164..RM-166, for 166
+`Verified` rows in total.
 Everything else is classified as already present, not applicable (GPU engine,
 packaging, CI) or deferred with a reason in
 `audits/upstream-sync-2026-10-30.md`.
@@ -63,6 +65,31 @@ work is not applicable to the Rust product.
 The worktree moved from `D:\openEMS-Project-rust` to
 `C:\Users\mberkanbicer\Projects\openEMS-Project-rust`; the historical
 path in `REMEDIATION_PLAN.md` is the old location of the same tree.
+
+## GUI modernization (Precision Workbench), 2026-10-30
+
+`docs/migration/audits/gui-modernization-audit.md` is the Phase 0 audit: stack,
+architecture, command inventory, ranked findings and the phase plan.
+Phase 1 is implemented and verified in this tree:
+
+- `QCSXCAD/rust-egui/src/theme.rs` defines the dark (default), light and
+  high-contrast palettes from DESIGN.md §3.1 plus the spacing/type tokens. The
+  viewport clear is linearised for the sRGB surface; contrast is asserted by
+  tests.
+- The shell has `File`/`Edit`/`View`/`Info`, a grouped command strip that wraps
+  whole groups at 1280 px, panel toggles (Ctrl+B / Ctrl+I), theme persistence in
+  `settings.json`, and a status bar with coordinates + unit, tool, selection,
+  projection, counts and an unsaved marker.
+- Viewport navigation is confined to the viewport, `Fit All` / `Fit Selection`
+  are wired, and the axis triad follows the theme.
+- The tree -> inspector -> status path is verified with a real click
+  (`audits/gui-selection-1440.png`).
+
+Tests: 52 `qcsxcad-core`, 24 `qcsxcad-egui`, 13 `appcsxcad`. Screenshots:
+`audits/gui-dark-1280.png`, `gui-dark-1440.png`, `gui-dark-1920.png`,
+`gui-light-1440.png`, `gui-high-contrast-1440.png`,
+`gui-selection-1440.png`. `audits/gui-parity.md` carries the parity update and
+the two recorded findings (sRGB vertex colours, Qt collapse/expand icons).
 
 ## Baseline
 
