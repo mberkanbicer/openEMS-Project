@@ -108,7 +108,7 @@ log=$(run "python build" bash scripts/ci/build_rust_python_wsl.sh --release)
 record "Python packages build + native imports" "$log" "$(grep -cE 'Installed ' "$log" || true) packages"
 
 log=$(run "python suites" bash scripts/ci/run_rust_python_tests_wsl.sh)
-record "native Python suites" "$log" "$(sum_unittest "$log")"
+record "native Python suites" "$log" "$(sum_unittest "$log"); $(grep -oE 'SKIPPED: [0-9]+ GPU[^)]*\)' "$log" | tail -1)"
 
 echo "== Octave testsuite (long)"
 log=$(run "octave suite" bash scripts/ci/run_octave_testsuite_wsl.sh)

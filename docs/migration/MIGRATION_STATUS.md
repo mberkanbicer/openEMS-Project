@@ -1,6 +1,6 @@
 # Rust Migration Status
 
-**Status (2026-10-30): Complete.** The register has **166 `Verified` rows and
+**Status (2026-10-30): Complete.** The register has **168 `Verified` rows and
 no open row** (`REMEDIATION_TASKS.md`); the GUI design-parity work (`RM-152`)
 and the native icons/metrics (`RM-153`) are closed, and the `Precision
 Workbench` redesign adds RM-164..RM-166 (theme tokens, shell, viewport
@@ -49,8 +49,8 @@ polydata surface, `--debug-memory`, the first-minute end-criteria cadence and
 the denormal flush, the PEC-edge `.vtp` dump and the FDTD-child scoping fix.
 The register grows to 163 `Verified` rows (RM-154..RM-163); the new APIs are
 wired into the GUI renderer and the Python bindings, and the full workspace
-suite is 865 passed / 0 failed. The GUI redesign adds RM-164..RM-166, for 166
-`Verified` rows in total.
+suite is 865 passed / 0 failed. The GUI redesign adds RM-164..RM-166 and the
+audit adds RM-167/RM-168, for 168 `Verified` rows in total.
 Everything else is classified as already present, not applicable (GPU engine,
 packaging, CI) or deferred with a reason in
 `audits/upstream-sync-2026-10-30.md`.
@@ -90,6 +90,32 @@ Tests: 52 `qcsxcad-core`, 24 `qcsxcad-egui`, 13 `appcsxcad`. Screenshots:
 `gui-light-1440.png`, `gui-high-contrast-1440.png`,
 `gui-selection-1440.png`. `audits/gui-parity.md` carries the parity update and
 the two recorded findings (sRGB vertex colours, Qt collapse/expand icons).
+
+## Completion audit (2026-10-30)
+
+`audit/` implements the audit/completion protocol against the existing port.
+The audit re-read the implementation instead of trusting the register, and
+found two P0 defects the row status had missed:
+
+- `CellConstantMaterial` was parsed, stored and exposed but never applied; the
+  operator always used quarter-cell averaging. Fixed by rejecting the option at
+  setup (E-008, RM-167, `cell_constant_material_is_rejected_at_setup`).
+- `MultiGrid` was parsed/stored/exposed but never reached the operator or
+  engine; RM-061 claimed `Verified` without a command or result. Fixed by
+  rejecting stored radii at setup while keeping the native setter contract
+  (E-007, RM-061, two regression tests).
+
+The audit also found Python façade drift from the carried upstream tests:
+missing `dc_free`, non-native `_SetLibraryArguments` errors, `Write2XML`
+writing an incomplete setup, and `GetPolyDataModel` missing/without NumPy
+shapes and a live transform. Fixed under RM-168; the native Python suites now
+pass (405 tests, 2 GPU tests reported `SKIPPED`).
+
+Records corrected: E-005 (the nightly task was deleted), the stale
+`FINAL_AUDIT.md` headline, and `RM-061`'s evidence. The register is now
+**168 `Verified`, 0 open**. The remaining gaps are validation strength
+(convergence, CST) and the platform matrix, not porting work; see
+`audit/releases/FINAL_READINESS.md` for the conditional release verdict.
 
 ## Baseline
 

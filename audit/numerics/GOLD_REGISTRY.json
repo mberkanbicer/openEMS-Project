@@ -1,0 +1,179 @@
+{
+  "generated": "2026-10-30",
+  "workspace_head": "ff95333e2b93c943038d28bf169adca1404fb9e8",
+  "categories": {
+    "A": "analytic / manufactured truth",
+    "D": "pinned upstream openEMS parity",
+    "E": "Rust backend-to-backend comparison"
+  },
+  "entries": [
+    {
+      "category": "D",
+      "path": "docs/migration/REFERENCE_TOLERANCES.md",
+      "sha256": "66e0f88b81ff7c9648e0fd78a7ec2245b14474546fe317b27e0823f6f3942129",
+      "bytes": 6197,
+      "provenance": "approved differential bounds (proposed)"
+    },
+    {
+      "category": "D",
+      "path": "docs/migration/VALIDATION.md",
+      "sha256": "427c76b87bce5895c7a680678711c6523869e934da4063bdba6490bc5a65ec31",
+      "bytes": 149736,
+      "provenance": "recorded validation sections"
+    },
+    {
+      "category": "D",
+      "path": "docs/migration/ACCEPTANCE.md",
+      "sha256": "c8a7d1c86bf6a3de0c66d620fdff4906264bc207ac8c12244613c5ad650dd36e",
+      "bytes": 1489,
+      "provenance": "last full acceptance report"
+    },
+    {
+      "category": "D",
+      "path": "docs/migration/reference-data/perf/performance-baseline.md",
+      "sha256": "a418efd404f2a740305bcfe78e3da13532004cb9955e1cff0b25e9ac70f16fa8",
+      "bytes": 5897,
+      "provenance": "pinned performance baseline"
+    },
+    {
+      "category": "D",
+      "path": "docs/migration/reference-data/perf/performance-baseline.csv",
+      "sha256": "84e5bd0f439826f78d1f7069fc5366fa07002e52e3c09a41ad85ad308a966a42",
+      "bytes": 10888,
+      "provenance": "machine-readable performance table"
+    },
+    {
+      "category": "A",
+      "path": "openEMS/rust/tests/analytic_validation.rs",
+      "sha256": "4a22ee6aa4dcdf22322c075af0cacb86e73decf447541badcff50bcaab6e4ff1",
+      "bytes": 8099,
+      "provenance": "analytic wave-speed oracles"
+    },
+    {
+      "category": "D",
+      "path": "scripts/ci/reference_harness.py",
+      "sha256": "c2894eb0775fb46818b8df165f4b113c3a2fafd9d6fd4a184eb4e3ad539b3baf",
+      "bytes": 12945,
+      "provenance": "51-case native differential harness"
+    },
+    {
+      "category": "D",
+      "path": "scripts/ci/run_reference_harness_wsl.sh",
+      "sha256": "089a2ba8eee68928719aa39ad2f6fe493ea3f335a8800cb31b03b6bdc5ea29e9",
+      "bytes": 585,
+      "provenance": "harness wrapper"
+    },
+    {
+      "category": "D",
+      "path": "scripts/ci/run_operator_dump_check_wsl.sh",
+      "sha256": "e80b5345921463c826fe798a7bdb26b1086d14f463114f270aa4fb1b5af922dc",
+      "bytes": 2238,
+      "provenance": "operator coefficient comparison"
+    },
+    {
+      "category": "D",
+      "path": "scripts/ci/run_upml_reflection_check_wsl.sh",
+      "sha256": "19f4093ddfd002d1740f3f5ede4e822313231a9e8634430ad80ccaaf86ab97f8",
+      "bytes": 3797,
+      "provenance": "PML reflection gate"
+    },
+    {
+      "category": "D",
+      "path": "scripts/ci/run_cylindrical_sar_check_wsl.sh",
+      "sha256": "fb12d389b7a1ef75c843d9d09718e0d7269969c467d0694bb768d1bd8f6aed2a",
+      "bytes": 13159,
+      "provenance": "cylindrical SAR gate"
+    },
+    {
+      "category": "D",
+      "path": "scripts/ci/run_curve_excitation_check_wsl.sh",
+      "sha256": "f2b2e8c411e9a5983ac6f55376618ee37e3b673161df0011a4b070385bc67d44",
+      "bytes": 4104,
+      "provenance": "curve excitation gate"
+    },
+    {
+      "category": "D",
+      "path": "scripts/ci/run_full_acceptance_wsl.sh",
+      "sha256": "27f19936df47851ec659b62a19edb75ad59a1a0795e2913161111f090a0f8d03",
+      "bytes": 6251,
+      "provenance": "acceptance driver"
+    },
+    {
+      "category": "D",
+      "path": "CSXCAD/rust/tests/fixtures/xml/01_empty.xml",
+      "sha256": "c94300e07982119108d1f4fb2164dae22d2a7f7f88a97ff308df6b104bd9dc4a",
+      "bytes": 381,
+      "provenance": "native-written XML corpus"
+    },
+    {
+      "category": "D",
+      "path": "CSXCAD/rust/tests/fixtures/xml/02_grid_background_parameters.xml",
+      "sha256": "5cc001f4d98d3a87e92333d3f2e6182e3c9dc55582e3ae1272c759f8bd8941b1",
+      "bytes": 1131,
+      "provenance": "native-written XML corpus"
+    },
+    {
+      "category": "D",
+      "path": "CSXCAD/rust/tests/fixtures/xml/03_materials.xml",
+      "sha256": "e2fbb08f71b361442440615b2895df582786503b6eeaf95d74582d3770e6949c",
+      "bytes": 3692,
+      "provenance": "native-written XML corpus"
+    },
+    {
+      "category": "D",
+      "path": "CSXCAD/rust/tests/fixtures/xml/04_dispersive.xml",
+      "sha256": "6fe14b32dc9149527931ecf2eedf079b5f8f6aae629e57b393c82d32dc4c4602",
+      "bytes": 4232,
+      "provenance": "native-written XML corpus"
+    },
+    {
+      "category": "D",
+      "path": "CSXCAD/rust/tests/fixtures/xml/05_sheets_lumped_abc.xml",
+      "sha256": "0a941043339e59cb4688054e280e78524d5a64736c2b67e7d09624d61e2592d0",
+      "bytes": 2001,
+      "provenance": "native-written XML corpus"
+    },
+    {
+      "category": "D",
+      "path": "CSXCAD/rust/tests/fixtures/xml/06_excitation_probe_dump.xml",
+      "sha256": "2aaaecdccd45fa0e2c0698c3b19ce5996e63a17e1c45816e1569e2216fd1dff4",
+      "bytes": 3898,
+      "provenance": "native-written XML corpus"
+    },
+    {
+      "category": "D",
+      "path": "CSXCAD/rust/tests/fixtures/xml/07_primitives.xml",
+      "sha256": "2e83f0538fffa44a01c6da0805a32b1fea1eec5b19b22c70fe01903baeb6bfdf",
+      "bytes": 4953,
+      "provenance": "native-written XML corpus"
+    },
+    {
+      "category": "D",
+      "path": "CSXCAD/rust/tests/fixtures/xml/08_transforms.xml",
+      "sha256": "c24cebd529d204150f1e63a5ef184174ced65904b609b0de708b660d60ad5c13",
+      "bytes": 4726,
+      "provenance": "native-written XML corpus"
+    },
+    {
+      "category": "D",
+      "path": "CSXCAD/rust/tests/fixtures/xml/09_cylindrical.xml",
+      "sha256": "86700bc68a052763e8642764f95ab7ce602debe46ad80bb94b25114e8debac78",
+      "bytes": 1876,
+      "provenance": "native-written XML corpus"
+    },
+    {
+      "category": "D",
+      "path": "CSXCAD/rust/tests/fixtures/xml/10_openems_wrapper.xml",
+      "sha256": "84f40b1962d9a017be0f002dfb4abc72b47a5a4760e7aed38ac4d059f459ac2e",
+      "bytes": 1234,
+      "provenance": "native-written XML corpus"
+    },
+    {
+      "category": "D",
+      "path": "CSXCAD/rust/tests/fixtures/xml/11_disc_material.xml",
+      "sha256": "3be771aafda2818f6dfb8f2c6a48cb791fc3a5adb7fb53093bb8b09c8684684d",
+      "bytes": 1557,
+      "provenance": "native-written XML corpus"
+    }
+  ]
+}
