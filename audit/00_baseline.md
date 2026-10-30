@@ -57,15 +57,15 @@ When the background acceptance run finishes, this section is replaced with its
 13-row table and the report path. A failure is recorded as FAIL; a check that
 cannot run is recorded with its blocker, never as a pass.
 
-The acceptance completed on 2026-10-30 at **`cf3d226`** with a clean worktree
-(the provenance check now compares with the Windows `core.autocrlf=true`
-checkout policy), every check executed fresh in a new log directory
-(`ACCEPTANCE.md`): **13/13 PASS**.
+The acceptance completed on 2026-10-30 with a clean worktree (the provenance
+check now compares with the Windows `core.autocrlf=true` checkout policy),
+every check executed fresh in a new log directory. `ACCEPTANCE.md` pins the
+full tested SHA and the per-check counts: **13/13 PASS**.
 
 | Check | Result | Evidence |
 |---|---|---|
 | workspace build (release) | PASS | 1 build |
-| crate unit + integration tests | PASS | 810 tests (fresh, includes RM-169..RM-177) |
+| crate unit + integration tests | PASS | see `ACCEPTANCE.md` (fresh; includes RM-169..RM-177) |
 | HDF5 feature tests | PASS | 506 tests (fresh) |
 | Python packages build + imports | PASS | 2 packages |
 | native Python suites | PASS | 459 cases; **SKIPPED: 2 GPU plugin tests** (no GPU engine; ADR 0002) |

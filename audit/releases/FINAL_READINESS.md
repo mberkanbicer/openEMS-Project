@@ -13,10 +13,10 @@ as a complete, CST-validated or production-ready replacement.
 ## 1. What is proven
 
 - Workspace builds and the crate/Python/Octave tests run on this host:
-  **acceptance 13/13 PASS** at `cf3d226` with a clean worktree
-  (`docs/migration/ACCEPTANCE.md`; 810 crate tests, 506 HDF5, 459 Python with
-  2 GPU skips, Octave 10/10, 51 differential cases; Windows workspace separately
-  886 tests / 33 binaries).
+  **acceptance 13/13 PASS** on a clean worktree; `docs/migration/ACCEPTANCE.md`
+  pins the tested SHA and counts (506 HDF5, 459 Python with 2 GPU skips, Octave
+  10/10, 51 differential cases; Windows workspace separately 886 tests / 33
+  binaries).
 - 51-case native differential harness, operator dump, UPML reflection, SAR and
   curve-excitation gates.
 - Analytic vacuum and dielectric propagation speed (2 % discrete bound).
