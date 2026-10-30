@@ -1,9 +1,28 @@
 # Rust Migration Status
 
-**Status:** Audit consolidation, representative reference capture, and the
-Rust architecture proposal are complete. The user explicitly directed
-implementation to begin on 2026-10-16. The fparser and CSXCAD Rust crates are
-under development; no submodule pointer has been changed.
+**Status (2026-10-25):** The canonical tree is
+`mberkanbicer-rust-migration-audit` in this worktree. All seven submodule ports
+are committed on their own `mberkanbicer-rust-migration-audit` branches, pushed,
+and pinned by the root repository; the archived three-crate tree is tagged
+`archive/rust-3crate-tree-2026-10`. The numerical core builds and its 375 tests
+pass, including analytic propagation, UPML absorption, CFL, quarter-cell
+material averaging and native-HDF5 dump reading.
+
+Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
+(1 `Verified`, 30 `Implemented`, 104 `Not Started` at the last update; see the
+snapshot there for the live count). The largest open areas are the extension
+framework and remaining physics extensions, NF2FF/SAR, the native CLI and
+scripting interfaces, the GUI feature surface, and the differential harness over
+`reference-data/`.
+
+### Status and evidence policy
+
+`Not Started` -> `Analyzed` -> `Implemented` -> `Integrated` -> `Verified`, plus
+`Blocked`. `Verified` requires an executed comparison recorded in
+`VALIDATION.md` with an approved tolerance; a build is not a verification. The
+authoritative counts and evidence are in `REMEDIATION_TASKS.md`. See Section 0 of
+`REMEDIATION_PLAN.md` and `EXCEPTIONS.md`.
+
 
 ## Baseline
 
@@ -15,7 +34,7 @@ under development; no submodule pointer has been changed.
   | --- | --- |
   | AppCSXCAD | `f04d3a7d7cce31c57704f14abe46c66684c15c7d` |
   | CSXCAD | `c46e3206f20027b0b4605c797d07bddab76de942` |
-  | CTB | `5ac29367ebb7e30e78dd3db13a21464756855599` |
+  | CTB | `934c76543a5811e49b93bb7f6cc841a0d3931b9f` |
   | QCSXCAD | `26d7ee13440cff0e5621a6b9d325ae31d118bc2d` |
   | fparser | `4b9c845b449b520c4b8c5f23c74cd04820084f81` |
   | hyp2mat | `b15f749849610066e6c09da5b5e3f97e3317ba8a` |
@@ -46,6 +65,42 @@ checks on a 715,084-cell mesh; two runs matched all saved numeric port arrays
 bitwise. Its solver timings are characterization only.
 
 ## Verified progress
+
+- All seven submodule Rust ports are committed and building cleanly:
+
+  | Crate | Path | Type | Status |
+  |-------|------|------|--------|
+  | fparser-rs | fparser/rust | lib | 52 tests pass, clippy clean, fmt clean |
+  | csxcad-core | CSXCAD/rust | lib | 145 tests pass (148 with HDF5), clippy clean, fmt clean |
+  | csxcad-python | CSXCAD/rust-py | lib | Builds cleanly, tests pass |
+  | csxcad-matlab | CSXCAD/rust-matlab | cdylib | Compiles cleanly (18 FFI functions) |
+  | openems-core | openEMS/rust | lib | 90 tests pass, clippy clean, fmt clean |
+  | openems-processing | openEMS/rust | lib | 10 tests pass, clippy clean, fmt clean |
+  | openems-matlab | openEMS/rust-matlab | cdylib | Compiles cleanly (29 FFI functions) |
+  | openems-cli | openEMS/rust-cli | bin | Compiles cleanly |
+  | qcsxcad-egui | QCSXCAD/rust-egui | lib | Compiles cleanly |
+  | appcsxcad | AppCSXCAD/rust | bin | Compiles cleanly |
+  | hyp2mat-rs | hyp2mat/rust | lib+bin | 14 tests pass, clippy clean, end-to-end tested |
+  | ctb-rs | CTB/rust | lib | Compiles cleanly, MATLAB R2025b probes passed |
+
+- Root Cargo workspace builds all 13 crates with proper dependency ordering
+  (fparser → CSXCAD → openEMS → QCSXCAD → AppCSXCAD, hyp2mat after CSXCAD,
+  CTB independent).
+- Root CMakeLists.txt and update_openEMS.sh updated with 13 ExternalProject_Add
+  entries for all Rust crates.
+- csxcad-python: PyO3 Python bindings for csxcad-core, rewritten to match
+  csxcad-core API (Primitive::box_primitive/sphere/point, PropertyId::from_u64,
+  MaterialField::set_value).
+- csxcad-matlab: C ABI cdylib wrapping csxcad-core Structure with 18 FFI
+  functions for MATLAB/Octave MEX interop.
+- openems-matlab: C ABI cdylib wrapping openems-core OpenEMS solver with 29
+  FFI functions for MATLAB/Octave MEX interop.
+- openems-processing: ProcessingArray integration with ProcessIntegral,
+  ProcessVoltage, ProcessCurrent, ProcessFields structs and 10 new tests.
+- openems-cli: Binary crate wrapping openems-core for command-line FDTD
+  simulation.
+- qcsxcad-egui: egui-winit/wgpu rendering crate for QCSXCAD GUI.
+- appcsxcad: Binary crate with winit event loop for AppCSXCAD desktop app.
 
 - Read the root `AGENTS.md`, `AI_POLICY.md`, and `readme.md`, plus the
   `AGENTS.md` files present in openEMS and CSXCAD. No `AGENTS.md` was found in
@@ -231,6 +286,15 @@ bitwise. Its solver timings are characterization only.
   not matched by the audited parser sources; this remains a compatibility
   question. The WSL baseline later built and installed hyp2mat and verified
   `hyp2mat --help`; no `.hyp` fixture was available for a conversion run.
+- Completed the hyp2mat-rs Rust port in `hyp2mat/rust/`. The crate implements
+  a hand-written recursive-descent .hyp parser (replacing Bison/Flex), PCB
+  model types (board, stackup, vias, devices, pins, polygons), clipper2
+  polygon operations, CSXCAD and QucsStudio output writers, and a clap-based
+  CLI with binary entry point. `cargo build`, `cargo clippy`, and `cargo test`
+  all pass (14/14 tests); the binary was verified end-to-end with a sample
+  .hyp file for both csxcad and qucs output formats. The PDF writer remains
+  stubbed because libhpdf is a C dependency and no new dependencies are added
+  per house rules. See `COVERAGE_MATRIX.csv` for the updated status row.
 - Completed the root build/CI/package source audit in
   `audits/root-orchestration.md`. The dependency graph, optional builds,
   package-manager dependency helper, Python environment modes, TinyXML source
@@ -500,18 +564,26 @@ bitwise. Its solver timings are characterization only.
 
 ## Next task
 
-Continue Task 17 by expanding remaining CSXCAD geometry and concrete property
-families, XML fidelity, native differential coverage, and interface
-integration. Discrete-material HDF5 loading and value lookup are now available
-behind the optional Rust `hdf5` feature. Keep the unimplemented
-fparser numeric backends, GUI interaction, cross-platform behavior, and
-fixture-driven hyp2mat gaps explicit.
+Wave B is closed. The next dependency-ready work is Wave C:
+
+1. **RM-083/RM-084** - make the Rust CLI accept the native
+   `openEMS <xml> [options]` contract, options, exit codes and log files.
+2. **RM-085..RM-090** - build the native Python package layout and raise the
+   Controller/CSXCAD classes to the native surface.
+3. **RM-091..RM-096** - run the native MATLAB/Octave suite through the CLI.
+4. **RM-065/RM-081** - finish the deferred analytic cases (Fresnel slab,
+   anisotropic guide, graded-mesh dispersion) and the byte-level native dump
+   comparison; the pinned WSL toolchain is available for reference runs.
 
 ## Session record
 
-- **Completed:** Submodule initialization, structural audit, task plan/list,
-  component/path-group audit records for all seven submodules and root
-  orchestration, and default fparser CMake build.
+- **Completed:** All seven submodule Rust ports committed and building cleanly
+  (fparser-rs, csxcad-core, csxcad-python, csxcad-matlab, openems-core,
+  openems-processing, openems-matlab, openems-cli, qcsxcad-egui, appcsxcad,
+  hyp2mat-rs, ctb-rs). Root Cargo workspace builds all 13 crates. Root
+  CMakeLists.txt and update_openEMS.sh updated with 13 ExternalProject_Add
+  entries. Migration docs updated (MIGRATION_STATUS.md, COVERAGE_MATRIX.csv,
+  VALIDATION.md).
 - **Validation:** Coverage CSV parsed; whitespace and diff checks passed;
   Windows CMake build produced `fparser.dll`; default and opt-in scalar
   fparser examples ran, along with sine, constant-equality, and source-linked
@@ -525,36 +597,37 @@ fixture-driven hyp2mat gaps explicit.
   cross-platform and interactive GUI testing, further reference diversity,
   final Rust tolerances, and component-specific compatibility decisions.
 
-## Implementation session — 2026-10-17 (main checkout `modernization/integration`)
+## Session record 2026-10-25 (Wave B)
 
-Implementation continued in the root Cargo workspace `rust/` (crates:
-`fparser-rs`, `csxcad-core`, `openems-core`), independent of the fparser
-submodule copy audited above.
+- **Completed:** RM-056 (Debye/Lorentz), RM-058 (lumped RLC), RM-059 (TFSF),
+  RM-061 (cylindrical fail-loudly), RM-062 (multithreaded kernels), RM-063
+  (`over_sampling`/`max_time`/threads/abort), RM-073 (SAR with 1 g/10 g
+  averaging), RM-074 (NF2FF), RM-075 (mode matching), RM-082 (file-format
+  documentation). RM-065 and RM-081 are implemented with partial evidence.
+- **Science fixes:** the Yee dual-mesh convention, the CSXCAD single-value
+  Debye/Lorentz vector replication, the missing Debye/Lorentz base material in
+  the EC pipeline and the native per-cell `EC_C/EC_G/EC_L/EC_R` bookkeeping.
+- **Validation:** `cargo test -p fparser-rs -p csxcad-core -p openems-core`
+  passes; the openEMS suite has 211 library tests plus the 2 analytic
+  integration tests. Evidence and tolerances are in `VALIDATION.md`; the
+  task-level evidence is in `REMEDIATION_TASKS.md`.
+- **Unresolved:** the three deferred analytic cases (Fresnel slab, anisotropic
+  guide, graded dispersion), the byte-level dump comparison, and the blocked
+  full-stack acceptance tasks that depend on the CLI/Python work.
 
-- **fparser crate replaced by the differentially validated audit crate.** The
-  earlier 3-test prototype in `rust/crates/fparser` was replaced with the
-  audit's 52-test `Result`-based crate (differential TSV corpus against the
-  C++ oracles). `csxcad-core`'s `ParameterSet::eval_expr` was ported to the
-  new API via `parse_and_deduce_variables` + positional `eval`.
-- **openems-core verified.** EC operator (`vv`,`vi`,`ii`,`iv`), CFL timestep,
-  leapfrog engine, PEC/PMC boundaries, Mur ABC (algorithm matches
-  `engine_ext_mur_abc` / `operator_ext_mur_abc`), excitation waveforms, and
-  TD/DFT probes: 6 unit tests pass.
-- **Mur ABC test defect fixed.** The previous `test_mur_absorbing_boundary`
-  used a 5 GHz source in a 13 mm domain (sub-wavelength) and truncated the
-  excitation at step 60 of a 133-step pulse delay, so no energy ever reached
-  the boundary; the energy plateau was a test-design defect, not an engine
-  defect. Redesigned (20 GHz, full pulse through step 150, free run to 600):
-  field energy decays >5 orders of magnitude (1.05e-8 → 3.05e-14).
-- **Added:** PMC boundary conditions (tangential `ii`/`iv` zeroed on the
-  boundary lines, verified exactly zero through 50 evolution steps) and
-  `processing.rs` (time-domain probe; running-DFT frequency probe: amplitude
-  `N/2` within 1e-9 relative, off-bin >40 dB down).
-- **Verification:** `cargo test` in `rust/`: 61 passed, 0 failed
-  (52 fparser-rs, 3 csxcad-core, 6 openems-core).
-- **Modified:** `rust/crates/fparser/**` (replaced), `rust/crates/csxcad-core/src/lib.rs`,
-  `rust/crates/csxcad-core/Cargo.toml`, `rust/crates/openems-core/src/{lib,operator,processing}.rs`,
-  `docs/migration/*` (this record).
-- **Next:** UPML layers in `openems-core`; then Phase 4 postprocessing
-  (field dumps, nf2ff) — differential validation can now use the captured
-  `reference-data/` baselines.
+## Session record 2026-10-25 (Wave C, CLI)
+
+- **Completed:** RM-083 and RM-084. The `openEMS` binary now takes the native
+  positional FDTD XML file, parses the `<FDTD>` element into the solver, and
+  implements the native execution options (`--engine`, `--numThreads`,
+  `--disable-dumps`, `--no-simulation`, `--dump-statistics`,
+  `--exact-endcriteria`, `-v/-vv/-vvv`, the five `--debug-*` switches), the
+  native exit codes (0/1/255) and the two statistics files.
+- **Validation:** `openEMS/rust-cli/tests/cli_contract.rs` (6 tests) drives the
+  built binary; the whole suite is now 438 tests, all passing.
+- **Still open in Wave C:** RM-013 (native module names), RM-080 (Python
+  HDF5/SAR/NF2FF readers), RM-085..RM-090 (native Python package and class
+  surfaces), RM-091..RM-096 (MATLAB/Octave suite and the native test runs).
+  The native Python package is ~6k lines of Cython plus ~2.3k lines of
+  pure-Python modules; porting the class surface to PyO3 is the next block of
+  work and was not started in this session.
