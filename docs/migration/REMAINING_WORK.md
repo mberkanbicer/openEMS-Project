@@ -12,6 +12,22 @@ This document decides *what is left and what must be chosen*; it does not
 change any status. Every close still needs the evidence rule from
 `REMEDIATION_PLAN.md` Section 0.
 
+## Status update 2026-10-30
+
+The register now has **177 `Verified`, 0 open** rows. New this session:
+RM-167 (CellConstantMaterial guard), RM-168 (python façade parity), RM-169
+(parser recursion bound), RM-170 (cavity TE101 mesh convergence, order
+2.05/2.03), RM-171 (sRGB material colours), RM-172 (`TimeStepFactor`
+validation/round-trip), RM-173 (persisted dock widths), RM-174 (dielectric
+speed refinement), RM-175 (MATLAB smoke), RM-176 (keyboard navigation and the
+Ctrl+K palette) and RM-177 (time-step self-convergence, order 2.32 against the
+fixed-mesh limit).
+
+The remaining limits are now decision- or environment-bound: CST data (none
+available), hosted platform matrix (E-005), owner approval of the proposed
+performance gate, a converged MSL notch model (the smoke model has no interior
+notch), and drag-docking (ADR 0010, Proposed).
+
 ## Status update 2026-10-29 (final)
 
 The register is closed: `RM-152` (GUI CAD workflow) and `RM-153`

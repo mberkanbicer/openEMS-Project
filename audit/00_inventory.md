@@ -99,7 +99,7 @@ Total Rust source ≈ **81k lines**. The workspace has no generated Rust code.
 | Formats | CSXCAD XML, HDF5 fields/probes/SAR/NF2FF, VTK (`.vtr/.vts/.vtp`), Touchstone, STL/PLY/POV/X3D, HyperLynx PCB |
 | CI definitions | 4 workflows (`ci.yml`, `rust.yml`, `reference.yml`, `windows-package.yml`) + 35 local scripts under `scripts/ci` |
 | CI execution | hosted Actions are disabled at the account level (E-005); the nightly Windows task was deleted by the owner on 2026-10-30, so **no nightly is scheduled now** |
-| Records | `docs/migration/` (register with 172 `Verified`, validation, tolerances, acceptance, exceptions, ADRs, per-component audits) |
+| Records | `docs/migration/` (register with 177 `Verified`, validation, tolerances, acceptance, exceptions, ADRs, per-component audits) |
 
 ## 6. What the inventory establishes
 

@@ -27,7 +27,11 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 HEAD_SHA="$(cd "$REPO_ROOT" && git rev-parse HEAD)"
 REV="$(cd "$REPO_ROOT" && git rev-parse --short HEAD)"
 DIRTY_AT_START=""
-if [ -n "$(cd "$REPO_ROOT" && git status --porcelain --untracked-files=no)" ]; then
+# This repository is checked out on Windows with core.autocrlf=true, while the
+# acceptance runs under WSL. Without the same setting WSL git reports every
+# CRLF file as modified. Compare with the checkout policy so only real edits
+# mark the tree dirty.
+if [ -n "$(cd "$REPO_ROOT" && git -c core.autocrlf=true status --porcelain --untracked-files=no)" ]; then
   REV="$REV-dirty"
   DIRTY_AT_START=" (dirty worktree at start)"
 fi

@@ -24,7 +24,7 @@
     {
       "category": "D",
       "path": "docs/migration/ACCEPTANCE.md",
-      "sha256": "346e541e24ad621a9dcda0f2a4aadecc9886295c4a0be1fc5fd6a83e66e3fb94",
+      "sha256": "03029cef8c2eec1a1bb705931daa75335d065adfb96e8efa2e5baecf0f9fcd04",
       "bytes": 1515,
       "provenance": "last full acceptance report"
     },
@@ -115,8 +115,8 @@
     {
       "category": "D",
       "path": "scripts/ci/run_full_acceptance_wsl.sh",
-      "sha256": "1186aaed19167410f03a1ab40880026d62692a026312ed5af75ecfa03e69f63a",
-      "bytes": 6511,
+      "sha256": "0ab241fab14abae4874acdea4a8df11893c4df629714f1fc38ef651a54df2aa9",
+      "bytes": 6788,
       "provenance": "acceptance driver"
     },
     {
