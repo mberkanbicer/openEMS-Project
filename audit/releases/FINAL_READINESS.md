@@ -19,7 +19,8 @@ CST-validated or production-ready replacement.
   curve-excitation gates.
 - Analytic vacuum and dielectric propagation speed (2 % discrete bound).
 - 405 native Python tests (2 GPU tests skipped), Octave 10/10, install layout.
-- GUI editor workflow with real-click tree → inspector → status evidence.
+- GUI editor workflow with real-click tree → inspector → status evidence;
+  arrow-key tree navigation with focus rings and a Ctrl+K command palette.
 - P0 guards: `CellConstantMaterial` and `MultiGrid` fail loudly (E-007/E-008)
   instead of changing the physics silently.
 

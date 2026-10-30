@@ -112,10 +112,12 @@ shown disabled with a stated reason, never silently inert.
    projection mode or whether a document is modified.
 6. **No panel visibility control.** Both docks are always present; there is no
    keyboard/menu fallback for hiding them (DESIGN.md §2 requires one).
-7. **Keyboard access is partial.** Delete and the file shortcuts exist; the tree
-   is not arrow-navigable, and focus is not visibly distinct from selection.
-8. **No command search.** There is no `Ctrl+K` registry, so rare exports are only
-   discoverable through menus.
+7. **Keyboard access was partial.** Fixed in RM-176: Up/Down move the tree
+   selection, Left/Right collapse/expand a property, and the selected row shows
+   a focus ring (`gui-selection-1440.png`).
+8. **No command search.** Fixed in RM-176: `Ctrl+K` (and Edit → Command
+   palette) opens a filtered registry wired to the menu handlers
+   (`gui-palette-1440.png`).
 9. **No docking.** Panels are fixed left/right/bottom. This is accepted for
    Phase 2 only if panel sizes persist and can be toggled; true drag-docking is
    deferred until an ADR approves a docking crate compatible with egui 0.37.
@@ -199,6 +201,6 @@ before upload (`stored_srgb_colours_are_linearised_for_the_surface`); the
 dark/light captures show the stored colour. The clear colour was already
 linearised in the same phase.
 
-Remaining phases: persisted dock sizes (egui panel state is session-only),
-arrow-key tree navigation and visible focus rings, and a `Ctrl+K` command
-registry.
+Dock sizes, arrow-key navigation with focus rings, and the `Ctrl+K` command
+registry are implemented (RM-173/RM-176). The remaining GUI limitation is true
+drag-docking, deferred until an ADR approves an egui-0.37-compatible crate.

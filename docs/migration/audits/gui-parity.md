@@ -180,10 +180,10 @@ history. The current shell differs on every point it lists:
 | Area | Current state |
 | --- | --- |
 | Theme | Three complete palettes (`Dark` default, `Light`, `High contrast`) from DESIGN.md §3.1, one spacing/typography scale, viewport clear colour follows the theme. |
-| Menu | `File`, `Edit`, `View`, `Info`; Edit exposes enabled-only Undo/Redo; View carries Fit All/Selection, standard views, parallel projection, theme, and panel visibility. |
+| Menu | `File`, `Edit`, `View`, `Info`; Edit exposes Command palette (Ctrl+K) and enabled-only Undo/Redo; View carries Fit All/Selection, standard views, parallel projection, theme, and panel visibility. |
 | Command strip | Grouped file/history/structure/create/fit/tool/view commands; creation moved into `+ Property`/`+ Primitive` menus; whole groups wrap at 1280 px and fit one row at 1440/1920 px. |
 | Docks | `Structure` (tree + grid + parameters, tree bounded so the lower sections stay reachable) and `Inspector` (property/primitive/transform), both clamped and padded; Ctrl+B / Ctrl+I toggle them. |
-| Tree | Title, action row, `PROPERTIES / PRIMITIVES` + `VIS` header, full-width selected/hover rows with an accent bar, context menu and Delete. |
+| Tree | Title, action row, `PROPERTIES / PRIMITIVES` + `VIS` header, full-width selected/hover rows with an accent bar, context menu and Delete; Up/Down/Left/Right keyboard navigation with a visible focus ring. |
 | Viewport | Dark/light viewport matching the theme, theme-coloured axis triad, hover label, navigation hint, Fit All/Selection, confined wheel/orbit. |
 | Status bar | Coordinates in the drawing unit (e.g. `mm`), active tool, selection summary, projection, property/primitive counts, unsaved marker. |
 

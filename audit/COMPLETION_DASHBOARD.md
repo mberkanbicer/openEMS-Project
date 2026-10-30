@@ -9,7 +9,7 @@ evidence, but the two P0 rows below mean the register's "172 Verified" tally ove
 
 | Status | Count | Meaning here |
 |---|---:|---|
-| `VERIFIED_COMPLETE` | 36 | implementation + executed comparison/analytic result recorded |
+| `VERIFIED_COMPLETE` | 37 | implementation + executed comparison/analytic result recorded |
 | `IMPLEMENTED_UNVERIFIED` | 1 | Windows installer workflow; no run at this HEAD |
 | `PARTIAL` | 2 | performance threshold, convergence study |
 | `INTENTIONALLY_DIFFERENT` | 1 | fparser extended-precision variants (E-001/ADR 0006) |
