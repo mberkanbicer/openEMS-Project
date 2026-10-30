@@ -40,6 +40,9 @@ not on `master`.
 | CSXCAD `c18abc8` | a new property's edge colour defaults to black, not its fill colour | `DEFAULT_EDGE` in `QCSXCAD/rust/src/tessellate.rs` is black, matching the native viewer |
 | openEMS `ac21861` (`memory-stats`) | `--debug-memory` reports the array memory and the peak RSS, per FDTD cell | `openEMS/rust/src/memory.rs` (`PeakResidentBytes`), `Operator::memory_bytes`, `OpenEMS::show_memory_stat`, `--debug-memory` flag; test `the_memory_report_lists_the_operator_arrays` |
 | fparser `a63b271` (`CI_testing`) | drop the Debian oldoldstable CI job (EOL, mirrors gone) | applied to the main project's fparser branch; it is CI configuration, so the Rust tree is unaffected |
+| CSXCAD `3861b71` | disc-material/background surface as plain points and quads (`GetPolyDataModel`) | `DiscreteMaterialGrid::surface_poly_data` + `DiscreteMaterialSurface` (flat VTK helpers); `disc_surface_tests` (3) |
+| openEMS `eb1c5ee` | energy end criteria every Nyquist period during the first 60 s, wall-clock afterwards | `EXACT_ENDCRIT_TIME`, `end_criteria_due`, plus the updated cadence test |
+| openEMS `367a63f` | flush denormals to zero during the run, restore the caller's setting | `denormal::FlushToZero` guard used by `run_fdtd`; `the_denormal_flush_is_set_and_restored` |
 
 ## Not applicable
 
@@ -47,8 +50,8 @@ not on `master`.
 | --- | --- |
 | CSXCAD `WIP` viewer GUI (`6438a4f`..`f8e5f81`), `CSXCAD.Viewer` Python package, MATLAB `csxcad-view` | a separate Python/Qt viewer product; the Rust GUI is the egui `QCSXCAD`/`AppCSXCAD` port and already has its own viewer. The figure-tab/settings ideas are UI design input, not a port of existing Rust components |
 | openEMS `WIP` Python `Results`, figures, `openems-view`, tutorial galleries (`9207285`..`9750c59`) | Python notebook/reporting surface for the viewer above |
-| openEMS `WIP` `fba307d` (recreate ports and NF2FF boxes after `ReadFromXML`) | the Rust Python binding does not model the native port/NF2FF wrapper objects; the Rust solver reads the structure directly. Deferred with the Python surface, below |
-| openEMS `WIP` `a0d5c87` (debug-PEC edge directions for `openems-view`) | viewer-specific debug output; the Rust `--debug-PEC` VTK dump already writes the edge boxes |
+| openEMS `WIP` `fba307d` (recreate ports and NF2FF boxes after `ReadFromXML`) | a setup-file mechanism that re-runs the Python port constructors; the Rust solver has no port objects because the XML already carries the geometry and excitations. Not applicable to the Rust architecture |
+| openEMS `WIP` `a0d5c87` (debug-PEC edge directions for `openems-view`) | the direction/unit arrays serve the Python viewer item; the Rust `--debug-PEC` dump writes a per-cell PEC scalar for ParaView, which needs no direction array |
 | `qtViewer`, `py_gui`, older `python` branches | obsolete experiments predating `master` |
 | other `CI_testing` branches | CI configuration only |
 
@@ -56,14 +59,14 @@ not on `master`.
 
 | Branch work | What it would need |
 | --- | --- |
-| Python `Results`/figures and the port/NF2FF wrapper objects | the Rust Python package would need the results/port object model first; a design decision, not a port of an existing Rust unit |
+| Python `Results`/figures | a reporting layer for the Python product; the Rust solver returns fields and probes through its own API |
 | viewer GUI features (figure tabs, settings dock, item parts) | product scope for the egui viewer; tracked as GUI work, not an upstream port |
 
 ## Evidence
 
 * Branch comparison: `git branch -r --list 'upstream/*'` and
   `git rev-list --count upstream/master..<branch>` in each submodule.
-* Tests after the port: `csxcad-core` 163 lib, `openems-core` 267 lib,
+* Tests after the port: `csxcad-core` 166 lib, `openems-core` 269 lib,
   `qcsxcad-core` 52 lib, all passing; workspace `cargo check` clean.
 * `--debug-memory` output, from
   `cargo test -p openems-core the_memory_report -- --nocapture`:

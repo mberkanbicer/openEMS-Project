@@ -41,8 +41,11 @@ branches merged the same commits without conflicts outside the changelogs.
 
 Ported to Rust in this pass: the DC-free Gaussian pulse (`DCFree`) end to
 end, the `INT_MAX` timestep clamp, the unknown-engine error, double precision
-polyhedron vertices, and the drawing tolerance (every primitive's containment,
-the robust polyhedron inside test and the operator tolerance from the mesh).
+polyhedron vertices, the drawing tolerance (every primitive's containment, the
+robust polyhedron inside test and the operator tolerance from the mesh), the
+nested `ContinuousStructure` lookup, the black default edge, the disc-material
+polydata surface, `--debug-memory`, the first-minute end-criteria cadence and
+the denormal flush. The register grows to 161 `Verified` rows (RM-154..RM-161).
 Everything else is classified as already present, not applicable (GPU engine,
 packaging, CI) or deferred with a reason in
 `audits/upstream-sync-2026-10-30.md`.
