@@ -1,0 +1,32 @@
+{
+  "case": "dielectric slab wave speed, eps_r=4, plane-wave line",
+  "command": "cargo run --release -p openems-core --example dielectric_convergence",
+  "geometry": "120 x 10 x 10 mm line; slab fills the domain; probes at 30 and 90 mm; Gaussian 4 GHz",
+  "boundary": "PML at x ends (4*scale cells), PMC at y, PEC at z",
+  "analytic_m_per_s": 149896229.0,
+  "levels": [
+    {
+      "scale": 1,
+      "mesh": [121, 11, 11],
+      "dt_s": 3.852e-12,
+      "measured_m_per_s": 149575100.0,
+      "relative_error": 0.0021426
+    },
+    {
+      "scale": 2,
+      "mesh": [241, 21, 21],
+      "dt_s": 1.926e-12,
+      "measured_m_per_s": 149723900.0,
+      "relative_error": 0.0011493
+    },
+    {
+      "scale": 4,
+      "mesh": [481, 41, 41],
+      "dt_s": 9.629e-13,
+      "measured_m_per_s": 149757500.0,
+      "relative_error": 0.00092527
+    }
+  ],
+  "observed_order": [0.90, 0.31],
+  "note": "The error decreases monotonically, but the order is below two and falls at the finest level. The correlation-delay estimator's resolution (~0.1-0.2 %) limits the fine end, so no second-order claim is made. The cavity TE101 study is the clean order evidence."
+}

@@ -17,6 +17,9 @@ Categories: **A** analytic, **D** pinned native parity, **E** backend-to-backend
 |---|---|---|---|---|
 | PEC cavity TE101 | 1.770e-3 | 4.270e-4 | 1.047e-4 | 2.05, 2.03 |
 
+Dielectric speed (eps_r=4) at h/h2/h4: 2.14e-3, 1.15e-3, 9.25e-4; monotone,
+observed order 0.90/0.31 (estimator-limited; no second-order claim).
+
 Time-step refinement at 4.75/2.37/1.19 ps moved the estimate by only 2.1 MHz,
 below the 13.3 MHz raw bin: **no temporal order claimed**.
 

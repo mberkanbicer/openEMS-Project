@@ -27,6 +27,25 @@ Geometry `a=5 cm, b=2 cm, d=6 cm`; the analytic mode is
 - Result: **second-order convergence**, 2.03-2.05, with a monotone error.
   This is the expected Yee order for a smooth cavity mode.
 
+## Measured: dielectric wave speed (plane-wave line)
+
+`cargo run --release -p openems-core --example dielectric_convergence` builds a
+120 x 10 x 10 mm parallel-plate line filled with `eps_r = 4` (PEC at z, PMC at
+y, PML at the x ends scaled to the mesh), drives a sheet source and correlates
+the pulse at 30 and 90 mm.
+
+| Scale | Mesh | dt | Measured (m/s) | Error |
+|---:|---|---:|---:|---:|
+| 1 | 121 x 11 x 11 | 3.852 ps | 1.495751e8 | 2.143e-3 |
+| 2 | 241 x 21 x 21 | 1.926 ps | 1.497239e8 | 1.149e-3 |
+| 4 | 481 x 41 x 41 | 0.963 ps | 1.497575e8 | 9.253e-4 |
+
+Analytic `c/2 = 1.498962e8 m/s`. The error decreases monotonically, but the
+observed order is **0.90** (h→h/2) and **0.31** (h/2→h/4): below two and falling
+at the fine end. The correlation-delay estimator's resolution (~0.1-0.2 %) is
+the likely limit, so this study claims **monotone accuracy, not second order**.
+Record: `docs/migration/reference-data/convergence/dielectric.json`.
+
 ## Time-step refinement (inconclusive at this record length)
 
 Same 20x10x24 mesh, `TimeStepFactor` 1.0 / 0.5 / 0.25, step count doubled to
@@ -52,6 +71,7 @@ the XML writer dropped every valid factor <=1 on round-trip.
 
 | Case | Status |
 |---|---|
+| Dielectric slab speed refinement | recorded; monotone but estimator-limited (above) |
 | Dielectric slab Fresnel R/T refinement | not run |
 | MSL notch S11/S21 refinement | not run |
 | Time-step (dt) refinement at fixed mesh | attempted; inconclusive at the 13.3 MHz bin (above) |
