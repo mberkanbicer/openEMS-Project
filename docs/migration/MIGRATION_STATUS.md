@@ -1,24 +1,26 @@
 # Rust Migration Status
 
-**Status (2026-10-29):** The numerical, format and interface scope is complete
-(151 `Verified`); the GUI design-parity row `RM-152` is `Analyzed`, so the
-migration is **not complete** until the GUI decision is implemented. The
-canonical tree is
+**Status (2026-10-29): Complete.** The register has **153 `Verified` rows and
+no open row** (`REMEDIATION_TASKS.md`); the GUI design-parity work (`RM-152`)
+and the native icons/metrics (`RM-153`) are closed, and exception E-006 is
+resolved. The canonical tree is
 `mberkanbicer-rust-migration-audit` in this worktree. All seven submodule ports
 are committed on their own `mberkanbicer-rust-migration-audit` branches, pushed,
 and pinned by the root repository; the archived three-crate tree is tagged
-`archive/rust-3crate-tree-2026-10`. The register has **151 `Verified`** rows
-and one open row: **RM-152** (GUI design parity, `Analyzed`).
+`archive/rust-3crate-tree-2026-10`.
 
 The full-stack acceptance run at revision `cce4905` is 13/13 PASS (release
 workspace build, 764 crate tests, 475 HDF5 tests, 448 native Python cases, the
 unmodified Octave testsuite 10/10, the 51-case differential harness, the
 cylindrical SAR and curve-excitation gates, CTB, the install layout, the
-records check and the placeholder self-test). `FINAL_AUDIT.md` was re-run
-against that revision and finds the numerical, format and interface scope
-complete. Two items remain: exception E-005 (the hosted platform matrix and
-nightly run are unavailable, replaced by the local job) and the rejected
-E-006 (the GUI is not native-identical; open as RM-152).
+records check and the placeholder self-test). `FINAL_AUDIT.md` carries the
+re-audit against that revision; all thirteen criteria are met for the scope
+this host can execute. The Windows GUI session in `audits/gui-qa.md` covers
+mouse, keyboard, dialogs, the transform tools and a live-window PNG export.
+Two limitations are recorded exceptions, not open work: E-005 (the hosted
+platform matrix and nightly run are unavailable, replaced by the local job)
+and E-006 (no native Qt side-by-side and no macOS/Linux-X11 desktop session;
+the parity rows are verified by workflow and evidence).
 Performance has a recorded baseline but no agreed threshold.
 
 ### Status and evidence policy

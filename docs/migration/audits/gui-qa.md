@@ -1,9 +1,10 @@
 # QCSXCAD / AppCSXCAD GUI QA checklist
 
-**Status:** automated, offscreen and Windows desktop items executed through
-2026-10-29, including real mouse input on the 3D viewport. `Export PNG`
-with a live window surface, the macOS/Linux desktop matrix and the native
-side-by-side remain open (E-006).
+**Status:** every check that this host can execute has been executed:
+automated, offscreen, and a Windows desktop session with real mouse and
+keyboard input, the dialogs and a live-window PNG export. Only the
+macOS/Linux desktop matrix (E-005) and the native Qt side-by-side (E-006)
+are environment-limited.
 
 Evidence artifact: [`gui-screenshot.png`](gui-screenshot.png) — a 1280x800
 frame rendered through the real wgpu pipelines and the real egui widgets by
@@ -113,9 +114,31 @@ GUI and the application records each gesture through `QCSXCAD_INPUT_TRACE`.
 ![mouse zoom](gui-mouse-zoom.jpg)
 ![transform apply](gui-mouse-transform-apply.jpg)
 
-Still open: B (keyboard focus in a text field), C (dialogs, including the
-`Export PNG` path with a live window surface) and a human five-minute pass over
-the native side-by-side.
+### Dialogs, keyboard focus and PNG export (same session)
+
+The dialogs and the keyboard paths were driven with real input
+(`SendInput` keyboard events with a Unicode payload, so `WM_CHAR` reaches
+winit and the text edit).
+
+| # | Check | Result |
+| --- | --- | --- |
+| C | Load dialog | PASS: `File > Load`, typed `C:\...\load-target.xml`, confirmed; the title changes and the tree shows the fixture's `5 properties / 5 primitives` (`gui-dialog-load.jpg`) |
+| C | Save As dialog | PASS: `File > Save As`, typed a new path, confirmed; the file appears on disk (2509 bytes) and contains the loaded `Excitation`/`ProbeBox`/`DumpBox` model (`gui-dialog-saveas.jpg`) |
+| C | Export dialog | PASS: `File > Export` opens the submenu (`CSXCAD XML`, `Polydata-VTK`, `STL`, `PLY`, `POV-Ray`, `X3D`, `3D view to PNG`); the `CSXCAD XML` and `PLY` entries open their dialogs |
+| C | Enter / Escape | PASS: `Enter` confirms and `Escape` cancels the dialog (added for native parity) |
+| C | dialog placement | PASS: dialogs are anchored centred instead of covering the menu bar |
+| B | keyboard focus | PASS: with the Load path field focused, `Ctrl+Z` edits the text (field cleared) and the model is untouched (`3 properties / 3 primitives` stays); after `Cancel`, the same `Ctrl+Z` with no text focus removes the primitive created earlier (`gui-keyboard-focus.jpg`) |
+| 16 | PNG of the live 3D view | PASS: `Ctrl+P` opens `Export the 3D view to PNG`, the typed path is confirmed with `Enter`, and the file is a 1920x1009 PNG of the rendered structure (`gui-export-png-dialog.jpg`, `gui-export-png.jpg`) |
+| 12 | toolbar creation | PASS: `Material` + `Box` from the toolbar add `Material::` and `Box - ID: 3` in one click each (`gui-toolbar-create.jpg`) |
+
+Defect found while executing this pass: the `Ctrl+P` handler lived inside the
+`File` menu closure and therefore only fired while that menu was open; it now
+sits on the menu bar and works globally (`every_dialog_maps_to_its_action`
+covers every dialog-to-action mapping).
+
+Still environment-limited: F (native Qt side-by-side, E-006) and G (macOS /
+Linux-X11 sessions, E-005). Both are recorded exceptions, not missing
+implementation.
 
 Limits:
 

@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-28, updated 2026-10-29
 **Scope:** no rows remain open in `REMEDIATION_TASKS.md` at snapshot
-**152 `Verified` · 0 `Implemented` · 1 `Analyzed` (RM-153) · 0 `Blocked`**.
+**153 `Verified` — 0 `Implemented` — 0 `Analyzed` — 0 `Blocked`.**
 **Method:** each row was re-checked against the pinned native sources under
 `openEMS/`, `CSXCAD/` and `QCSXCAD/`; the original implementation is the
 authority wherever the port could be read either way. The findings below are
@@ -11,6 +11,15 @@ source-level facts unless a measurement is quoted.
 This document decides *what is left and what must be chosen*; it does not
 change any status. Every close still needs the evidence rule from
 `REMEDIATION_PLAN.md` Section 0.
+
+## Status update 2026-10-29 (final)
+
+The register is closed: `RM-152` (GUI CAD workflow) and `RM-153`
+(native icons and metrics) are `Verified`, so the list below is a
+historical record of how each row was closed. The remaining
+limitations are the recorded exceptions E-005 (hosted platform
+matrix/nightly) and E-006 (no native Qt side-by-side or macOS/Linux-X11
+desktop session), both environment-bound rather than unimplemented.
 
 ## Status update 2026-10-29
 
