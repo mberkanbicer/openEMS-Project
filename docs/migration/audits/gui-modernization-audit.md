@@ -192,12 +192,13 @@ Verification:
   helper now sets DPI awareness, forces the app topmost and captures the client
   rectangle.
 
-Recorded finding (not changed in this phase): the wgpu surface is an sRGB
-target while the renderer writes stored material colours as linear values, so
-materials render lighter than in the native Qt application. Changing it alters
-the appearance of every property and belongs to a renderer colour-management
-change with its own validation.
+Fixed 2026-10-30 (RM-171): the viewport was an sRGB target while stored
+material colours were written as linear values, so every material rendered
+lighter. `renderer.rs` now converts fill/edge colours with `srgb_to_linear`
+before upload (`stored_srgb_colours_are_linearised_for_the_surface`); the
+dark/light captures show the stored colour. The clear colour was already
+linearised in the same phase.
 
 Remaining phases: persisted dock sizes (egui panel state is session-only),
-arrow-key tree navigation and visible focus rings, a `Ctrl+K` command registry,
-and a colour-managed viewport.
+arrow-key tree navigation and visible focus rings, and a `Ctrl+K` command
+registry.

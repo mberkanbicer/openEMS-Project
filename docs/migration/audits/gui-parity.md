@@ -193,12 +193,12 @@ Evidence: `docs/migration/audits/gui-dark-1280.png`,
 tree -> inspector -> status). Tests: 52 `qcsxcad-core`, 24 `qcsxcad-egui`,
 13 `appcsxcad`.
 
-Two findings recorded rather than changed silently:
+Findings:
 
-- The wgpu surface is an sRGB target and the renderer's vertex colours are
-  written as if they were linear, so stored material colours render lighter
-  than the native application. Data and shaders were not modified; this is a
-  renderer-colour-management task for the viewport phase.
+- **Fixed 2026-10-30 (RM-171):** the wgpu surface is an sRGB target and the
+  renderer wrote stored colours as linear, so materials rendered lighter.
+  `renderer.rs` now linearises fill/edge colours; a unit test and the
+  dark/light captures record it.
 - The Qt icon set's `viewmag-`/`viewmag+` are used for collapse/expand because
   they are the only matching icons available; they carry tooltips and will be
   replaced when an outline icon family is approved (ADR required).

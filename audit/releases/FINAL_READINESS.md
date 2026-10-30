@@ -36,7 +36,7 @@ CST-validated or production-ready replacement.
 | Analytic SAR | missing (`VAL-002`) |
 | MATLAB (as opposed to Octave) | not run |
 | Fuzzing/Miri/sanitizers | not run |
-| GUI colour management, layout persistence | open P2 (`GUI-001/002`) |
+| GUI layout persistence | open P2 (`GUI-002`); colour management fixed (RM-171) |
 
 ## 3. Checklist (protocol §13)
 
@@ -67,7 +67,7 @@ CST-validated or production-ready replacement.
 2. Convergence study for the dielectric slab, MSL notch, SAR and dt refinement (the cavity is recorded).
 3. Hosted or local macOS/FreeBSD/Windows runs at the release commit.
 4. An agreed performance gate, with the release commit measured.
-5. The sRGB material-colour fix (or a recorded acceptance of the difference).
+5. ~~The sRGB material-colour fix.~~ Met (RM-171).
 6. A decision on multi-grid and cell-constant materials: implement, or keep the
    explicit rejection in the release notes.
 7. A MATLAB run if MATLAB support is advertised.

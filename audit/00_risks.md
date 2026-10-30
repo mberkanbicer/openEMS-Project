@@ -31,7 +31,6 @@ reach the operator/engine or the writer.
 |---|---|---|---|
 | VAL-001 | Independent validation is partly covered: cavity TE101 converges at order 2.05/2.03; slab, MSL and dt refinement are still missing | `audit/numerics/CONVERGENCE.md` | slab/MSL/dt refinement |
 | PERF-001 | Baseline without an accepted threshold | 3.78x/2.14x/2.92x wall; no gate | agree per-case gate |
-| GUI-001 | sRGB material colours render too light | `audits/gui-modernization-audit.md` §9 | linearise vertex colours |
 | GUI-002 | Panel sizes do not persist | egui panel state is session-only | persist with settings |
 | DOC-001 | No rustfmt/clippy baseline | `cargo fmt --check` fails on pre-existing code | separate cleanup PR |
 
