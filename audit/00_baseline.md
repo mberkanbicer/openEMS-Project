@@ -19,6 +19,7 @@ All commands ran in `C:\Users\mberkanbicer\Projects\openEMS-Project-rust` with
 | 10 | `scripts/ci/msl_convergence.py` | no interior S11 notch in 1-7 GHz (band-edge minimum 0.085-0.089); inconclusive, no order | `docs/migration/reference-data/convergence/msl_notch.json` |
 | 11 | `scripts/ci/convergence_study.py --mode dt` | phase estimator at 400 ns: temporal error 2.06 MHz -> 0.41 MHz vs the dt->0 limit (order 2.32); 3.73 MHz residual is spatial | `docs/migration/reference-data/convergence/cavity_dt.json` |
 | 12 | `scripts/ci/run_analytic_sar_check_wsl.sh` | lossy line 2 GHz: alpha 9.3513 vs 9.3601 Np/m (9.4e-4), beta 84.3651 vs 84.3547 rad/m (1.2e-4), SAR slope 18.7027 vs 18.7202 1/m (9.4e-4), formula 1.7e-7 | `docs/migration/reference-data/convergence/analytic_sar.json` |
+| 13 | `scripts/ci/run_msl_convergence_wsl.sh` | MSL notch (\|S11\| peak / \|S21\| dip): 3.6700 / 3.6712 / 3.6703 GHz at 373/448/560 um, spread 3.0e-4; quarter-wave 3.6871 GHz (0.46%) | `docs/migration/reference-data/convergence/msl_notch.json` |
 
 The workspace test run used default features. The HDF5 feature suite is a
 separate run inside the acceptance script (475 tests at the last recorded

@@ -17,15 +17,15 @@
     {
       "category": "D",
       "path": "docs/migration/VALIDATION.md",
-      "sha256": "d830557e5807c0628e3785376e738e933e7f029268e58c730673e66050183696",
-      "bytes": 151579,
+      "sha256": "3c31cd9c7b7faf415c84ed09e8fefcaa5f2ed34f3bedea08ec9a4bc38cd13677",
+      "bytes": 151652,
       "provenance": "recorded validation sections"
     },
     {
       "category": "D",
       "path": "docs/migration/ACCEPTANCE.md",
-      "sha256": "385ed32d284ac64764e8ecbf2d3544d190db5dc511b100b06c58057e7c810746",
-      "bytes": 1489,
+      "sha256": "102e9aea196ced1c219dbc437cf3013b40c3a0cf8f1f698f80c0743f4b444931",
+      "bytes": 1661,
       "provenance": "last full acceptance report"
     },
     {
@@ -62,6 +62,20 @@
       "sha256": "2e38eec98b2a7103c2cb1a9eeb013558ef3cffb42cf56e10b590e34537203aa5",
       "bytes": 701,
       "provenance": "analytic SAR lossy-line record"
+    },
+    {
+      "category": "A",
+      "path": "docs/migration/reference-data/convergence/msl_notch.json",
+      "sha256": "41af921864c2604b8d8189aea19a4ed31c2d053f1c56df8fff0e3c5640d9e040",
+      "bytes": 225910,
+      "provenance": "MSL notch mesh-refinement record"
+    },
+    {
+      "category": "A",
+      "path": "scripts/ci/run_msl_convergence_wsl.sh",
+      "sha256": "eaa03abb007998a21de1147567750ec90d99f9f9d822ca8d22c363722cbad1b5",
+      "bytes": 656,
+      "provenance": "MSL notch harness wrapper"
     },
     {
       "category": "A",

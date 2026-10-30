@@ -3,9 +3,9 @@
 
 Reuses the pinned smoke model (`openEMS/.github/smoketests/python/
 MSL_NotchFilter.py`) with a longer record and three mesh resolutions. The
-observable is the S11 notch (minimum |S11| in 3-7 GHz); the finest mesh is the
-reference for the difference, so this is a self-convergence study, not an
-analytic proof.
+observable is the shunt-open-stub notch: a peak in |S11| and a dip in |S21|.
+The finest mesh is the reference for the difference, so this is a
+self-convergence study, not an analytic proof.
 
 Run (WSL, Rust venv):
     PYTHONPATH=openEMS/rust-py/python:CSXCAD/rust-py/python \
@@ -105,35 +105,42 @@ def run_level(divisor: int) -> dict:
 
     fdtd.Run(sim, cleanup=True, verbose=0)
 
-    freq = np.linspace(1e9, 7e9, 601)
+    freq = np.linspace(1e9, 7e9, 1201)
     for port in (port0, port1):
         port.CalcPort(sim, freq, ref_impedance=50)
     s11 = np.abs(port0.uf_ref / port0.uf_inc)
-    # Prefer an interior local minimum; a band-edge minimum is a roll-off, not a
-    # notch. Keep the whole curve so the choice is auditable.
-    interior = np.where(
-        (s11[1:-1] < s11[:-2]) & (s11[1:-1] < s11[2:])
-    )[0] + 1
-    interior = interior[(freq[interior] > 1.2e9) & (freq[interior] < 6.8e9)]
-    if len(interior):
-        index = int(interior[np.argmin(s11[interior])])
-        kind = "local minimum"
+    s21 = np.abs(port1.uf_ref / port0.uf_inc)
+    # A shunt open stub reflects at its quarter-wave resonance: the notch is a
+    # peak in |S11| (and a dip in |S21|), not a dip in |S11|. Search for the
+    # interior maximum and report both curves so the choice is auditable.
+    band = (freq > 1.2e9) & (freq < 6.8e9)
+    masked = np.where(band, s11, -np.inf)
+    index = int(np.argmax(masked))
+    # Quadratic interpolation of |S11| around the peak for a sub-bin estimate.
+    if 0 < index < len(s11) - 1:
+        left, middle, right = s11[index - 1], s11[index], s11[index + 1]
+        denominator = left - 2.0 * middle + right
+        offset = (
+            0.5 * (left - right) / denominator if denominator != 0.0 else 0.0
+        )
     else:
-        index = int(np.argmin(s11))
-        kind = "band-edge minimum (no interior notch)"
-    notch = float(freq[index])
+        offset = 0.0
+    step = float(freq[1] - freq[0])
+    notch = float(freq[index] + offset * step)
     depth = float(s11[index])
+    transmission = float(s21[index])
     print(
-        f"divisor {divisor}: resolution {resolution:.4f} um, {kind} at "
-        f"{notch/1e9:.4f} GHz, |S11| {depth:.4f}"
+        f"divisor {divisor}: resolution {resolution:.4f} um, |S11| peak at "
+        f"{notch/1e9:.4f} GHz (|S11| {depth:.4f}, |S21| {transmission:.4e})"
     )
     return {
         "divisor": divisor,
         "resolution_um": resolution,
         "notch_hz": notch,
-        "s11_depth": depth,
-        "minimum_kind": kind,
+        "s11_peak": depth,
+        "s21_at_notch": transmission,
         "s11_curve": [float(value) for value in s11],
+        "s21_curve": [float(value) for value in s21],
     }
 
 
@@ -147,15 +154,43 @@ def main() -> int:
             f"divisor {level['divisor']}: difference vs finest "
             f"{level['difference_hz']/1e6:.3f} MHz ({level['difference_rel']:.3e})"
         )
+    spread = max(level["difference_rel"] for level in levels)
+    finest_pair = abs(levels[-1]["notch_hz"] - levels[-2]["notch_hz"]) / reference
+
+    # Microstrip effective permittivity (Hammerstad) and the quarter-wave
+    # estimate for the 12 mm open stub: f = c / (4 L sqrt(eps_eff)).
+    ratio = MSL_WIDTH / SUBSTRATE_THICKNESS
+    eps_eff = (SUBSTRATE_EPR + 1.0) / 2.0 + (SUBSTRATE_EPR - 1.0) / 2.0 / math.sqrt(
+        1.0 + 12.0 / ratio
+    )
+    quarter_wave = C0 / (4.0 * STUB_LENGTH * 1e-6 * math.sqrt(eps_eff))
+    analytic_error = abs(reference - quarter_wave) / quarter_wave
+    print(
+        f"eps_eff {eps_eff:.4f}, quarter-wave estimate {quarter_wave/1e9:.4f} GHz, "
+        f"finest notch {reference/1e9:.4f} GHz ({analytic_error:.2%})"
+    )
+    print(f"mesh spread {spread:.3e}, finest pair {finest_pair:.3e}")
 
     record = {
-        "case": "microstrip notch filter, S11 notch",
+        "case": "microstrip notch filter, shunt open stub, |S11| peak",
         "model": "openEMS/.github/smoketests/python/MSL_NotchFilter.py",
         "steps": STEPS,
-        "frequencies_hz": [float(value) for value in np.linspace(1e9, 7e9, 601)],
+        "frequencies_hz": [float(value) for value in np.linspace(1e9, 7e9, 1201)],
         "levels": levels,
         "reference": "finest mesh",
-        "note": "self-convergence of a graded 3-D model; no analytic notch oracle",
+        "mesh_spread_rel": spread,
+        "finest_pair_rel": finest_pair,
+        "eps_eff": eps_eff,
+        "quarter_wave_hz": quarter_wave,
+        "quarter_wave_rel_error": analytic_error,
+        "note": (
+            "The shunt open stub reflects at its quarter-wave resonance, so the "
+            "notch is the |S11| maximum and the |S21| minimum; the earlier study "
+            "searched for a |S11| minimum and is superseded. Self-convergence of "
+            "a graded 3-D model; the quarter-wave estimate neglects the open-end "
+            "extension, so it is a check of the order of magnitude, not an oracle."
+        ),
+        "result": "converged" if finest_pair < 1.0e-2 else "not converged",
     }
     path = os.path.join(
         REPO_ROOT, "docs", "migration", "reference-data", "convergence", "msl_notch.json"

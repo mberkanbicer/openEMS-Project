@@ -47,15 +47,26 @@ at the fine end. The correlation-delay estimator's resolution (~0.1-0.2 %) is
 the likely limit, so this study claims **monotone accuracy, not second order**.
 Record: `docs/migration/reference-data/convergence/dielectric.json`.
 
-## MSL notch filter — attempted, model-limited
+## MSL notch filter (converged)
 
-`scripts/ci/msl_convergence.py` re-ran the pinned smoke model with 30 000 steps
-at three resolutions (divisors 40/50/60). The S11 minimum is at **7 GHz**, the
-top of the band, at every level (|S11| 0.0852 / 0.0888 / 0.0895) and |S11|
-falls monotonically toward it: there is **no interior notch** in 1-7 GHz. The
-smoke model is a CI runnable, not a converged notch design, so this study
-claims no order and is recorded as **inconclusive**. MSL port parity itself is
-covered by the native differential harness. Record:
+Harness: `scripts/ci/run_msl_convergence_wsl.sh`
+(`scripts/ci/msl_convergence.py`). It re-ran the pinned smoke model with 30 000
+steps at three resolutions (divisors 40/50/60). **Correction:** the first run of this
+study searched for a minimum of |S11| and therefore reported "no interior
+notch". A shunt open stub reflects at its quarter-wave resonance, so the notch
+is a **peak** in |S11| (and a dip in |S21|). The corrected observable gives:
+
+| Divisor | Resolution (um) | Notch (GHz) | \|S11\| | \|S21\| | Diff vs finest |
+|---:|---:|---:|---:|---:|---:|
+| 40 | 559.7 | 3.6703 | 0.9916 | 2.33e-3 | 0.259 MHz (7.1e-5) |
+| 50 | 447.7 | 3.6712 | 0.9920 | 3.01e-3 | 1.110 MHz (3.0e-4) |
+| 60 | 373.1 | 3.6700 | 0.9921 | 3.14e-3 | reference |
+
+The mesh spread is **3.0e-4** (1.1 MHz) and the finest pair differs by the
+same 0.03 %, so the notch is converged at this mesh. The Hammerstad effective
+permittivity is 2.8694, giving a quarter-wave estimate of 3.6871 GHz; the
+finest notch is 0.46 % below it, as expected from the open-end extension that
+the simple formula neglects. Record:
 `docs/migration/reference-data/convergence/msl_notch.json`.
 
 ## Time-step refinement at fixed mesh (self-convergence)

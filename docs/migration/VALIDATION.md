@@ -2460,7 +2460,7 @@ JSON under `reference-data/convergence/`:
 | PEC cavity h/h2/h4 | TE101 vs analytic 3.9024232466 GHz | errors 1.770e-3 / 4.270e-4 / 1.047e-4, order **2.05 / 2.03** |
 | PEC cavity dt x1/x0.5/x0.25 | TE101 vs the fixed-mesh dt->0 limit | temporal error 2.062 MHz -> 0.412 MHz, ratio 5.0, order **2.32** (one pair); 3.73 MHz offset is spatial |
 | Dielectric line h/h2/h4 (eps_r=4) | speed vs c/2 | errors 2.143e-3 / 1.149e-3 / 9.253e-4, monotone, order 0.90/0.31 (estimator-limited) |
-| MSL notch smoke | S11 minimum | no interior notch in 1-7 GHz; **inconclusive**, no order |
+| MSL shunt-open-stub notch | \|S11\| peak (\|S21\| dip) | 3.6700 / 3.6712 / 3.6703 GHz at 373/448/560 um; spread 3.0e-4, quarter-wave estimate 3.6871 GHz (0.46 %) |
 
 These are studies, not CI gates. The MSL result says the smoke model is not a
 converged notch design; it is not evidence of a solver defect.

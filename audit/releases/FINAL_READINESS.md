@@ -5,10 +5,11 @@ Decision: **CONDITIONAL_RESEARCH_RELEASE**
 The default CPU solver path is evidence-backed against the pinned native
 implementation and two analytic wave-speed cases, and the two silently ignored
 physics options found by this audit are now rejected explicitly. Convergence is
-measured for the cavity (mesh and time step) and the dielectric speed; MSL/SAR
-convergence and any independent (CST) comparison are still missing. The port is
-not a complete equivalent of every upstream feature, so it must not be described
-as a complete, CST-validated or production-ready replacement.
+measured for the cavity (mesh and time step), the dielectric speed and the MSL
+notch, and SAR is validated against the exact lossy-medium solution. An
+independent (CST) comparison is still missing. The port is not a complete
+equivalent of every upstream feature, so it must not be described as a complete,
+CST-validated or production-ready replacement.
 
 ## 1. What is proven
 
@@ -30,7 +31,7 @@ as a complete, CST-validated or production-ready replacement.
 
 | Item | Status |
 |---|---|
-| Mesh/time convergence | **partly measured**: cavity TE101 order 2.05/2.03; dt order 2.32 vs the fixed-mesh limit; dielectric monotone 0.90/0.31; MSL model has no interior notch (`numerics/CONVERGENCE.md`) |
+| Mesh/time convergence | **measured**: cavity TE101 2.05/2.03; dt 2.32 vs the fixed-mesh limit; dielectric monotone 0.90/0.31; MSL notch 3.6700 GHz with 3.0e-4 mesh spread (`numerics/CONVERGENCE.md`) |
 | CST MWS comparison | **blocked**, no data (`cst/`) |
 | GPU compute | **not implemented** (scope, ADR 0002) |
 | macOS/FreeBSD/Windows run at this HEAD | **blocked** (E-005; no hosted CI) |
@@ -51,7 +52,7 @@ as a complete, CST-validated or production-ready replacement.
 | Missing/partial high-priority paths completed | Partly: Python façade and P0 guards fixed; multi-grid/GPU remain out of scope |
 | No unreported C++ runtime | Met (`legacy_dependency_register.md`) |
 | CPU reference passes analytic/regression | Met for the recorded corpus |
-| Mesh/time convergence | **Partly met**: cavity mesh (2.05/2.03) and time step (2.32 vs the dt->0 limit), dielectric speed monotone; MSL/SAR not established |
+| Mesh/time convergence | **Met for the recorded studies**: cavity mesh/time, dielectric speed, MSL notch; no CST or SAR-averaging convergence claim |
 | Physical conventions validated | Met for wave speed, ports, and SAR (analytic lossy line); absolute SAR scale follows the validated DFT convention |
 | Immutable reference provenance | Met (`GOLD_REGISTRY.json`), no self-generation |
 | SIMD/thread backends compared | Not met (no SIMD variant) |
@@ -67,7 +68,7 @@ as a complete, CST-validated or production-ready replacement.
 
 1. ~~A clean 13/13 acceptance run at the release commit.~~ Met at `cf3d226`;
    re-run at the final tagged commit.
-2. A converged MSL notch model (cavity mesh/time, dielectric speed and analytic SAR are recorded; the smoke MSL model has no interior notch).
+2. ~~A converged MSL notch model.~~ Met (RM-179): notch 3.6700 GHz, 3.0e-4 mesh spread.
 3. Hosted or local macOS/FreeBSD/Windows runs at the release commit.
 4. Owner approval of the proposed performance gate (the release-tree run already passes it).
 5. ~~The sRGB material-colour fix.~~ Met (RM-171).
@@ -80,7 +81,8 @@ as a complete, CST-validated or production-ready replacement.
 - No GPU acceleration.
 - No cylindrical multi-grid; models that request it stop at setup.
 - `CellConstantMaterial` models stop at setup.
-- No CST validation. Convergence is measured only for the cavity (mesh/time)
-  and the dielectric speed; no MSL/SAR convergence claim.
+- No CST validation. Convergence is measured for the cavity (mesh/time), the
+  dielectric speed and the MSL notch, and SAR is validated on a lossy line; no
+  SAR-averaging convergence claim.
 - macOS/FreeBSD/Windows verification predates this HEAD.
 - Performance is 2-4x native on the recorded cases, not faster.

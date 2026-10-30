@@ -11,7 +11,7 @@ evidence, but the two P0 rows below mean the register's "172 Verified" tally ove
 |---|---:|---|
 | `VERIFIED_COMPLETE` | 37 | implementation + executed comparison/analytic result recorded |
 | `IMPLEMENTED_UNVERIFIED` | 1 | Windows installer workflow; no run at this HEAD |
-| `PARTIAL` | 2 | performance threshold, convergence study |
+| `PARTIAL` | 1 | performance threshold |
 | `INTENTIONALLY_DIFFERENT` | 1 | fparser extended-precision variants (E-001/ADR 0006) |
 | `INTENTIONALLY_UNSUPPORTED` | 5 | GPU compute (ADR 0002), FreeBSD hyp2mat (E-004), GUI solver control, multi-grid (E-007), cell-constant material (E-008) |
 | `BLOCKED` | 2 | hosted CI/platform matrix (E-005), CST comparison (no data) |
@@ -74,7 +74,7 @@ convergence evidence exists.
 
 | ID | Finding | Evidence | Next action |
 |---|---|---|---|
-| VAL-001 | Independent validation is now broader: analytic wave-speed tests, a **cavity TE101 mesh study (order 2.05/2.03)**, a **time-step study (order 2.32 vs the dt->0 limit)** and a monotone dielectric speed study. MSL has no interior notch in the smoke model, SAR refinement is not run, and there is no CST data. | `audit/numerics/CONVERGENCE.md`; `reference-data/convergence/` | SAR refinement and a converged notch model |
+| VAL-001 | Independent validation is now broad: analytic wave-speed tests, a **cavity TE101 mesh study (2.05/2.03)**, a **time-step study (2.32 vs the dt->0 limit)**, a monotone dielectric speed study, a **converged MSL notch (3.6700 GHz, 3.0e-4 spread)** and an **analytic SAR lossy line (9.4e-4)**. No CST data and no SAR-averaging convergence claim. | `audit/numerics/CONVERGENCE.md`; `reference-data/convergence/` | CST data when available |
 | PERF-001 | Baseline refreshed at `c54f55d`: default 2.45x / 2.23x / 2.90x, basic 1.61x / 1.67x / 1.65x; RSS ≤3.08x. The proposed 4.0x / 3.25x gate passes but is not formally accepted. | `audit/performance/CPU_BASELINE.md`; `scripts/ci/check_performance_baseline.py` | Owner approval + release CI wiring |
 | DOC-001 | The repository is hand-formatted; `cargo fmt --check` fails on pre-existing code, and clippy has no baseline. | `00_baseline.md` §3 | Separate formatting PR; establish clippy baseline |
 

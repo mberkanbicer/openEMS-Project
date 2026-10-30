@@ -20,6 +20,12 @@ Categories: **A** analytic, **D** pinned native parity, **E** backend-to-backend
 Dielectric speed (eps_r=4) at h/h2/h4: 2.14e-3, 1.15e-3, 9.25e-4; monotone,
 observed order 0.90/0.31 (estimator-limited; no second-order claim).
 
+MSL shunt-open-stub notch at 373/448/560 um: 3.6700 / 3.6712 / 3.6703 GHz,
+spread 3.0e-4; quarter-wave estimate 3.6871 GHz (0.46 % high, open-end
+extension not modelled). The earlier "no interior notch" record was wrong:
+it searched for a |S11| minimum, but a shunt open stub reflects at resonance
+(`|S11|` peak, `|S21|` 2-3e-3).
+
 Time-step refinement at 4.75/2.37/1.19 ps: against the fixed-mesh dt->0 limit
 (3.898696 GHz) the temporal error falls 2.06 MHz -> 0.41 MHz, ratio 5.0
 (order 2.32 for one refinement pair). The 3.73 MHz offset from the analytic
