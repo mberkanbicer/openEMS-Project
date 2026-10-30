@@ -1,32 +1,34 @@
 # Memory and I/O
 
-Source: same recorded baseline (2026-10-27). Not re-run.
+Data: refreshed baseline at `c54f55d` (3 measured runs).
 
-## Peak RSS (threaded / serial)
+## Peak RSS
 
-| Case | Native | Rust | Ratio |
-|---|---:|---:|---:|
-| cavity | 46.5 MiB | 14.7 MiB | 0.32x |
-| Coax | 249.4 MiB | 738.6 MiB (threaded), 738.3 MiB (serial) | 2.96x / 3.08x |
-| msl_port | 46.8 MiB | 17.8 MiB | 0.38x |
+| Case | Native | Rust | Ratio | Config |
+|---|---:|---:|---:|---|
+| cavity | 46.6 MiB | 14.8 MiB | 0.32x | default (32 threads) |
+| Coax | 249.5 MiB | 740.7 MiB | 2.97x | default |
+| msl_port | 46.7 MiB | 17.6 MiB | 0.38x | default |
+| Coax | 239.8 MiB | 738.4 MiB | 3.08x | basic (1 thread) |
 
-The Rust operator keeps all six field arrays plus `vv/vi/ii/iv` in `f32`
-(`12 * cells * 4` bytes), which dominates the Coax case (2.1 M cells). Native's
-compressed-SSE operator stores a more compact coefficient representation, which
-explains the 3x peak on the large case.
+The operator keeps six field arrays plus `vv/vi/ii/iv` in `f32`
+(`12 * cells * 4` bytes), which dominates the 2.1 M-cell Coax case. Native's
+compressed-SSE operator stores a more compact coefficient representation. Small
+cases are much lighter than native because there is no VTK/Qt runtime.
 
 ## I/O
 
-- HDF5 writes are not part of the measured wall time (the baseline stops after
+- HDF5 writes are outside the measured wall time (the baseline stops after
   stepping). No I/O throughput benchmark is recorded.
-- The HDF5 feature is optional; a build without it cannot write native field
-  dumps (E-002).
-- Async dumps are not implemented; the engine writes at the requested cadence
-  on the stepping thread. A large dump therefore stalls the run. This is a
-  potential P2 improvement, not measured.
+- The HDF5 feature is optional; without it, native field dumps cannot be written
+  (E-002).
+- Dumps are written on the stepping thread; a large dump stalls the run. No
+  async dump queue is implemented or measured.
 
 ## Gaps
 
-- No allocation-rate or peak-memory profile per phase.
-- No large-model (>5 M cells) memory test.
+- No allocation-rate or per-phase memory profile.
+- No >5 M-cell model test.
 - No streaming/chunked dump path.
+- Peak RSS is the child-process peak from `/usr/bin/time -v`; do not mix thread
+  counts when comparing.

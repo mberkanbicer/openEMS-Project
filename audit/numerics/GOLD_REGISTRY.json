@@ -31,15 +31,15 @@
     {
       "category": "D",
       "path": "docs/migration/reference-data/perf/performance-baseline.md",
-      "sha256": "a418efd404f2a740305bcfe78e3da13532004cb9955e1cff0b25e9ac70f16fa8",
-      "bytes": 5897,
+      "sha256": "86ff524a4c1dca03d40adbb7c27a6e76e6925043686febb5a9c2807c01837090",
+      "bytes": 5992,
       "provenance": "pinned performance baseline"
     },
     {
       "category": "D",
       "path": "docs/migration/reference-data/perf/performance-baseline.csv",
-      "sha256": "84e5bd0f439826f78d1f7069fc5366fa07002e52e3c09a41ad85ad308a966a42",
-      "bytes": 10888,
+      "sha256": "29f858fdd7db5230ca23c7eb56f3a21819de5d7123c3de2e4a7bed9da81c5e24",
+      "bytes": 16754,
       "provenance": "machine-readable performance table"
     },
     {

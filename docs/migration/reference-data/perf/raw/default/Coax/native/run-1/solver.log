@@ -21,11 +21,8 @@ Max. number of timesteps: 5000 ( --> 5.5991 * Excitation signal length)
 Create FDTD engine (compressed SSE + multi-threading)
 Running FDTD engine... this may take a while... grab a cup of coffee?!?
 Exact-endcriteria: evaluating the end criteria every 62 timestep(s) (this excitation's Nyquist rate)
-[@        4s] Timestep:          120 || Speed:   62.1 MC/s (3.370e-02 s/TS) || Energy: ~8.63e-22 (- 0.00dB)
-[@        8s] Timestep:          330 || Speed:  104.4 MC/s (2.003e-02 s/TS) || Energy: ~9.49e-17 (- 0.00dB)
-[@       12s] Timestep:          570 || Speed:  124.3 MC/s (1.682e-02 s/TS) || Energy: ~4.65e-15 (- 0.00dB)
-[@       16s] Timestep:          855 || Speed:  146.0 MC/s (1.432e-02 s/TS) || Energy: ~1.85e-15 (- 4.20dB)
-[@       20s] Timestep:         1155 || Speed:  154.5 MC/s (1.354e-02 s/TS) || Energy: ~5.03e-19 (-39.84dB)
+[@        4s] Timestep:          372 || Speed:  193.8 MC/s (1.079e-02 s/TS) || Energy: ~1.14e-15 (- 0.00dB)
+[@        8s] Timestep:          930 || Speed:  284.2 MC/s (7.359e-03 s/TS) || Energy: ~8.80e-17 (-17.41dB)
 RunFDTD: end-criteria of -40.00dB reached after 1178 timesteps (-40.18dB)
-Time for 1178 iterations with 2091204.00 cells : 20.75 sec
-Speed: 118.74 MCells/s 
+Time for 1178 iterations with 2091204.00 cells : 9.51 sec
+Speed: 259.17 MCells/s 

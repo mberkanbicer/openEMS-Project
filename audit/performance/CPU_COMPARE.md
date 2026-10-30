@@ -1,36 +1,37 @@
-# CPU comparison — knobs, threads and what was measured
+# CPU comparison — knobs and throughput
 
-All data from `docs/migration/reference-data/perf/performance-baseline.md`
-(2026-10-27). Not re-run here.
+Data: refreshed baseline at `c54f55d` (`performance-baseline.md`, 3 measured
+runs after a warm-up). Not a new optimization.
 
-## Threaded ("fastest") vs serial ("basic")
+## Threading effect (default vs basic)
 
-| Case | Native threaded | Rust threaded | Ratio | Native serial | Rust serial | Ratio |
+| Case | Rust basic | Rust default | Speed-up | Native basic | Native default | Speed-up |
 |---|---:|---:|---:|---:|---:|---:|
-| cavity | 1.34 s | 5.07 s | 3.78x | 2.81 s | 5.10 s | 1.81x |
-| Coax | 24.99 s | 53.53 s | 2.14x | 42.38 s | 111.29 s | 2.63x |
-| msl_port | 0.51 s | 1.49 s | 2.92x | 0.69 s | 1.40 s | 2.03x |
+| cavity | 1.93 s | 1.86 s | 1.04x | 1.20 s | 0.76 s | 1.58x |
+| Coax | 42.89 s | 21.95 s | 1.95x | 25.62 s | 9.86 s | 2.60x |
+| msl_port | 0.51 s | 0.58 s | 0.88x (overhead) | 0.31 s | 0.20 s | 1.55x |
 
-Threading helps the Rust engine (5.07 vs 5.10 for cavity is noise; Coax 53.5
-vs 111.3 is ~2x). The native SSE engine gains more on the small cavity.
+The threaded Rust engine scales on the large Coax case but the small cavity and
+msl_port gain little or lose to thread overhead. Native's SSE kernel scales
+better on all three.
 
-## Throughput
+## Throughput (default)
 
-Rust threaded: cavity 36.1, Coax 46.0, msl_port 16.2 MCells/s. Native threaded:
-136.6 / 98.6 / 47.4. The gap is the compressed-SSE kernel and its cache
-behavior, not a correctness issue.
+Rust: 98.4 / 112.2 / 41.7 MCells/s (cavity / Coax / msl).
+Native: 240.8 / 249.8 / 121.0 MCells/s.
+
+The gap is the compressed-SSE implementation and memory traffic, not a
+correctness issue; the same stop step and fields are used.
 
 ## What was not measured
 
-- No SIMD-specific variant was benchmarked separately; the Rust engine is
-  scalar/threaded.
-- No NUMA, cache-miss or instruction-count profiling is recorded.
-- No GPU comparison exists (no GPU backend).
-- Warm-up/thermal effects are only partially controlled (two runs per config).
+- No separate SIMD variant (the Rust engine is scalar + threads).
+- No NUMA/cache-miss/instruction profiling.
+- No GPU comparison (no GPU backend).
+- Only 3 measured runs; host is shared with the WSL acceptance work.
 
 ## Optimization status
 
-No optimization was attempted in this audit. The prompt's Phase 5 requires a
-verified baseline and per-change measurement; that baseline exists, but the
-acceptance threshold is not agreed (`PERF-001`). Optimization work should not
-start before the P0 correctness guards and the convergence study are in place.
+No optimization was attempted in this audit. The baseline and the proposed gate
+are in place; optimization should follow the P0/correctness and convergence
+work, with paired before/after runs.

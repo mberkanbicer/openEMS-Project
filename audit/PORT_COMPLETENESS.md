@@ -55,7 +55,7 @@ silent option drops, now guarded).
 | GPU compute | `INTENTIONALLY_UNSUPPORTED` (ADR 0002); GPU tests are reported `SKIPPED`, never passed |
 | CST comparison | `BLOCKED`: no licence/data |
 | Mesh/time convergence | `PARTIAL`: analytic wave speed only; no refinement table |
-| Performance threshold | `PARTIAL`: baseline recorded, no gate |
+| Performance threshold | `PARTIAL`: refreshed baseline; proposed gate passes, not yet accepted |
 | Platform matrix | `BLOCKED`: hosted Actions unavailable; last run predates HEAD |
 | GUI panel-layout persistence | `PARTIAL` (P2); viewport colour management fixed (RM-171) |
 | Parser hardening | no fuzz corpus; fparser has no nesting-depth limit (SEC-001) |

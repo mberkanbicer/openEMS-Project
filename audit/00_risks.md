@@ -30,7 +30,7 @@ reach the operator/engine or the writer.
 | ID | Risk | Evidence | Next |
 |---|---|---|---|
 | VAL-001 | Independent validation is partly covered: cavity TE101 converges at order 2.05/2.03; slab, MSL and dt refinement are still missing | `audit/numerics/CONVERGENCE.md` | slab/MSL/dt refinement |
-| PERF-001 | Baseline without an accepted threshold | 3.78x/2.14x/2.92x wall; no gate | agree per-case gate |
+| PERF-001 | Baseline refreshed at `c54f55d` (default 2.45x / 2.23x / 2.90x; basic 1.61x / 1.67x / 1.65x; RSS ≤3.08x). The proposed 4.0x / 3.25x gate passes, but no threshold is formally accepted. | `audit/performance/CPU_BASELINE.md`; `scripts/ci/check_performance_baseline.py` | Owner approves the gate and wires it into release CI |
 | GUI-002 | Panel sizes do not persist | egui panel state is session-only | persist with settings |
 | DOC-001 | No rustfmt/clippy baseline | `cargo fmt --check` fails on pre-existing code | separate cleanup PR |
 

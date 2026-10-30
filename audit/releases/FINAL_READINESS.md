@@ -32,7 +32,7 @@ CST-validated or production-ready replacement.
 | GPU compute | **not implemented** (scope, ADR 0002) |
 | macOS/FreeBSD/Windows run at this HEAD | **blocked** (E-005; no hosted CI) |
 | Windows installer | workflow present, no run at this HEAD |
-| Performance threshold | baseline only (`PERF-001`) |
+| Performance threshold | refreshed baseline; proposed 4.0x/3.25x gate passes; approval pending (`PERF-001`) |
 | Analytic SAR | missing (`VAL-002`) |
 | MATLAB (as opposed to Octave) | not run |
 | Fuzzing/Miri/sanitizers | not run |
@@ -66,7 +66,7 @@ CST-validated or production-ready replacement.
    working tree; re-run at the final tagged commit.
 2. Convergence study for the dielectric slab, MSL notch, SAR and dt refinement (the cavity is recorded).
 3. Hosted or local macOS/FreeBSD/Windows runs at the release commit.
-4. An agreed performance gate, with the release commit measured.
+4. Owner approval of the proposed performance gate (the release-tree run already passes it).
 5. ~~The sRGB material-colour fix.~~ Met (RM-171).
 6. A decision on multi-grid and cell-constant materials: implement, or keep the
    explicit rejection in the release notes.

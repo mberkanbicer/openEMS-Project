@@ -22,15 +22,11 @@ Max. number of timesteps: 5000 ( --> 5.5991 * Excitation signal length)
 Create FDTD engine
 Running FDTD engine... this may take a while... grab a cup of coffee?!?
 Exact-endcriteria: evaluating the end criteria every 62 timestep(s) (this excitation's Nyquist rate)
-[@        4s] Timestep:          120 || Speed:   61.1 MC/s (3.422e-02 s/TS) || Energy: ~8.63e-22 (- 0.00dB)
-[@        8s] Timestep:          210 || Speed:   47.0 MC/s (4.446e-02 s/TS) || Energy: ~8.38e-19 (- 0.00dB)
-[@       12s] Timestep:          310 || Speed:   50.5 MC/s (4.144e-02 s/TS) || Energy: ~9.49e-17 (- 0.00dB)
-[@       16s] Timestep:          465 || Speed:   76.3 MC/s (2.742e-02 s/TS) || Energy: ~2.45e-15 (- 0.00dB)
-[@       20s] Timestep:          600 || Speed:   70.1 MC/s (2.983e-02 s/TS) || Energy: ~4.65e-15 (- 0.00dB)
-[@       25s] Timestep:          735 || Speed:   62.8 MC/s (3.331e-02 s/TS) || Energy: ~4.65e-15 (- 0.19dB)
-[@       29s] Timestep:          868 || Speed:   66.6 MC/s (3.142e-02 s/TS) || Energy: ~1.03e-15 (- 6.73dB)
-[@       33s] Timestep:         1005 || Speed:   69.9 MC/s (2.990e-02 s/TS) || Energy: ~2.90e-17 (-22.23dB)
-[@       37s] Timestep:         1140 || Speed:   69.9 MC/s (2.991e-02 s/TS) || Energy: ~5.04e-19 (-39.84dB)
+[@        4s] Timestep:          180 || Speed:   91.3 MC/s (2.291e-02 s/TS) || Energy: ~4.07e-20 (- 0.00dB)
+[@        8s] Timestep:          345 || Speed:   83.5 MC/s (2.505e-02 s/TS) || Energy: ~9.49e-17 (- 0.00dB)
+[@       12s] Timestep:          555 || Speed:  108.0 MC/s (1.936e-02 s/TS) || Energy: ~4.01e-15 (- 0.00dB)
+[@       16s] Timestep:          780 || Speed:  110.8 MC/s (1.887e-02 s/TS) || Energy: ~3.83e-15 (- 1.03dB)
+[@       20s] Timestep:         1005 || Speed:  113.6 MC/s (1.840e-02 s/TS) || Energy: ~2.90e-17 (-22.23dB)
 RunFDTD: end-criteria of -40.00dB reached after 1178 timesteps (-40.18dB)
-Time for 1178 iterations with 2091204.00 cells : 38.41 sec
-Speed: 64.13 MCells/s 
+Time for 1178 iterations with 2091204.00 cells : 23.94 sec
+Speed: 102.91 MCells/s 

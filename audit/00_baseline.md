@@ -24,7 +24,7 @@ revision).
 | Evidence | Revision | Result |
 |---|---|---|
 | Full acceptance, 13 checks | `cce4905` (recorded in `docs/migration/ACCEPTANCE.md`) | 13/13 PASS: release build, 764 crate tests, 475 HDF5 tests, 2 Python packages, 448 native Python cases, Octave 10/10, 51 differential cases, cylindrical SAR, curve excitation, CTB Octave, install layout, records, placeholders |
-| Performance | `f1cdbe5` binaries (SHA-256 pinned in the baseline) | cavity 3.78x, Coax 2.14x, msl_port 2.92x native wall; RSS 0.32x / 2.96x / 0.39x; serial kernel 1.81x / 2.63x / 2.03x. Full tables in `docs/migration/reference-data/perf/performance-baseline.md` |
+| Performance | refreshed at `c54f55d` (3 runs, SHA-256 pinned) | default: cavity 2.45x, Coax 2.23x, msl_port 2.90x; basic: 1.61x / 1.67x / 1.65x; RSS 0.32-3.08x. Proposed 4.0x/3.25x gate: PASS. `docs/migration/reference-data/perf/performance-baseline.md` |
 | Platform builds | `f69ed4d` | Linux/macOS/FreeBSD/Windows jobs green before Actions was disabled; no run after that revision |
 
 ## 3. Commands deliberately not run

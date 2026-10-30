@@ -76,7 +76,7 @@ convergence evidence exists.
 | ID | Finding | Evidence | Next action |
 |---|---|---|---|
 | VAL-001 | Independent validation was thin; the cavity is now covered. Two analytic wave-speed tests plus native-parity cases, and a **cavity TE101 refinement study (order 2.05/2.03)**; slab, MSL and dt refinement still missing, no CST data. | `audit/numerics/CONVERGENCE.md`; `reference-data/convergence/cavity.json` | Add slab, MSL notch and dt refinement |
-| PERF-001 | Baseline exists (wall 3.78x / 2.14x / 2.92x native; RSS 0.32x / 2.96x / 0.39x) but no accepted threshold. | `reference-data/perf/performance-baseline.md` | Agree per-case gate: median of 5, ≤4x wall, ≤20 % regression, RSS ≤3.25x or absolute cap |
+| PERF-001 | Baseline refreshed at `c54f55d`: default 2.45x / 2.23x / 2.90x, basic 1.61x / 1.67x / 1.65x; RSS ≤3.08x. The proposed 4.0x / 3.25x gate passes but is not formally accepted. | `audit/performance/CPU_BASELINE.md`; `scripts/ci/check_performance_baseline.py` | Owner approval + release CI wiring |
 | GUI-002 | Theme persists; panel sizes/layout do not (egui panel state is session-only). | `qcsxcad-egui/src/app.rs` | Persist panel geometry with the settings file |
 | DOC-001 | The repository is hand-formatted; `cargo fmt --check` fails on pre-existing code, and clippy has no baseline. | `00_baseline.md` §3 | Separate formatting PR; establish clippy baseline |
 

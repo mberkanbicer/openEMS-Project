@@ -22,5 +22,5 @@ Create FDTD engine (compressed SSE + multi-threading)
 Running FDTD engine... this may take a while... grab a cup of coffee?!?
 Exact-endcriteria: evaluating the end criteria every 132 timestep(s) (this excitation's Nyquist rate)
 RunFDTD: end-criteria of -50dB reached after 1716 timesteps (-59.256dB)
-Time for 1716 iterations with 14098 cells : 0.47049 sec
-Speed: 51.4191 MCells/s 
+Time for 1716 iterations with 14098 cells : 0.173715 sec
+Speed: 139.264 MCells/s 

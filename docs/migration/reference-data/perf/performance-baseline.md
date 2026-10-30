@@ -2,23 +2,23 @@
 
 Measured comparison of the Rust solver (`openems-cli`) against the pinned native openEMS on identical input XML. Every number in this file was produced by `scripts/ci/run_performance_baseline_wsl.sh`; nothing is estimated.
 
-- Generated: 2026-10-27 23:13:02 (UTC)
-- Repository revision at run time: `f1cdbe5` (informational; the measured binaries are pinned by their SHA-256 below)
+- Generated: 2026-10-30 20:04:32 (UTC)
+- Repository revision at run time: `c54f55d` (informational; the measured binaries are pinned by their SHA-256 below)
 - Native solver: `/home/mberkanbicer/opt/openEMS/bin/openEMS` (openEMS 64bit -- version v0.37.0)
   - SHA-256 `339f2c2e7dbc04f5eb6f8516413e35c4a85bc9f09d81e1b8f91c9845c782bf11`
-- Rust solver: `/mnt/d/openEMS-Project-rust/target/release/openems-cli` (built 2026-10-27T22:05:39Z)
-  - SHA-256 `7e0522fcab7aa1c288fe77cfe1e99e3476e558922bc81f3f6739e1638e8b8266`
+- Rust solver: `/mnt/c/Users/mberkanbicer/Projects/openEMS-Project-rust/target/release/openems-cli` (built 2026-10-30T19:56:56Z)
+  - SHA-256 `2369d8de991fb6bd59d8eaa8c1e8f82a0e7794f532c2864ed1ce37e20d2e3fa5`
 - Both binaries are copied into the scratch working directory before the first run, so a rebuild during the measurement cannot mix two executables.
-- CPU: 13th Gen Intel(R) Core(TM) i9-13900H — 20 hardware threads
-- Memory: 48026 MiB total
+- CPU: Intel(R) Core(TM) i9-14900HX — 32 hardware threads
+- Memory: 48025 MiB total
 - Kernel: `Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.43`
-- Load average at start: `0.99 0.29 0.10 1/331 491`
+- Load average at start: `0.54 0.15 0.05 1/542 528`
 
 ## Method
 
 Both solvers run the same materialised `input.xml` per case (SHA-256 below), in their own working directory, one process at a time, with `--exact-endcriteria` so the stopping point is machine independent.
 
-Each solver gets 1 discarded warm-up run(s) followed by 2 measured run(s). Wall time is the best of the measured runs and peak RSS the maximum of the measured runs, both read from `/usr/bin/time -v` (`Elapsed (wall clock) time` and `Maximum resident set size`).
+Each solver gets 1 discarded warm-up run(s) followed by 3 measured run(s). Wall time is the best of the measured runs and peak RSS the maximum of the measured runs, both read from `/usr/bin/time -v` (`Elapsed (wall clock) time` and `Maximum resident set size`).
 
 Command form (identical for both solvers, options after the file):
 
@@ -45,23 +45,23 @@ The raw `/usr/bin/time -v` output and solver logs of every run are stored next t
 
 | case | solver | engine | threads | wall s (best) | wall s (runs) | peak RSS MiB | MCells/s | stop step | wall ratio | RSS ratio |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| cavity | native | compressed SSE + multi-threading | 20 | 1.34 | 1.49, 1.34 | 46.5 | 136.60 | 20000 | - | - |
-| cavity | rust | fastest (threaded kernel) | 20 | 5.07 | 5.07, 5.21 | 14.7 | 36.10 | 20000 | 3.78× | 0.32× |
-| Coax | native | compressed SSE + multi-threading | 20 | 24.99 | 25.48, 24.99 | 249.4 | 98.58 | 1178 | - | - |
-| Coax | rust | fastest (threaded kernel) | 20 | 53.53 | 53.53, 53.73 | 738.6 | 46.02 | 1178 | 2.14× | 2.96× |
-| msl_port | native | compressed SSE + multi-threading | 20 | 0.51 | 0.53, 0.51 | 46.8 | 47.44 | 1716 | - | - |
-| msl_port | rust | fastest (threaded kernel) | 20 | 1.49 | 1.49, 1.52 | 17.8 | 16.24 | 1716 | 2.92× | 0.38× |
+| cavity | native | compressed SSE + multi-threading | 32 | 0.76 | 0.78, 0.79, 0.76 | 46.6 | 240.84 | 20000 | - | - |
+| cavity | rust | fastest (threaded kernel) | 32 | 1.86 | 1.86, 1.90, 1.89 | 14.8 | 98.41 | 20000 | 2.45× | 0.32× |
+| Coax | native | compressed SSE + multi-threading | 32 | 9.86 | 9.86, 10.67, 10.33 | 249.5 | 249.84 | 1178 | - | - |
+| Coax | rust | fastest (threaded kernel) | 32 | 21.95 | 21.95, 23.08, 23.46 | 740.7 | 112.23 | 1178 | 2.23× | 2.97× |
+| msl_port | native | compressed SSE + multi-threading | 32 | 0.20 | 0.20, 0.22, 0.22 | 46.7 | 120.96 | 1716 | - | - |
+| msl_port | rust | fastest (threaded kernel) | 32 | 0.58 | 0.60, 0.58, 0.64 | 17.6 | 41.71 | 1716 | 2.90× | 0.38× |
 
 ## Results — `--engine basic`, one thread
 
 | case | solver | engine | threads | wall s (best) | wall s (runs) | peak RSS MiB | MCells/s | stop step | wall ratio | RSS ratio |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| cavity | native | basic | 1 | 2.81 | 2.86, 2.81 | 45.9 | 65.14 | 20000 | - | - |
-| cavity | rust | basic (serial kernel) | 1 | 5.10 | 5.30, 5.10 | 14.7 | 35.89 | 20000 | 1.81× | 0.32× |
-| Coax | native | basic | 1 | 42.38 | 51.56, 42.38 | 239.5 | 58.13 | 1178 | - | - |
-| Coax | rust | basic (serial kernel) | 1 | 111.29 | 111.29, 118.63 | 738.3 | 22.14 | 1178 | 2.63× | 3.08× |
-| msl_port | native | basic | 1 | 0.69 | 0.69, 0.70 | 46.3 | 35.06 | 1716 | - | - |
-| msl_port | rust | basic (serial kernel) | 1 | 1.40 | 1.40, 1.41 | 18.0 | 17.28 | 1716 | 2.03× | 0.39× |
+| cavity | native | basic | 1 | 1.20 | 1.25, 1.33, 1.20 | 46.0 | 152.53 | 20000 | - | - |
+| cavity | rust | basic (serial kernel) | 1 | 1.93 | 2.10, 2.18, 1.93 | 14.8 | 94.84 | 20000 | 1.61× | 0.32× |
+| Coax | native | basic | 1 | 25.62 | 25.62, 26.31, 25.73 | 239.8 | 96.15 | 1178 | - | - |
+| Coax | rust | basic (serial kernel) | 1 | 42.89 | 45.18, 42.89, 43.30 | 738.4 | 57.44 | 1178 | 1.67× | 3.08× |
+| msl_port | native | basic | 1 | 0.31 | 0.31, 0.32, 0.31 | 46.3 | 78.04 | 1716 | - | - |
+| msl_port | rust | basic (serial kernel) | 1 | 0.51 | 0.51, 0.53, 0.52 | 17.7 | 47.44 | 1716 | 1.65× | 0.38× |
 
 ## Notes
 

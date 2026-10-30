@@ -1,18 +1,18 @@
-	Command being timed: "/tmp/openems-perf-59qpozhi/bin/native-openEMS /tmp/openems-perf-59qpozhi/cases/Coax.xml --exact-endcriteria"
-	User time (seconds): 60.87
-	System time (seconds): 1.86
-	Percent of CPU this job got: 251%
-	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:24.99
+	Command being timed: "/tmp/openems-perf-k8q2nh72/bin/native-openEMS /tmp/openems-perf-k8q2nh72/cases/Coax.xml --exact-endcriteria"
+	User time (seconds): 20.00
+	System time (seconds): 0.37
+	Percent of CPU this job got: 190%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:10.67
 	Average shared text size (kbytes): 0
 	Average unshared data size (kbytes): 0
 	Average stack size (kbytes): 0
 	Average total size (kbytes): 0
-	Maximum resident set size (kbytes): 255360
+	Maximum resident set size (kbytes): 255488
 	Average resident set size (kbytes): 0
 	Major (requiring I/O) page faults: 0
-	Minor (reclaiming a frame) page faults: 74802
-	Voluntary context switches: 60616
-	Involuntary context switches: 74
+	Minor (reclaiming a frame) page faults: 74836
+	Voluntary context switches: 18435
+	Involuntary context switches: 33
 	Swaps: 0
 	File system inputs: 0
 	File system outputs: 0
