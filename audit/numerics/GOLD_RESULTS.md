@@ -20,8 +20,10 @@ Categories: **A** analytic, **D** pinned native parity, **E** backend-to-backend
 Dielectric speed (eps_r=4) at h/h2/h4: 2.14e-3, 1.15e-3, 9.25e-4; monotone,
 observed order 0.90/0.31 (estimator-limited; no second-order claim).
 
-Time-step refinement at 4.75/2.37/1.19 ps moved the estimate by only 2.1 MHz,
-below the 13.3 MHz raw bin: **no temporal order claimed**.
+Time-step refinement at 4.75/2.37/1.19 ps: against the fixed-mesh dt->0 limit
+(3.898696 GHz) the temporal error falls 2.06 MHz -> 0.41 MHz, ratio 5.0
+(order 2.32 for one refinement pair). The 3.73 MHz offset from the analytic
+mode is spatial error. Record: `reference-data/convergence/cavity_dt.json`.
 
 Common 72.53 ns window, 65 536 points, Hann, 32x zero-padding. Record:
 `docs/migration/reference-data/convergence/cavity.json`. Slab/MSL/dt refinement

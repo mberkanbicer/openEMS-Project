@@ -19,8 +19,10 @@
 
 ## Not tested (do not claim)
 
-- Mesh refinement is recorded for the PEC cavity TE101 only (order 2.03-2.05);
-  slab, MSL and dt refinement remain open (`CONVERGENCE.md`).
+- Mesh refinement is recorded for the PEC cavity TE101 (order 2.03-2.05), the
+  time step converges at order 2.32 against the fixed-mesh limit, and the
+  dielectric speed error is monotone. MSL/SAR refinement remains open
+  (`CONVERGENCE.md`).
 - No independent solver (CST/other) comparison.
 - No adversarial model corpus (degenerate solids, overlapping priorities,
   source on boundary, sub-cell PEC, OOM).

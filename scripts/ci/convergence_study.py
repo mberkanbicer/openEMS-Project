@@ -129,11 +129,52 @@ def peak_frequency(run: dict, window_s: float, samples: int) -> dict:
     }
 
 
+def phase_frequency(run: dict, window_s: float) -> dict:
+    """Frequency from the unwrapped phase of the band-passed analytic signal.
+
+    An FFT peak is limited by the window (1/window_s ~ 2.5 MHz at 400 ns) even
+    with interpolation. The TE101 line is narrow and long-lived, so the slope of
+    its unwrapped phase gives a much finer estimate.
+    """
+    t0 = float(run["t"][0])
+    samples = 1 << 18
+    grid = t0 + np.linspace(0.0, window_s, samples, endpoint=False)
+    values = np.interp(grid, run["t"], run["v"])
+    values = values - values.mean()
+
+    spectrum = np.fft.fft(values)
+    freqs = np.fft.fftfreq(len(values), window_s / samples)
+    target = analytic_te101()
+    mask = (freqs > target - 0.25e9) & (freqs < target + 0.25e9)
+    analytic = np.fft.ifft(np.where(mask, spectrum, 0.0)) * 2.0
+
+    amplitude = np.abs(analytic)
+    threshold = 0.2 * float(amplitude.max())
+    keep = amplitude > threshold
+    # Ignore the excitation transient and the low-amplitude tail.
+    keep[: len(values) // 5] = False
+    if int(keep.sum()) < 1000:
+        raise SystemExit("phase estimator: too few samples above threshold")
+
+    phase = np.unwrap(np.angle(analytic))
+    slope = float(np.polyfit(grid[keep], phase[keep], 1)[0])
+    peak = slope / (2.0 * math.pi)
+    return {
+        "te101_hz": peak,
+        "relative_error": abs(peak - analytic_te101()) / analytic_te101(),
+        "window_s": window_s,
+        "fft_bin_hz": 1.0 / window_s,
+        "phase_samples": int(keep.sum()),
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", choices=["mesh", "dt"], default="mesh")
+    parser.add_argument("--estimator", choices=["fft", "phase"], default=None)
     parser.add_argument("--json", default=None)
     args = parser.parse_args()
+    estimator = args.estimator or ("phase" if args.mode == "dt" else "fft")
     args.json = os.path.abspath(
         args.json
         or (
@@ -148,9 +189,10 @@ def main() -> int:
         runs = [build_and_run(*level) for level in levels]
         label = "PEC cavity, TE101, mesh refinement"
     else:
-        # Fixed mesh; halve dt and double the step count to keep the physical
-        # window. dt error should fall while the spatial floor remains.
-        settings = [(1.0, 16000), (0.5, 32000), (0.25, 64000)]
+        # Fixed mesh; halve dt and double the step count to keep a 400 ns
+        # window, which puts the raw FFT bin at 2.5 MHz and lets the phase
+        # estimator resolve the temporal error.
+        settings = [(1.0, 84000), (0.5, 168000), (0.25, 336000)]
         runs = [
             build_and_run(20, 10, 24, steps, factor)
             for factor, steps in settings
@@ -159,10 +201,11 @@ def main() -> int:
 
     window_s = min(run["duration"] for run in runs)
     samples = 1 << 16
+    estimate = phase_frequency if estimator == "phase" else lambda run, window: peak_frequency(run, window, samples)
 
     rows = []
     for run in runs:
-        peak = peak_frequency(run, window_s, samples)
+        peak = estimate(run, window_s)
         row = {
             "mesh": run["mesh"],
             "cells": run["cells"],
@@ -179,37 +222,64 @@ def main() -> int:
             "rel err {relative_error:.3e}".format(**row)
         )
 
+
     exact = analytic_te101()
     print(f"analytic TE101: {exact:.6e} Hz (common window {window_s*1e9:.2f} ns)")
-    errors = [row["relative_error"] for row in rows]
     orders = []
-    for i in range(1, len(rows)):
-        if errors[i] <= 0.0 or errors[i - 1] <= 0.0:
-            orders.append(None)
-            continue
-        if args.mode == "mesh":
+    if args.mode == "dt":
+        # At fixed mesh the dt -> 0 limit is the finest time step, not the
+        # analytic value: the remaining offset is the spatial error measured by
+        # the mesh study. Refinement is judged against that limit.
+        reference = rows[-1]["te101_hz"]
+        for row in rows:
+            row["difference_vs_finest_hz"] = row["te101_hz"] - reference
+        diffs = [abs(row["difference_vs_finest_hz"]) for row in rows[:-1]]
+        for i in range(len(diffs) - 1):
+            if diffs[i] <= 0.0 or diffs[i + 1] <= 0.0:
+                orders.append(None)
+                continue
+            order = math.log(diffs[i] / diffs[i + 1]) / math.log(2.0)
+            orders.append(order)
+            print(f"time-step order between factor steps {i + 1}: {order:.2f}")
+        print(
+            "fixed-mesh dt->0 limit: {:.6e} Hz; residual vs analytic {:.3e} Hz "
+            "(spatial error)".format(reference, reference - exact)
+        )
+    else:
+        errors = [row["relative_error"] for row in rows]
+        for i in range(1, len(rows)):
+            if errors[i] <= 0.0 or errors[i - 1] <= 0.0:
+                orders.append(None)
+                continue
             ratio = rows[i]["mesh"][0] / rows[i - 1]["mesh"][0]
-        else:
-            ratio = rows[i - 1]["time_step_factor"] / rows[i]["time_step_factor"]
-        order = math.log(errors[i - 1] / errors[i]) / math.log(ratio)
-        orders.append(order)
-        print(f"observed order step {i}: {order:.2f}")
+            order = math.log(errors[i - 1] / errors[i]) / math.log(ratio)
+            orders.append(order)
+            print(f"observed order step {i}: {order:.2f}")
 
     record = {
         "case": label,
         "mode": args.mode,
+        "estimator": estimator,
         "geometry_m": [A, B, D],
         "analytic_hz": exact,
         "levels": rows,
         "observed_order": orders,
+        "reference": (
+            "finest time step (factor 0.25) at fixed mesh" if args.mode == "dt" else "analytic"
+        ),
         "note": (
-            "dt variation is below the raw FFT bin (13.3 MHz); no temporal order is claimed"
+            "self-convergence at fixed mesh: the dt->0 limit is the finest step; "
+            "the residual against the analytic mode is the spatial error"
             if args.mode == "dt"
             else "mesh refinement supports the reported order"
         ),
         "engine": "Rust openEMS Python bindings",
         "probe": "ut1y",
-        "window": "common window, Hann, 32x zero-padding, quadratic peak interpolation",
+        "window": (
+            "common window, band-passed analytic signal, unwrapped-phase slope"
+            if estimator == "phase"
+            else "common window, Hann, 32x zero-padding, quadratic peak interpolation"
+        ),
         "samples": samples,
     }
     os.makedirs(os.path.dirname(args.json), exist_ok=True)

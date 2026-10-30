@@ -1,6 +1,7 @@
 {
   "case": "PEC cavity, TE101, time-step refinement",
   "mode": "dt",
+  "estimator": "phase",
   "geometry_m": [
     0.05,
     0.02,
@@ -15,14 +16,16 @@
         24
       ],
       "cells": 4800,
-      "steps": 16000,
+      "steps": 84000,
       "time_step_factor": 1.0,
       "solver_dt": 4.746617225147896e-12,
-      "sample_interval": 9.4932344503e-12,
-      "te101_hz": 3900757053.197561,
-      "relative_error": 0.0004269637744125765,
-      "window_s": 7.5238629635866e-08,
-      "fft_bin_hz": 13291044.837468749
+      "sample_interval": 9.493234450285714e-12,
+      "te101_hz": 3900757652.644834,
+      "relative_error": 0.00042681016542775316,
+      "window_s": 3.98005040983066e-07,
+      "fft_bin_hz": 2512530.9908890002,
+      "phase_samples": 209558,
+      "difference_vs_finest_hz": 2061254.9352874756
     },
     {
       "mesh": [
@@ -31,14 +34,16 @@
         24
       ],
       "cells": 4800,
-      "steps": 32000,
+      "steps": 168000,
       "time_step_factor": 0.5,
       "solver_dt": 2.373308612573948e-12,
-      "sample_interval": 1.1866543062875001e-11,
-      "te101_hz": 3899106931.0556855,
-      "relative_error": 0.0008498092828620853,
-      "window_s": 7.5238629635866e-08,
-      "fft_bin_hz": 13291044.837468749
+      "sample_interval": 1.1866543062857143e-11,
+      "te101_hz": 3899108094.441015,
+      "relative_error": 0.0008495111641661511,
+      "window_s": 3.98005040983066e-07,
+      "fft_bin_hz": 2512530.9908890002,
+      "phase_samples": 209716,
+      "difference_vs_finest_hz": 411696.7314682007
     },
     {
       "mesh": [
@@ -47,23 +52,25 @@
         24
       ],
       "cells": 4800,
-      "steps": 64000,
+      "steps": 336000,
       "time_step_factor": 0.25,
       "solver_dt": 1.186654306286974e-12,
-      "sample_interval": 1.305319736916466e-11,
-      "te101_hz": 3898694989.5518675,
-      "relative_error": 0.0009553697200036888,
-      "window_s": 7.5238629635866e-08,
-      "fft_bin_hz": 13291044.837468749
+      "sample_interval": 1.3053197369160256e-11,
+      "te101_hz": 3898696397.7095466,
+      "relative_error": 0.0009550088781395155,
+      "window_s": 3.98005040983066e-07,
+      "fft_bin_hz": 2512530.9908890002,
+      "phase_samples": 209716,
+      "difference_vs_finest_hz": 0.0
     }
   ],
   "observed_order": [
-    -0.9930254328684278,
-    -0.16892004902315036
+    2.3238690479179773
   ],
-  "note": "dt variation is below the raw FFT bin (13.3 MHz); no temporal order is claimed",
+  "reference": "finest time step (factor 0.25) at fixed mesh",
+  "note": "self-convergence at fixed mesh: the dt->0 limit is the finest step; the residual against the analytic mode is the spatial error",
   "engine": "Rust openEMS Python bindings",
   "probe": "ut1y",
-  "window": "common window, Hann, 32x zero-padding, quadratic peak interpolation",
+  "window": "common window, band-passed analytic signal, unwrapped-phase slope",
   "samples": 65536
 }

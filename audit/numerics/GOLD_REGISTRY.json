@@ -17,8 +17,8 @@
     {
       "category": "D",
       "path": "docs/migration/VALIDATION.md",
-      "sha256": "427c76b87bce5895c7a680678711c6523869e934da4063bdba6490bc5a65ec31",
-      "bytes": 149736,
+      "sha256": "28d2ca3cb7f1112819341e03d4e2ab8ba406d684a00463065250ed2aa4ad74a5",
+      "bytes": 150616,
       "provenance": "recorded validation sections"
     },
     {
@@ -52,15 +52,15 @@
     {
       "category": "A",
       "path": "docs/migration/reference-data/convergence/cavity.json",
-      "sha256": "d7be1fe63cb6ecc0e3880f7533a0d7923e65b12e6c77e920bf83dd3deca48d53",
-      "bytes": 1352,
+      "sha256": "3f4de286761cde6a3d7243848881c4dd82eef3b4aa1753e5fd051b175ad791f9",
+      "bytes": 1713,
       "provenance": "cavity TE101 mesh-refinement record"
     },
     {
       "category": "A",
       "path": "scripts/ci/convergence_study.py",
-      "sha256": "c2dd31005ba24f314e99b1c24d76cc3de6a143fd4dfe59cc5dc39d5ed5e655b2",
-      "bytes": 7676,
+      "sha256": "a74e89b5326d3a38e69e4bb38e3cc841dbe53ff37c06933083d27f48c8da394d",
+      "bytes": 10820,
       "provenance": "cavity refinement harness"
     },
     {

@@ -28,7 +28,7 @@ CST-validated or production-ready replacement.
 
 | Item | Status |
 |---|---|
-| Mesh/time convergence | **partly measured**: cavity TE101 order 2.05/2.03; dielectric monotone 0.90/0.31; MSL model has no interior notch; dt below resolution (`numerics/CONVERGENCE.md`) |
+| Mesh/time convergence | **partly measured**: cavity TE101 order 2.05/2.03; dt order 2.32 vs the fixed-mesh limit; dielectric monotone 0.90/0.31; MSL model has no interior notch (`numerics/CONVERGENCE.md`) |
 | CST MWS comparison | **blocked**, no data (`cst/`) |
 | GPU compute | **not implemented** (scope, ADR 0002) |
 | macOS/FreeBSD/Windows run at this HEAD | **blocked** (E-005; no hosted CI) |

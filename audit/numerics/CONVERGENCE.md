@@ -1,10 +1,11 @@
 # Convergence and uncertainty
 
-## Status: cavity mesh refinement recorded; slab, MSL and time-step refinement still open
+## Status: cavity mesh and time-step refinement recorded; slab and MSL still open
 
 No h / h/2 / h/4 sweep or dt sweep was recorded before this audit.
 `VALIDATION.md` labels several cases as "capped/analytic, not converged
-scientific acceptance cases". This study closes the first part of that gap.
+scientific acceptance cases". This study closes the cavity and dielectric parts
+of that gap.
 
 ## Measured: PEC cavity TE101
 
@@ -57,26 +58,32 @@ claims no order and is recorded as **inconclusive**. MSL port parity itself is
 covered by the native differential harness. Record:
 `docs/migration/reference-data/convergence/msl_notch.json`.
 
-## Time-step refinement (inconclusive at this record length)
+## Time-step refinement at fixed mesh (self-convergence)
 
 Same 20x10x24 mesh, `TimeStepFactor` 1.0 / 0.5 / 0.25, step count doubled to
-keep the physical window. The reported `solver_dt` confirms the factor is
-applied (4.747 / 2.373 / 1.187 ps).
+hold a 400 ns window. The reported `solver_dt` confirms the factor is applied
+(4.747 / 2.373 / 1.187 ps). A phase-slope estimator (band-passed analytic
+signal, 400 ns window, 2.5 MHz raw bin) reproduces the interpolated FFT peak to
+six digits, so the frequencies below are genuine, not estimator noise.
 
-| Factor | solver dt (ps) | TE101 (Hz) | Relative error |
+| Factor | solver dt (ps) | TE101 (Hz) | Difference vs dt->0 |
 |---:|---:|---:|---:|
-| 1.00 | 4.747 | 3.900757e9 | 4.270e-4 |
-| 0.50 | 2.373 | 3.899107e9 | 8.498e-4 |
-| 0.25 | 1.187 | 3.898695e9 | 9.554e-4 |
+| 1.00 | 4.747 | 3.900758e9 | +2.062e6 Hz |
+| 0.50 | 2.373 | 3.899108e9 | +4.12e5 Hz |
+| 0.25 | 1.187 | 3.898696e9 | reference |
 
-The total variation (2.1 MHz) is **below the 13.3 MHz raw FFT bin** of the
-72.5 ns record, so this run does **not** establish a temporal order and does not
-show temporal error; a longer record or a phase-based estimator is required.
-Record: `docs/migration/reference-data/convergence/cavity_dt.json`.
+At fixed mesh the dt -> 0 limit is the finest step, **3.898696 GHz**, not the
+analytic value: the remaining offset is spatial error, which dt refinement
+cannot remove. Measured against that limit the temporal error falls from
+2.06 MHz to 0.41 MHz, a ratio of 5.0, i.e. **order 2.32** for this one
+refinement pair — consistent with second-order time integration within the
+resolution of two levels. The 3.73 MHz (9.55e-4) residual against the analytic
+mode is the spatial error of the 20x10x24 mesh and must be reduced by h.
 
-The run also exposed and fixed two `TimeStepFactor` defects (RM-172): a factor
+The study also exposed and fixed two `TimeStepFactor` defects (RM-172): a factor
 >1 was accepted even though native ignores it (it can exceed the CFL limit), and
-the XML writer dropped every valid factor <=1 on round-trip.
+the XML writer dropped every valid factor <=1 on round-trip. Record:
+`docs/migration/reference-data/convergence/cavity_dt.json`.
 
 ## Still open
 
@@ -85,7 +92,7 @@ the XML writer dropped every valid factor <=1 on round-trip.
 | Dielectric slab speed refinement | recorded; monotone but estimator-limited (above) |
 | Dielectric slab Fresnel R/T refinement | not run |
 | MSL notch S11/S21 refinement | attempted; model has no interior notch (inconclusive, above) |
-| Time-step (dt) refinement at fixed mesh | attempted; inconclusive at the 13.3 MHz bin (above) |
+| Time-step (dt) refinement at fixed mesh | recorded; order 2.32 against the dt->0 limit (above) |
 | SAR mesh refinement | not run |
 | Non-converging cases | none recorded yet |
 

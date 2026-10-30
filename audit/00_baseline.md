@@ -17,6 +17,7 @@ All commands ran in `C:\Users\mberkanbicer\Projects\openEMS-Project-rust` with
 | 8 | `cargo run --release -p openems-core --example dielectric_convergence` | dielectric speed errors 2.14e-3 / 1.15e-3 / 9.25e-4; order 0.90 / 0.31, estimator-limited | `docs/migration/reference-data/convergence/dielectric.json` |
 | 9 | `matlab -batch "run(...matlab_smoke.m)"` (R2025b, Windows) | XML write, `--no-simulation` setup and 50-step run through the Rust CLI all returned; `MATLAB smoke: PASS` | `scripts/ci/matlab_smoke.m` |
 | 10 | `scripts/ci/msl_convergence.py` | no interior S11 notch in 1-7 GHz (band-edge minimum 0.085-0.089); inconclusive, no order | `docs/migration/reference-data/convergence/msl_notch.json` |
+| 11 | `scripts/ci/convergence_study.py --mode dt` | phase estimator at 400 ns: temporal error 2.06 MHz -> 0.41 MHz vs the dt->0 limit (order 2.32); 3.73 MHz residual is spatial | `docs/migration/reference-data/convergence/cavity_dt.json` |
 
 The workspace test run used default features. The HDF5 feature suite is a
 separate run inside the acceptance script (475 tests at the last recorded
