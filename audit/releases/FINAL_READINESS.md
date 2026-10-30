@@ -36,7 +36,6 @@ CST-validated or production-ready replacement.
 | Analytic SAR | missing (`VAL-002`) |
 | MATLAB (as opposed to Octave) | not run |
 | Fuzzing/Miri/sanitizers | not run |
-| GUI layout persistence | open P2 (`GUI-002`); colour management fixed (RM-171) |
 
 ## 3. Checklist (protocol §13)
 

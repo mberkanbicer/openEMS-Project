@@ -57,7 +57,7 @@ silent option drops, now guarded).
 | Mesh/time convergence | `PARTIAL`: analytic wave speed only; no refinement table |
 | Performance threshold | `PARTIAL`: refreshed baseline; proposed gate passes, not yet accepted |
 | Platform matrix | `BLOCKED`: hosted Actions unavailable; last run predates HEAD |
-| GUI panel-layout persistence | `PARTIAL` (P2); viewport colour management fixed (RM-171) |
+
 | Parser hardening | no fuzz corpus; fparser has no nesting-depth limit (SEC-001) |
 
 ## 5. Readiness statement

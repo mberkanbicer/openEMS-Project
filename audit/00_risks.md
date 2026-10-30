@@ -31,7 +31,6 @@ reach the operator/engine or the writer.
 |---|---|---|---|
 | VAL-001 | Independent validation is partly covered: cavity TE101 converges at order 2.05/2.03; slab, MSL and dt refinement are still missing | `audit/numerics/CONVERGENCE.md` | slab/MSL/dt refinement |
 | PERF-001 | Baseline refreshed at `c54f55d` (default 2.45x / 2.23x / 2.90x; basic 1.61x / 1.67x / 1.65x; RSS ≤3.08x). The proposed 4.0x / 3.25x gate passes, but no threshold is formally accepted. | `audit/performance/CPU_BASELINE.md`; `scripts/ci/check_performance_baseline.py` | Owner approves the gate and wires it into release CI |
-| GUI-002 | Panel sizes do not persist | egui panel state is session-only | persist with settings |
 | DOC-001 | No rustfmt/clippy baseline | `cargo fmt --check` fails on pre-existing code | separate cleanup PR |
 
 ## P3 / accepted scope
@@ -48,5 +47,5 @@ reach the operator/engine or the writer.
 2. PY-001 rebuild and native Python suites (in progress).
 3. Records E-005/FINAL_AUDIT (E-005 corrected; FINAL_AUDIT to re-issue).
 4. Validation: analytic SAR, convergence study, performance gate.
-5. GUI colour management and layout persistence.
+5. GUI arrow-key navigation and visible focus rings.
 6. Platform matrix when Actions or hosts are available.

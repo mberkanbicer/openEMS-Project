@@ -9,9 +9,9 @@ evidence, but the two P0 rows below mean the register's "172 Verified" tally ove
 
 | Status | Count | Meaning here |
 |---|---:|---|
-| `VERIFIED_COMPLETE` | 35 | implementation + executed comparison/analytic result recorded |
+| `VERIFIED_COMPLETE` | 36 | implementation + executed comparison/analytic result recorded |
 | `IMPLEMENTED_UNVERIFIED` | 1 | Windows installer workflow; no run at this HEAD |
-| `PARTIAL` | 3 | performance threshold, convergence study, dock-layout persistence |
+| `PARTIAL` | 2 | performance threshold, convergence study |
 | `INTENTIONALLY_DIFFERENT` | 1 | fparser extended-precision variants (E-001/ADR 0006) |
 | `INTENTIONALLY_UNSUPPORTED` | 5 | GPU compute (ADR 0002), FreeBSD hyp2mat (E-004), GUI solver control, multi-grid (E-007), cell-constant material (E-008) |
 | `BLOCKED` | 2 | hosted CI/platform matrix (E-005), CST comparison (no data) |
@@ -76,7 +76,6 @@ convergence evidence exists.
 |---|---|---|---|
 | VAL-001 | Independent validation was thin; the cavity is now covered. Two analytic wave-speed tests plus native-parity cases, and a **cavity TE101 refinement study (order 2.05/2.03)**; slab, MSL and dt refinement still missing, no CST data. | `audit/numerics/CONVERGENCE.md`; `reference-data/convergence/cavity.json` | Add slab, MSL notch and dt refinement |
 | PERF-001 | Baseline refreshed at `c54f55d`: default 2.45x / 2.23x / 2.90x, basic 1.61x / 1.67x / 1.65x; RSS ≤3.08x. The proposed 4.0x / 3.25x gate passes but is not formally accepted. | `audit/performance/CPU_BASELINE.md`; `scripts/ci/check_performance_baseline.py` | Owner approval + release CI wiring |
-| GUI-002 | Theme persists; panel sizes/layout do not (egui panel state is session-only). | `qcsxcad-egui/src/app.rs` | Persist panel geometry with the settings file |
 | DOC-001 | The repository is hand-formatted; `cargo fmt --check` fails on pre-existing code, and clippy has no baseline. | `00_baseline.md` §3 | Separate formatting PR; establish clippy baseline |
 
 ## 5. Working code that must not be disturbed
