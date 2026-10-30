@@ -45,9 +45,10 @@ polyhedron vertices, the drawing tolerance (every primitive's containment, the
 robust polyhedron inside test and the operator tolerance from the mesh), the
 nested `ContinuousStructure` lookup, the black default edge, the disc-material
 polydata surface, `--debug-memory`, the first-minute end-criteria cadence and
-the denormal flush and the PEC-edge `.vtp` dump. The register grows to 162
-`Verified` rows (RM-154..RM-162); the new APIs are wired into the GUI
-renderer and the Python bindings.
+the denormal flush, the PEC-edge `.vtp` dump and the FDTD-child scoping fix.
+The register grows to 163 `Verified` rows (RM-154..RM-163); the new APIs are
+wired into the GUI renderer and the Python bindings, and the full workspace
+suite is 865 passed / 0 failed.
 Everything else is classified as already present, not applicable (GPU engine,
 packaging, CI) or deferred with a reason in
 `audits/upstream-sync-2026-10-30.md`.

@@ -66,9 +66,20 @@ not on `master`.
 
 * Branch comparison: `git branch -r --list 'upstream/*'` and
   `git rev-list --count upstream/master..<branch>` in each submodule.
-* Tests after the port: `csxcad-core` 166 lib, `openems-core` 271 lib,
-  `qcsxcad-core` 52 lib, all passing; the Python bindings and the workspace
+* Tests after the port: `cargo test` (workspace default members) is **865
+  passed, 0 failed** across 36 test binaries; `csxcad-core` 166 lib and
+  `openems-core` 271 lib among them. The Python bindings and the workspace
   `cargo check` are clean.
+* `--debug-PEC` end to end, from
+  `openems-cli 07_primitives.xml --no-simulation --debug-PEC`:
+
+```text
+[openEMS] PEC edges written to 'PEC_dump.vtp' (212 edges)
+<Piece NumberOfPoints="108" NumberOfLines="212" ...>
+<DataArray type="UInt8" Name="direction" ...> 0 0 ... 1 1 ... 2 2 ...
+<FieldData><DataArray type="Float64" Name="LengthUnit" ...> 1 </DataArray></FieldData>
+```
+
 * `--debug-memory` output, from
   `cargo test -p openems-core the_memory_report -- --nocapture`:
 
