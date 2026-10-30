@@ -27,14 +27,14 @@ CST-validated or production-ready replacement.
 
 | Item | Status |
 |---|---|
-| Mesh/time convergence | **partly measured**: cavity TE101 order 2.05/2.03; dielectric monotone 0.90/0.31 (estimator-limited); MSL/dt not established (`numerics/CONVERGENCE.md`) |
+| Mesh/time convergence | **partly measured**: cavity TE101 order 2.05/2.03; dielectric monotone 0.90/0.31; MSL model has no interior notch; dt below resolution (`numerics/CONVERGENCE.md`) |
 | CST MWS comparison | **blocked**, no data (`cst/`) |
 | GPU compute | **not implemented** (scope, ADR 0002) |
 | macOS/FreeBSD/Windows run at this HEAD | **blocked** (E-005; no hosted CI) |
 | Windows installer | workflow present, no run at this HEAD |
 | Performance threshold | refreshed baseline; proposed 4.0x/3.25x gate passes; approval pending (`PERF-001`) |
 | Analytic SAR | missing (`VAL-002`) |
-| MATLAB (as opposed to Octave) | not run |
+| MATLAB (as opposed to Octave) | smoke PASS (R2025b: XML write, setup, 50-step run) |
 | Fuzzing/Miri/sanitizers | not run |
 
 ## 3. Checklist (protocol §13)
@@ -69,7 +69,7 @@ CST-validated or production-ready replacement.
 5. ~~The sRGB material-colour fix.~~ Met (RM-171).
 6. A decision on multi-grid and cell-constant materials: implement, or keep the
    explicit rejection in the release notes.
-7. A MATLAB run if MATLAB support is advertised.
+7. ~~A MATLAB run if MATLAB support is advertised.~~ Smoke met (full suite still open).
 
 ## 5. Honest limitations for the release note
 

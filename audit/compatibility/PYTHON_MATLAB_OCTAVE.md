@@ -18,8 +18,8 @@
 | C ABI | `csxcad-matlab` and `openems-matlab` cdylibs; 34 exported symbols checked by `abi_inventory.rs`; `catch_unwind` on every export; null/deleted-pointer contract tests |
 | M-files | 70 CSXCAD + 121 openEMS + 29 CTB `.m` files retained from upstream |
 | Octave | unmodified upstream testsuite **10/10** (recorded acceptance); CTB CLI Octave exercise PASS |
-| MATLAB | **not run** — no MATLAB session in this audit. The C ABI is platform/version specific; no claim is made |
-| Gaps | MATLAB/Octave binaries are host-specific; no Windows/macOS MATLAB test; interleaved-complex vs legacy array behavior only exercised on this host |
+| MATLAB | **PASS** (smoke, R2025b/PCWIN64): `InitCSX`/`DefineRectGrid`/`AddMetal`/`AddBox`/`InitFDTD` → `WriteOpenEMS` (XML) → `RunOpenEMS` with `--no-simulation` and a 50-step simulation, both via the Rust CLI. Command: `matlab -batch "run('.../matlab_smoke.m')"` |
+| Gaps | MATLAB/Octave binaries are host-specific; this is a Windows MATLAB smoke, not a full MATLAB test suite; interleaved-complex vs legacy array behavior is exercised by the Octave suite on this host |
 
 ## Cross-language equivalence
 
@@ -32,4 +32,4 @@ physics.
 
 - Python 3.14 is the venv used here; other versions are untested in this
   session.
-- MATLAB is unverified; do not ship a MATLAB claim without a MATLAB run.
+- MATLAB is verified only at smoke level (model write + setup + short run); the full MATLAB suite is not executed.

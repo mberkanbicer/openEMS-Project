@@ -30,7 +30,7 @@ CSXCAD,37f2db9,Rectilinear grid and mesh,csxcad-core,grid.rs,VERIFIED_COMPLETE,"
 CSXCAD,37f2db9,Parameters and expressions,csxcad-core + fparser-rs,"parameter.rs, fparser/rust",VERIFIED_COMPLETE,"expression_evaluation.rs, parameter parity (f64)",expression tests,P1,E-001: no extended precision
 CSXCAD,37f2db9,HDF5 geometry/field layout,csxcad-core,hdf5.rs,VERIFIED_COMPLETE,HDF5 feature suite (recorded),cargo test --features hdf5,P1,none
 CSXCAD,37f2db9,Python CSXCAD bindings,csxcad-python,CSXCAD/rust-py,VERIFIED_COMPLETE,448 native Python cases include CSXCAD tests,native Python suites,P1,none
-CSXCAD,37f2db9,MATLAB/Octave CSXCAD bindings,csxcad-matlab + .m,"CSXCAD/rust-matlab, 70 .m files",VERIFIED_COMPLETE,C-ABI inventory + Octave suite; 70 M-files present,ABI + Octave,P1,none
+CSXCAD,37f2db9,MATLAB/Octave CSXCAD bindings,csxcad-matlab + .m,"CSXCAD/rust-matlab, 70 .m files",VERIFIED_COMPLETE,C-ABI inventory + Octave suite; 70 M-files present; MATLAB R2025b smoke (XML + setup + 50-step run) PASS,ABI + Octave,P1,none
 fparser,525f4b7,Expression parser (f64),fparser-rs,fparser/rust,VERIFIED_COMPLETE,52 crate tests; CSXCAD expression parity,crate + parity,P1,E-001 intentional f64-only scope
 fparser,525f4b7,Extended precision (float/long double/MPFR),none,upstream variants,INTENTIONALLY_DIFFERENT,E-001 + ADR 0006,none,P3,documented limitation
 hyp2mat,ded44d0,HyperLynx/PCB import and CSXCAD conversion,hyp2mat-rs,hyp2mat/rust,VERIFIED_COMPLETE,9/9 model dumps byte-identical; native CSXCAD reads all outputs,fixtures + differential,P1,E-004: FreeBSD unavailable

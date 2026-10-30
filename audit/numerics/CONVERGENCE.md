@@ -46,6 +46,17 @@ at the fine end. The correlation-delay estimator's resolution (~0.1-0.2 %) is
 the likely limit, so this study claims **monotone accuracy, not second order**.
 Record: `docs/migration/reference-data/convergence/dielectric.json`.
 
+## MSL notch filter — attempted, model-limited
+
+`scripts/ci/msl_convergence.py` re-ran the pinned smoke model with 30 000 steps
+at three resolutions (divisors 40/50/60). The S11 minimum is at **7 GHz**, the
+top of the band, at every level (|S11| 0.0852 / 0.0888 / 0.0895) and |S11|
+falls monotonically toward it: there is **no interior notch** in 1-7 GHz. The
+smoke model is a CI runnable, not a converged notch design, so this study
+claims no order and is recorded as **inconclusive**. MSL port parity itself is
+covered by the native differential harness. Record:
+`docs/migration/reference-data/convergence/msl_notch.json`.
+
 ## Time-step refinement (inconclusive at this record length)
 
 Same 20x10x24 mesh, `TimeStepFactor` 1.0 / 0.5 / 0.25, step count doubled to
@@ -73,7 +84,7 @@ the XML writer dropped every valid factor <=1 on round-trip.
 |---|---|
 | Dielectric slab speed refinement | recorded; monotone but estimator-limited (above) |
 | Dielectric slab Fresnel R/T refinement | not run |
-| MSL notch S11/S21 refinement | not run |
+| MSL notch S11/S21 refinement | attempted; model has no interior notch (inconclusive, above) |
 | Time-step (dt) refinement at fixed mesh | attempted; inconclusive at the 13.3 MHz bin (above) |
 | SAR mesh refinement | not run |
 | Non-converging cases | none recorded yet |
