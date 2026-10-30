@@ -11,7 +11,7 @@ All commands ran in `C:\Users\mberkanbicer\Projects\openEMS-Project-rust` with
 | 2 | `cargo check --workspace` | pass; only pre-existing `unused_variables` warnings in `openEMS/rust/src/{debug_dump,openems}.rs` | shell output |
 | 3 | `python scripts/ci/check_migration_docs.py` | `migration record check passed` | shell output |
 | 4 | `cargo test -p qcsxcad-core -p qcsxcad-egui -p appcsxcad` | 52 + 24 + 13 passed | subset of #1, run separately |
-| 5 | `scripts/ci/run_full_acceptance_wsl.sh` (WSL2, native openEMS v0.37.0) | **13/13 PASS** (section 5) | `docs/migration/ACCEPTANCE.md`; `%TEMP%\opencode\acceptance_run3.log` |
+| 5 | `scripts/ci/run_full_acceptance_wsl.sh` (WSL2, native openEMS v0.37.0) | **13/13 PASS** (section 5) | `docs/migration/ACCEPTANCE.md`; `scripts/ci/run_full_acceptance_wsl.sh (report: docs/migration/ACCEPTANCE.md)` |
 | 6 | `cargo test --workspace --all-targets --no-fail-fast` (final tree) | **886 passed, 0 failed, 0 ignored**, 33 binaries | `%TEMP%\opencode\workspace_test_final.log` |
 | 7 | `scripts/ci/run_convergence_check_wsl.sh` | cavity TE101 order 2.05 / 2.03; errors 1.770e-3 / 4.270e-4 / 1.047e-4 | `docs/migration/reference-data/convergence/cavity.json` |
 | 8 | `cargo run --release -p openems-core --example dielectric_convergence` | dielectric speed errors 2.14e-3 / 1.15e-3 / 9.25e-4; order 0.90 / 0.31, estimator-limited | `docs/migration/reference-data/convergence/dielectric.json` |
