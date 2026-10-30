@@ -45,11 +45,11 @@
   (`CTB/rust/src/touchstone.rs`, differential tests).
 - `hyp2mat` parses HyperLynx files with explicit record handling and fixture
   coverage.
-- **SEC-001 (open)**: `fparser` is a recursive-descent parser with no explicit
-  nesting-depth limit. A hostile expression with very deep parentheses can
-  exhaust the stack. No fuzz corpus exists for fparser, XML, Touchstone or
-  hyp2mat. Recommended: depth limit + `cargo fuzz` targets; not changed here
-  because it alters parser error behavior and needs its own test corpus.
+- **SEC-001 (fixed 2026-10-30)**: `fparser` now counts recursion and returns
+  `ParseErrorKind::OutOfMemory` beyond 512 nested expression/unary levels
+  (`deeply_nested_expressions_are_rejected_without_overflowing`: 4000 levels
+  rejected, 100 parse). No fuzz corpus exists yet for fparser, XML, Touchstone
+  or hyp2mat; `cargo fuzz` targets remain a gap.
 
 ## 4. Runtime panics / unwraps
 

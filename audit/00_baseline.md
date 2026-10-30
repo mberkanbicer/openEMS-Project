@@ -12,7 +12,7 @@ All commands ran in `C:\Users\mberkanbicer\Projects\openEMS-Project-rust` with
 | 3 | `python scripts/ci/check_migration_docs.py` | `migration record check passed` | shell output |
 | 4 | `cargo test -p qcsxcad-core -p qcsxcad-egui -p appcsxcad` | 52 + 24 + 13 passed | subset of #1, run separately |
 | 5 | `scripts/ci/run_full_acceptance_wsl.sh` (WSL2, native openEMS v0.37.0) | **13/13 PASS** (section 5) | `docs/migration/ACCEPTANCE.md`; `%TEMP%\opencode\acceptance_run3.log` |
-| 6 | `cargo test --workspace --all-targets --no-fail-fast` (final tree) | **881 passed, 0 failed, 0 ignored**, 32 binaries | `%TEMP%\opencode\workspace_test_final.log` |
+| 6 | `cargo test --workspace --all-targets --no-fail-fast` (final tree) | **882 passed, 0 failed, 0 ignored**, 32 binaries | `%TEMP%\opencode\workspace_test_final.log` |
 
 The workspace test run used default features. The HDF5 feature suite is a
 separate run inside the acceptance script (475 tests at the last recorded
@@ -58,7 +58,7 @@ The acceptance completed on 2026-10-30 at `ff95333` + the audit changes
 | Check | Result | Evidence |
 |---|---|---|
 | workspace build (release) | PASS | 1 build |
-| crate unit + integration tests | PASS | 803 tests (fresh) |
+| crate unit + integration tests | PASS | 804 tests (fresh, includes RM-169) |
 | HDF5 feature tests | PASS | 504 tests (cached from the same tree) |
 | Python packages build + imports | PASS | 2 packages |
 | native Python suites | PASS | 459 cases; **SKIPPED: 2 GPU plugin tests** (no GPU engine; ADR 0002) |

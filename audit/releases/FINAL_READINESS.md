@@ -13,7 +13,7 @@ CST-validated or production-ready replacement.
 
 - Workspace builds and the crate/Python/Octave tests run on this host:
   **acceptance 13/13 PASS** at `ff95333` + the audit changes
-  (`docs/migration/ACCEPTANCE.md`; 803 crate tests, 504 HDF5, 459 Python with
+  (`docs/migration/ACCEPTANCE.md`; 804 crate tests, 504 HDF5, 459 Python with
   2 GPU skips, Octave 10/10, 51 differential cases).
 - 51-case native differential harness, operator dump, UPML reflection, SAR and
   curve-excitation gates.

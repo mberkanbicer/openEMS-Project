@@ -3,7 +3,7 @@
 Audit of the **existing** Rust port. Basis: `component_matrix.csv` (47
 subsystem rows) plus the executed commands in `00_baseline.md`. This is not a
 file-count percentage; 34 of 47 audited subsystems have executed verification
-evidence, but the two P0 rows below mean the register's "166 Verified" tally
+evidence, but the two P0 rows below mean the register's "169 Verified" tally
 overstates correctness for the affected input classes.
 
 ## 1. Status counts (subsystem level)

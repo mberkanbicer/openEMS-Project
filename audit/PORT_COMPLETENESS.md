@@ -18,7 +18,7 @@ audit uses the protocol taxonomy. Mapping used in `component_matrix.csv`:
 | `BLOCKED` | `Blocked` | external dependency |
 | `UNKNOWN` | — | not investigated |
 
-The register now reports **168 `Verified`, 0 open rows** after RM-167/RM-168.
+The register now reports **169 `Verified`, 0 open rows** after RM-167/RM-169.
 This audit adds subsystem-level findings the row status did not capture (two P0
 silent option drops, now guarded).
 

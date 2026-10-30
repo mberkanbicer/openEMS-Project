@@ -18,7 +18,7 @@ the 53 `Implemented` rows, RM-144, and the platform/GUI evidence that this host
 cannot produce; they are listed in Section 3.
 
 > **2026-10-30 note:** the register is the authoritative count and now has
-> **168 `Verified`, 0 open** rows. The audit in `audit/` re-checked the
+> **169 `Verified`, 0 open** rows. The audit in `audit/` re-checked the
 > implementation and found two silently ignored physics options
 > (`CellConstantMaterial`, cylindrical `MultiGrid`), now rejected at setup
 > (RM-167/RM-061) and recorded as E-007/E-008. The headline counts below are
