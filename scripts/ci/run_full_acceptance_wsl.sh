@@ -158,7 +158,7 @@ log=$(run "performance measurement" bash scripts/ci/run_performance_baseline_wsl
 record "performance measurement (fresh)" "$log" "$(grep -cE '^(default|basic),' "$LOG_DIR/perf/performance-baseline.csv" 2>/dev/null || echo 0) measured runs"
 
 log=$(run "performance gate" python3 scripts/ci/check_performance_baseline.py --csv "$LOG_DIR/perf/performance-baseline.csv")
-record "performance gate (4.0x wall / 3.25x RSS)" "$log" "$(grep -c 'PASS$' "$log" || true) cases within limits"
+record "performance gate (4.0x wall / 3.25x RSS)" "$log" "$(grep -cE '^[a-z]+ +[A-Za-z0-9_]+ .*PASS$' "$log" || true) cases within limits"
 
 echo "== install layout and records"
 log=$(run "cmake install layout" bash scripts/ci/check_cmake_install.sh)

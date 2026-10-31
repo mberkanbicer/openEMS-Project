@@ -10,13 +10,15 @@ are committed on their own `mberkanbicer-rust-migration-audit` branches, pushed,
 and pinned by the root repository; the archived three-crate tree is tagged
 `archive/rust-3crate-tree-2026-10`.
 
-The full-stack acceptance run at revision `cce4905` is 13/13 PASS (release
-workspace build, 764 crate tests, 475 HDF5 tests, 448 native Python cases, the
-unmodified Octave testsuite 10/10, the 51-case differential harness, the
-cylindrical SAR and curve-excitation gates, CTB, the install layout, the
-records check and the placeholder self-test). `FINAL_AUDIT.md` carries the
-re-audit against that revision; all thirteen criteria are met for the scope
-this host can execute. The Windows GUI session in `audits/gui-qa.md` covers
+The full-stack acceptance run is **17/17 PASS** and covers the release
+workspace build, 843 crate tests, 506 HDF5 tests, 459 native Python cases (2
+GPU skips), the unmodified Octave testsuite 10/10, the 51-case differential
+harness, the cylindrical SAR and curve-excitation gates, the analytic SAR, the
+CST comparison harness self-test, CTB, a fresh performance measurement gated at
+4.0x wall / 3.25x peak RSS, the install layout, the records check and the
+placeholder self-test. `FINAL_AUDIT.md` carries the re-audit against an earlier
+revision; all thirteen criteria are met for the scope this host can execute. The
+Windows GUI session in `audits/gui-qa.md` covers
 mouse, keyboard, dialogs, the transform tools and a live-window PNG export.
 Two limitations are recorded exceptions, not open work: E-005 (the hosted
 platform matrix and nightly run are unavailable, replaced by the local job)

@@ -86,9 +86,8 @@ python scripts/ci/run_cst_comparison.py \
   --out docs/migration/cst/msl_notch_comparison.md
 ```
 
-The harness also accepts CST ASCII exports if you rename the extension; it
-parses Touchstone (`RI`, `MA`, `DB`; Hz…GHz) and reports the notch frequency,
-depth, rejection and the |S11| RMS difference.
+The harness reads Touchstone (`RI`, `MA`, `DB`; Hz…GHz). It does not parse CST's
+own ASCII 1D export, so always send the Touchstone file.
 
 ## Acceptance gates and why
 
