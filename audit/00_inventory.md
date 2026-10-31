@@ -67,7 +67,7 @@ Total Rust source ≈ **81k lines**. The workspace has no generated Rust code.
 ## 4. Tests that exist
 
 - 32 test binaries in the final debug run of this session (unit +
-  integration + doc/bin targets), **886 passed / 0 failed / 0 ignored**; the
+  integration + doc/bin targets), **897 passed / 0 failed / 0 ignored**; the
   pre-audit run was 851/30. Evidence: section 4 of `00_baseline.md`,
   `workspace_test.log` and `workspace_test_final.log`.
 - Integration suites: `CSXCAD/rust/tests` (expression evaluation, mesh
