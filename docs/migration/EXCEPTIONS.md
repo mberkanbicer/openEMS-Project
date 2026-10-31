@@ -22,10 +22,17 @@ with M-file wrappers, so the omission no longer exists.
 | E-010 | No hosted CI or macOS/FreeBSD/Windows run at this HEAD: GitHub Actions is disabled at the account level (dispatch returns HTTP 422) | E-005 / CI-001; owner/environment | Platform claims rest on runs before this HEAD; the current tree is verified on Windows and WSL2 only | Enable Actions at the account level (or run the workflows on hosted runners) and attach the platform matrix |
 | E-011 | The proposed performance gate (wall <=4.0x, peak RSS <=3.25x native) is not formally accepted | PERF-001; owner decision | The gate passes on the recorded baseline (`check_performance_baseline.py`) but is not an acceptance criterion and is not wired into release CI | Owner signs off on the thresholds; wire the script into the release job |
 | E-012 | `windows-package.yml` has not run at this HEAD | PKG-001; requires a Windows runner with vcpkg/Qt (a local run is a multi-hour C++ build) | No Windows installer artifact is verified at this HEAD; the workflow source is present | Run the workflow on a Windows runner and attach the resulting artifact |
-| E-013 | No floating dock windows: `egui_tiles` provides tabs, splits and drag-docking, not panes floating outside the main window | ADR 0010; toolkit capability | Panels dock as tabs/splits and persist; the native Qt floating-panel behaviour is not reproduced | Use tabs/splits, or add a separate viewport for floating panes if that workflow is required |
 
 ### Resolved
 
+- **E-013 (no floating dock windows) closed 2026-10-31 (owner decision,
+  ADR 0010):** `egui_tiles` docks panes as tabs/splits with drag grips and
+  persists the tree, but cannot float panes outside the main window. The owner
+  accepted the tab/split workflow as the docking scope for this fork, so the
+  missing Qt-style floating panels are a decided scope choice, not open work.
+  The docking behaviour and its 32 `qcsxcad-egui` (4 docking) + 18 `appcsxcad`
+  tests are unchanged; floating windows would need a new ADR and a separate
+  viewport.
 - **E-014 (no sanitizer pass) closed 2026-10-31 (RM-183):**
   `scripts/ci/run_asan_checks_wsl.sh` runs the fparser suite and the
   `operator::` tests under `-Zsanitizer=address` with `-Zbuild-std` and a

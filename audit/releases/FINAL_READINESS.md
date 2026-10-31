@@ -36,7 +36,7 @@ CST-validated or production-ready replacement.
 | GPU compute | **not implemented** (scope, ADR 0002) |
 | macOS/FreeBSD/Windows run at this HEAD | **blocked** (E-005/E-010; no hosted CI) |
 | Windows installer | workflow present, no run at this HEAD (`PKG-001`, E-012) |
-| GUI drag-docking | **PASS** (ADR 0010): tabs/splits/drag grips, persisted; no floating windows (E-013) |
+| GUI drag-docking | **PASS** (ADR 0010): tabs/splits/drag grips, persisted; tab/split workflow accepted, floating panes out of scope (E-013 closed) |
 | Performance threshold | refreshed baseline; proposed 4.0x/3.25x gate passes; approval pending (`PERF-001`, E-011) |
 | Analytic SAR | **PASS** (`VAL-002`): lossy line alpha 9.3513 vs 9.3601 Np/m, beta 84.3651 vs 84.3547 rad/m, SAR slope rel 9.4e-4 |
 | MATLAB (as opposed to Octave) | smoke PASS (R2025b: XML write, setup, 50-step run) |
@@ -78,8 +78,9 @@ action that removes it; none is silently treated as verified.
   baseline but is not formally accepted; it is not used as a release gate.
 - **E-012 / PKG-001** - `windows-package.yml` has not run at this HEAD, so no
   Windows installer artifact is verified.
-- **E-013 / ADR 0010** - egui_tiles docks panes as tabs/splits but has no floating
-  windows; the Qt floating-panel behaviour is not reproduced.
+- **E-013 (closed 2026-10-31)** - the owner accepted the tab/split dock
+  workflow (ADR 0010); `egui_tiles` has no floating panes, so Qt-style floating
+  panels stay out of scope rather than being tracked as missing work.
 - **E-014 (closed 2026-10-31)** - ASan now passes 53 parser + 58 operator
   tests; TSan is not claimed for the single-threaded selection.
 

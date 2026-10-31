@@ -1,6 +1,6 @@
 # ADR 0010: Drag-docking for the Rust GUI
 
-**Status:** Implemented 2026-10-31 (accepted for this fork)
+**Status:** Implemented and accepted 2026-10-31 for this fork (tabs/splits; no floating panes)
 **Date:** 2026-10-30
 **Context:** RM-176, `audits/gui-modernization-audit.md` §2/§9, ADR 0009
 **Decision owner:** Project owner
@@ -50,6 +50,14 @@ the tree and its visibility persist in `settings.json`, `Ctrl+B`/`Ctrl+I` use
 `qcsxcad-egui` tests (4 docking) and 18 `appcsxcad` tests, and the default and
 docked layouts are captured in `audits/gui-docking-1440.png` and
 `audits/gui-docking-docked-1440.png`.
+
+### Owner decision (2026-10-31)
+
+The owner accepted the tab/split docking workflow as the docking scope for this
+fork and does not require floating panes. The difference from the Qt application
+is therefore a recorded scope decision, and `EXCEPTIONS.md` closes `E-013`
+instead of keeping it open. Floating windows remain available as a future
+change, but only through a new ADR and a separate viewport implementation.
 
 ## Consequences
 

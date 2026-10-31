@@ -207,4 +207,5 @@ registry and drag-docking are implemented (RM-173/RM-176/RM-181). ADR 0010 uses
 pane has a drag grip, panes form tabs/splits, `Ctrl+B`/`Ctrl+I` hide them, and the
 tree is stored in `settings.json`. Captures: `gui-docking-1440.png` (default) and
 `gui-docking-docked-1440.png` (Structure+Inspector tabbed). Floating windows are
-not provided by egui_tiles and are not claimed.
+not provided by egui_tiles and are not claimed; the owner accepted the
+tab/split workflow as the docking scope on 2026-10-31, closing E-013 (ADR 0010).

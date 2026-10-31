@@ -6,7 +6,8 @@ Verifies:
     vocabulary;
   * the "Current status snapshot" counts match the task table;
   * the remaining-backlog header matches the number of `Not Started` rows;
-  * MIGRATION_STATUS.md and COVERAGE_MATRIX.csv only use the closed vocabulary.
+  * MIGRATION_STATUS.md and COVERAGE_MATRIX.csv only use the closed vocabulary;
+  * COVERAGE_MATRIX.csv and audit/component_matrix.csv have no ragged rows.
 """
 
 from __future__ import annotations
@@ -113,8 +114,34 @@ def check_coverage() -> list[str]:
     return problems
 
 
+def check_csv_width() -> list[str]:
+    """Reject rows whose comma count does not match the header.
+
+    An unquoted comma silently shifts every later field, so a status can end up
+    in the evidence column while the row still parses.
+    """
+    problems: list[str] = []
+    for relative in ("docs/migration/COVERAGE_MATRIX.csv", "audit/component_matrix.csv"):
+        path = ROOT / relative
+        if not path.exists():
+            problems.append(f"{relative} missing")
+            continue
+        with path.open(newline="", encoding="utf-8", errors="replace") as handle:
+            reader = csv.reader(handle)
+            header = next(reader, None)
+            if not header:
+                problems.append(f"{relative} has no header")
+                continue
+            for number, row in enumerate(reader, start=2):
+                if len(row) != len(header):
+                    problems.append(
+                        f"{relative}:{number}: {len(row)} fields, header has {len(header)}"
+                    )
+    return problems
+
+
 def main() -> int:
-    problems = check_tasks() + check_status_doc() + check_coverage()
+    problems = check_tasks() + check_status_doc() + check_coverage() + check_csv_width()
     if problems:
         print("migration record check failed:", file=sys.stderr)
         for problem in problems:
