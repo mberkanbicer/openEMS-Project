@@ -17,8 +17,8 @@
     {
       "category": "D",
       "path": "docs/migration/VALIDATION.md",
-      "sha256": "3c31cd9c7b7faf415c84ed09e8fefcaa5f2ed34f3bedea08ec9a4bc38cd13677",
-      "bytes": 151652,
+      "sha256": "975d0dd350f00a9c4842a22df9939f0658eef3f26e29523f997be91ebc2058f9",
+      "bytes": 152357,
       "provenance": "recorded validation sections"
     },
     {
@@ -76,6 +76,34 @@
       "sha256": "eaa03abb007998a21de1147567750ec90d99f9f9d822ca8d22c363722cbad1b5",
       "bytes": 656,
       "provenance": "MSL notch harness wrapper"
+    },
+    {
+      "category": "A",
+      "path": "scripts/ci/run_miri_checks_wsl.sh",
+      "sha256": "5cc89498a1dc4c368debde46daec9d6f0e183b1bf76d6457755b4959d343b377",
+      "bytes": 1547,
+      "provenance": "Miri parser/operator gate"
+    },
+    {
+      "category": "A",
+      "path": "QCSXCAD/rust-egui/src/docking.rs",
+      "sha256": "61832be4da091c3320be65d3057bcb1f4588b6e4709e5cee70e0c45b97495860",
+      "bytes": 8959,
+      "provenance": "egui_tiles dock layout"
+    },
+    {
+      "category": "A",
+      "path": "docs/migration/audits/gui-docking-1440.png",
+      "sha256": "5d7612f91cdf658018ffa13b6668531a000d61edc53f87a2178d2ec99f74566c",
+      "bytes": 174711,
+      "provenance": "default docking layout capture"
+    },
+    {
+      "category": "A",
+      "path": "docs/migration/audits/gui-docking-docked-1440.png",
+      "sha256": "80d606366a024fb2572998a36e3860c39314aed7eb5bc88eff725809c4ad2fd4",
+      "bytes": 157693,
+      "provenance": "persisted tabbed dock layout capture"
     },
     {
       "category": "A",
@@ -150,8 +178,8 @@
     {
       "category": "D",
       "path": "scripts/ci/run_full_acceptance_wsl.sh",
-      "sha256": "ebacb5be56b1fa4225f8096dd7438271f1bf0a1d066dacbb231e6bceadf1b788",
-      "bytes": 6973,
+      "sha256": "95095aab27f15fee8702c69ccd157ef4cf9c61edd70d9980a160386840038512",
+      "bytes": 6989,
       "provenance": "acceptance driver"
     },
     {

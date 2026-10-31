@@ -1,21 +1,21 @@
 # Completion dashboard
 
-Audit of the **existing** Rust port. Basis: `component_matrix.csv` (48
+Audit of the **existing** Rust port. Basis: `component_matrix.csv` (49
 subsystem rows) plus the executed commands in `00_baseline.md`. This is not a
-file-count percentage; 38 of 48 audited subsystems have executed verification
+file-count percentage; 39 of 49 audited subsystems have executed verification
 evidence, consistent with the register's **179 `Verified`** rows.
 
 ## 1. Status counts (subsystem level)
 
 | Status | Count | Meaning here |
 |---|---:|---|
-| `VERIFIED_COMPLETE` | 38 | implementation + executed comparison/analytic result recorded |
+| `VERIFIED_COMPLETE` | 39 | implementation + executed comparison/analytic result recorded |
 | `IMPLEMENTED_UNVERIFIED` | 1 | Windows installer workflow; no run at this HEAD |
 | `PARTIAL` | 1 | performance threshold |
 | `INTENTIONALLY_DIFFERENT` | 1 | fparser extended-precision variants (E-001/ADR 0006) |
 | `INTENTIONALLY_UNSUPPORTED` | 5 | GPU compute (ADR 0002), FreeBSD hyp2mat (E-004), GUI solver control, multi-grid (E-007), cell-constant material (E-008) |
 | `BLOCKED` | 2 | hosted CI/platform matrix (E-005), CST comparison (no data) |
-| **Total** | **48** | |
+| **Total** | **49** | |
 
 Trust level: high for the default Cartesian/homogeneous/differential paths
 (51-case native harness + analytic wave-speed + Octave/Python suites). Models

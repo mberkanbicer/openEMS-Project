@@ -1,6 +1,6 @@
 # ADR 0010: Drag-docking for the Rust GUI
 
-**Status:** Proposed — owner decision required
+**Status:** Implemented 2026-10-31 (accepted for this fork)
 **Date:** 2026-10-30
 **Context:** RM-176, `audits/gui-modernization-audit.md` §2/§9, ADR 0009
 **Decision owner:** Project owner
@@ -29,11 +29,11 @@ provides a tiling layout with drag/re-dock and resizing. It does not provide
 floating windows; Qt-style floating panels would still need a separate viewport
 implementation.
 
-## Decision (proposed)
+## Decision
 
-Adopt `egui_tiles 0.18` behind a feature flag in `qcsxcad-egui`, use it for the
-two existing docks only, and keep the current fixed-panel code path as the
-default until the tiling layout passes the same evidence bar:
+Adopted `egui_tiles 0.18` behind the `docking` feature in `qcsxcad-egui`. The
+application enables it, so the three panes are a real tile tree; the fixed
+panel path is kept for builds without the feature. The acceptance bar was:
 
 1. the structure/inspector content renders unchanged (no duplicated widgets);
 2. widths and the tile tree are persisted next to the window settings;
@@ -44,8 +44,12 @@ default until the tiling layout passes the same evidence bar:
    persistence round-trip test;
 6. a 1440x900 capture shows the re-docked layout and is added to `audits/`.
 
-Until the owner approves the dependency, the product keeps the verified
-persisted-panel behaviour and this remains the only open GUI parity item.
+All six points are met (2026-10-31): the pane contents are the existing widgets,
+the tree and its visibility persist in `settings.json`, `Ctrl+B`/`Ctrl+I` use
+`Tree::set_visible`, the tree keyboard/focus/palette tests pass, there are 32
+`qcsxcad-egui` tests (4 docking) and 18 `appcsxcad` tests, and the default and
+docked layouts are captured in `audits/gui-docking-1440.png` and
+`audits/gui-docking-docked-1440.png`.
 
 ## Consequences
 

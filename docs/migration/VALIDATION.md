@@ -2465,6 +2465,21 @@ JSON under `reference-data/convergence/`:
 These are studies, not CI gates. The MSL result says the smoke model is not a
 converged notch design; it is not evidence of a solver defect.
 
+## Miri memory-safety pass (RM-180)
+
+`scripts/ci/run_miri_checks_wsl.sh` (nightly + Miri) runs:
+
+- `fparser-rs`: **21 passed, 0 failed**, 32 filtered;
+- `openems-core`: three operator timestep/coordinate tests, **3 passed**;
+- result: **no undefined behaviour** reported.
+
+The 32 filtered parser tests are the optimizer's exact last-bit
+floating-point parity tests (`optimization*`, `optimized*`). Miri's float
+emulation differs from the host in the final bit (for example
+`-0.5463024898437903` vs `-0.5463024898437905`, or `0.9999999999999998` vs
+`1.0`), so those tests cannot be used as a Miri gate. The full suite still
+passes natively (53/53). No fuzzing or sanitizer run is recorded.
+
 ## Analytic SAR (VAL-002, RM-178)
 
 `scripts/ci/run_analytic_sar_check_wsl.sh` drives a homogeneous lossy TEM line

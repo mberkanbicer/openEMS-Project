@@ -36,11 +36,11 @@ CST-validated or production-ready replacement.
 | GPU compute | **not implemented** (scope, ADR 0002) |
 | macOS/FreeBSD/Windows run at this HEAD | **blocked** (E-005; no hosted CI) |
 | Windows installer | workflow present, no run at this HEAD (`PKG-001`) |
-| GUI drag-docking | ADR 0010 proposed (`egui_tiles 0.18`, egui-0.37 compatible); owner decision required |
+| GUI drag-docking | **PASS** (ADR 0010 implemented): egui_tiles 0.18 tree, drag grips, tab groups, persisted in `settings.json`; no floating windows |
 | Performance threshold | refreshed baseline; proposed 4.0x/3.25x gate passes; approval pending (`PERF-001`) |
 | Analytic SAR | **PASS** (`VAL-002`): lossy line alpha 9.3513 vs 9.3601 Np/m, beta 84.3651 vs 84.3547 rad/m, SAR slope rel 9.4e-4 |
 | MATLAB (as opposed to Octave) | smoke PASS (R2025b: XML write, setup, 50-step run) |
-| Fuzzing/Miri/sanitizers | not run |
+| Fuzzing/Miri/sanitizers | **Miri PASS**: 21 parser + 3 operator tests, 0 UB; 32 optimizer exact-FP tests excluded (Miri float emulation); no fuzz/sanitizer run |
 
 ## 3. Checklist (protocol §13)
 
@@ -59,8 +59,8 @@ CST-validated or production-ready replacement.
 | GPU parity | N/A (no backend) |
 | CST comparison | **Blocked** |
 | Python/MATLAB/Octave compatibility | Python/Octave met; MATLAB smoke PASS (R2025b) |
-| GUI edit/validate/export | Met; no solver run by design |
-| Security/unsafe/fuzz review | Partly: source review; no fuzz/Miri |
+| GUI edit/validate/export | Met; dock layout (tabs/splits) is draggable and persisted; no solver run by design |
+| Security/unsafe/fuzz review | Partly: source review + a Miri pass on parser/operator; no fuzz or sanitizer run |
 | Cross-platform builds | **Blocked at HEAD** |
 | Final report links evidence | Met (this tree) |
 

@@ -1,6 +1,6 @@
 # Rust Migration Status
 
-**Status (2026-10-31): Complete.** The register has **179 `Verified` rows and
+**Status (2026-10-31): Complete.** The register has **181 `Verified` rows and
 no open row** (`REMEDIATION_TASKS.md`); the GUI design-parity work (`RM-152`)
 and the native icons/metrics (`RM-153`) are closed, and the `Precision
 Workbench` redesign adds RM-164..RM-166 (theme tokens, shell, viewport
@@ -51,7 +51,8 @@ The register grows to 163 `Verified` rows (RM-154..RM-163); the new APIs are
 wired into the GUI renderer and the Python bindings, and the full workspace
 suite is 865 passed / 0 failed. The GUI redesign adds RM-164..RM-166 and the
 audit adds RM-167/RM-168, the parser hardening adds RM-169, the cavity convergence study adds RM-170, the viewport colour fix adds RM-171, the `TimeStepFactor` fix adds RM-172, dock persistence adds RM-173, the dielectric study adds RM-174, and the MATLAB smoke adds RM-175, and the keyboard/palette work adds RM-176, and the time-step study adds RM-177, and the analytic SAR validation adds RM-178, and the corrected MSL notch study
-adds RM-179, for 179 `Verified` rows in total.
+adds RM-179, the Miri pass adds RM-180, and drag-docking adds RM-181, for 181 `Verified`
+rows in total.
 Everything else is classified as already present, not applicable (GPU engine,
 packaging, CI) or deferred with a reason in
 `audits/upstream-sync-2026-10-30.md`.
@@ -114,7 +115,7 @@ pass (405 tests, 2 GPU tests reported `SKIPPED`).
 
 Records corrected: E-005 (the nightly task was deleted), the stale
 `FINAL_AUDIT.md` headline, and `RM-061`'s evidence. The register is now
-**179 `Verified`, 0 open**. The remaining gaps are validation strength
+**181 `Verified`, 0 open**. The remaining gaps are validation strength
 (convergence, CST) and the platform matrix, not porting work; see
 `audit/releases/FINAL_READINESS.md` for the conditional release verdict.
 
