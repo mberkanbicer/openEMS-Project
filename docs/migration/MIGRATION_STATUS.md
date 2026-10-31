@@ -10,7 +10,7 @@ are committed on their own `mberkanbicer-rust-migration-audit` branches, pushed,
 and pinned by the root repository; the archived three-crate tree is tagged
 `archive/rust-3crate-tree-2026-10`.
 
-The full-stack acceptance run is **17/17 PASS** and covers the release
+The full-stack acceptance run is **18/18 PASS** and covers the release
 workspace build, 843 crate tests, 506 HDF5 tests, 459 native Python cases (2
 GPU skips), the unmodified Octave testsuite 10/10, the 51-case differential
 harness, the cylindrical SAR and curve-excitation gates, the analytic SAR, the
