@@ -125,6 +125,9 @@ log=$(run "octave suite" bash scripts/ci/run_octave_testsuite_wsl.sh)
 record "native Octave testsuite" "$log" "$(sum_octave "$log")"
 
 echo "== differential gates"
+log=$(run "operator dump" bash scripts/ci/run_operator_dump_check_wsl.sh)
+record "operator dump (quarter + cell-centre)" "$log" "$(grep -c 'operator dump check: PASS' "$log" || true) dump comparisons"
+
 log=$(run "reference harness" bash scripts/ci/run_reference_harness_wsl.sh)
 record "differential reference harness" "$log" "$(grep -c '"ok": true' "$log" || true) cases ok"
 

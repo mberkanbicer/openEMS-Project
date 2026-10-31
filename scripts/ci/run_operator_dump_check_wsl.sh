@@ -61,3 +61,47 @@ if [ "$status" -ne 0 ]; then
   exit 1
 fi
 echo "operator dump check: PASS"
+
+# E-008: the same comparison with CellConstantMaterial="1" (native
+# AverageMatCellCenter) and a material box that straddles cell centres. The
+# quarter-cell path would produce different coefficients here, so this is the
+# differential fixture for the cell-centre averaging method.
+cat > "$WORK/cellcenter.xml" <<EOF
+<openEMS>
+  <FDTD NumberOfTimesteps="5" TimeStepMethod="3" CellConstantMaterial="1">
+    <BoundaryCond xmin="PML" xmax="PML" ymin="PML" ymax="PML" zmin="PML" zmax="PML"/>
+    <Excitation Type="0" f0="1e9" fc="2e9"/>
+  </FDTD>
+  <ContinuousStructure CoordSystem="0">
+    <RectilinearGrid DeltaUnit="0.001">
+      <XLines>$LINES</XLines>
+      <YLines>$LINES</YLines>
+      <ZLines>$LINES</ZLines>
+    </RectilinearGrid>
+    <BackgroundMaterial Epsilon="2" Mue="1" Sigma="0" Kappa="0"/>
+    <Properties>
+      <Material Name="slab">
+        <Property Epsilon="6" Mue="1" Sigma="0" Kappa="0"/>
+        <Primitives>
+          <Box Priority="1">
+            <P1 X="4.5" Y="4.5" Z="4.5"/>
+            <P2 X="15.5" Y="15.5" Z="15.5"/>
+          </Box>
+        </Primitives>
+      </Material>
+    </Properties>
+  </ContinuousStructure>
+</openEMS>
+EOF
+
+rm -f "$WORK/native/operator_dump.vtr" "$WORK/rust/operator_dump.vtk"
+( cd "$WORK/native" && "$NATIVE_BIN" ../cellcenter.xml --no-simulation --debug-operator >cellcenter.log 2>&1 )
+( cd "$WORK/rust" && "$RUST_BIN" ../cellcenter.xml --no-simulation --debug-operator >cellcenter.log 2>&1 )
+python3 "$SCRIPT_DIR/compare_operator_dump.py" \
+  "$WORK/native/operator_dump.vtr" "$WORK/rust/operator_dump.vtk" 1.0e-6
+status=$?
+if [ "$status" -ne 0 ]; then
+  echo "cell-centre operator dump check: FAIL"
+  exit 1
+fi
+echo "cell-centre operator dump check: PASS"

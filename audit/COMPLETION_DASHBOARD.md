@@ -2,24 +2,24 @@
 
 Audit of the **existing** Rust port. Basis: `component_matrix.csv` (49
 subsystem rows) plus the executed commands in `00_baseline.md`. This is not a
-file-count percentage; 42 of 49 audited subsystems have executed verification
+file-count percentage; 43 of 49 audited subsystems have executed verification
 evidence, consistent with the register's **183 `Verified`** rows.
 
 ## 1. Status counts (subsystem level)
 
 | Status | Count | Meaning here |
 |---|---:|---|
-| `VERIFIED_COMPLETE` | 42 | implementation + executed comparison/analytic result recorded |
+| `VERIFIED_COMPLETE` | 43 | implementation + executed comparison/analytic result recorded |
 | `INTENTIONALLY_DIFFERENT` | 1 | fparser extended-precision variants (E-001/ADR 0006) |
-| `INTENTIONALLY_UNSUPPORTED` | 5 | GPU compute (ADR 0002), FreeBSD hyp2mat (E-004), GUI solver control, multi-grid (E-007), cell-constant material (E-008) |
+| `INTENTIONALLY_UNSUPPORTED` | 4 | GPU compute (ADR 0002), FreeBSD hyp2mat (E-004), GUI solver control, multi-grid (E-007) |
 | `BLOCKED` | 1 | hosted CI/platform matrix (E-010) |
 | **Total** | **49** | |
 
 Trust level: high for the default Cartesian/homogeneous/differential paths
 (51-case native harness + analytic wave-speed + Octave/Python suites). Models
-that set `CellConstantMaterial` or `MultiGrid` now stop with an explicit setup
-error (E-007/E-008) instead of silently simulating something else. Convergence
-studies and a CST 2026 notch comparison are recorded in
+that request `MultiGrid` still stop with an explicit setup error (E-007);
+`CellConstantMaterial` is implemented and differentially verified (E-008
+closed). Convergence studies and a CST 2026 notch comparison are recorded in
 `docs/migration/VALIDATION.md` and `docs/migration/cst/`.
 
 ## 2. P0 — silent wrong physics (fixed in this audit)
@@ -38,9 +38,11 @@ studies and a CST 2026 notch comparison are recorded in
   interfaces. Default models (QuarterCell) are unaffected.
 - Evidence: code search, no test covers the flag. Taxonomy
   `IMPLEMENTED_BROKEN`.
-- Disposition: **fixed** by rejecting the option at setup with an explicit
-  error (E-008) and `cell_constant_material_is_rejected_at_setup`. Implementing
-  `AverageMatCellCenter` remains a feature for a later change.
+- Disposition: **implemented 2026-11-01.** The setup switch selects
+  `MaterialAveraging::CellCenter`, `AverageMatCellCenter` mirrors the native
+  dual-node sampling, and the differential operator dump with
+  `CellConstantMaterial="1"` matches native (vv exact, vi 9.9e-8, ii exact,
+  iv 1.1e-13). E-008 closed.
 
 ### NUM-002 — cylindrical `MultiGrid` is accepted, stored, exposed and ignored
 
@@ -112,7 +114,8 @@ No module above is to be replaced while closing the two P0 rows.
 
 ## 8. Must not be portrayed as finished
 
-- Any multigrid or cell-constant-material model result (currently silent).
+- Any multigrid model result (cell-constant materials are now implemented);
+  the cylindrical multi-grid feature remains unimplemented.
 - A general CST equivalence: the MSL notch is validated (0.749 %), not every
   solver feature.
 - GPU acceleration (not implemented; out of scope).

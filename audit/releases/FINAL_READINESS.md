@@ -3,13 +3,14 @@
 Decision: **CONDITIONAL_RESEARCH_RELEASE**
 
 The default CPU solver path is evidence-backed against the pinned native
-implementation and two analytic wave-speed cases, and the two silently ignored
-physics options found by this audit are now rejected explicitly. Convergence is
-measured for the cavity (mesh and time step), the dielectric speed and the MSL
-notch, and SAR is validated against the exact lossy-medium solution. An
-independent CST 2026 comparison now validates the MSL notch (0.749 % on the
-resonance). The port is not a complete equivalent of every upstream feature, so
-it must not be described as a complete or production-ready replacement.
+implementation and two analytic wave-speed cases. `CellConstantMaterial` is now
+implemented and differentially verified; cylindrical multi-grid is still
+rejected explicitly. Convergence is measured for the cavity (mesh and time
+step), the dielectric speed and the MSL notch, and SAR is validated against the
+exact lossy-medium solution. An independent CST 2026 comparison now validates
+the MSL notch (0.749 % on the resonance). The port is not a complete equivalent
+of every upstream feature, so it must not be described as a complete or
+production-ready replacement.
 
 ## 1. What is proven
 
@@ -25,8 +26,8 @@ it must not be described as a complete or production-ready replacement.
 - 459 native Python tests (2 GPU tests skipped), Octave 10/10, install layout.
 - GUI editor workflow with real-click tree → inspector → status evidence;
   arrow-key tree navigation with focus rings and a Ctrl+K command palette.
-- P0 guards: `CellConstantMaterial` and `MultiGrid` fail loudly (E-007/E-008)
-  instead of changing the physics silently.
+- P0 guards: cylindrical `MultiGrid` fails loudly (E-007); `CellConstantMaterial`
+  is implemented and differentially verified against native (E-008 closed).
 
 ## 2. What is not proven
 
@@ -95,15 +96,15 @@ action that removes it; none is silently treated as verified.
 3. Hosted or local macOS/FreeBSD/Windows runs at the release commit.
 4. ~~Owner approval of the proposed performance gate.~~ Met 2026-10-31: 4.0x wall / 3.25x RSS accepted and measured fresh in acceptance.
 5. ~~The sRGB material-colour fix.~~ Met (RM-171).
-6. A decision on multi-grid and cell-constant materials: implement, or keep the
-   explicit rejection in the release notes.
+6. ~~A decision on multi-grid and cell-constant materials.~~ Cell-constant
+   averaging implemented 2026-11-01 (E-008); multi-grid remains an explicit
+   rejection (E-007).
 7. ~~A MATLAB run if MATLAB support is advertised.~~ Smoke met (full suite still open).
 
 ## 5. Honest limitations for the release note
 
 - No GPU acceleration.
 - No cylindrical multi-grid; models that request it stop at setup.
-- `CellConstantMaterial` models stop at setup.
 - CST validates the MSL notch (0.749 %); it is a single fixture, not a
   CST validation of every solver feature. Convergence is measured for the
   cavity (mesh/time), the dielectric speed and the MSL notch, and SAR is

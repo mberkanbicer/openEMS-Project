@@ -298,7 +298,8 @@ Step "smoke: Python wheels" {
     $env:PATH = "$binDir;$env:PATH"
     $probe = Join-Path $OutDir "smoke-python.py"
     @"
-import tempfile, os
+import os, tempfile
+os.add_dll_directory(r"$binDir")
 from CSXCAD import ContinuousStructure
 from openEMS import openEMS, _openems
 import csxcad_py

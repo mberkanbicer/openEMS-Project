@@ -2545,6 +2545,27 @@ the peak. Record: `reference-data/convergence/analytic_sar.json`. Tolerance is
 SAR scale is the engine's DFT convention (validated pointwise), so the analytic
 claim is the spatial decay and phase, not an independent W/kg calibration.
 
+## Cell-constant material averaging (E-008, 2026-11-01)
+
+`CellConstantMaterial="1"` now selects native `AverageMatCellCenter`
+(`MaterialAveraging::CellCenter`): the four transverse cells are sampled at
+their dual-node (cell) centres instead of quarter points, and the edge
+mue/sigma width uses the dual mesh. `scripts/ci/run_operator_dump_check_wsl.sh`
+runs two differential cases: the original quarter-cell model and a
+`CellConstantMaterial="1"` model with a material box straddling cell centres
+(20^3 mesh). Native vs Rust:
+
+| coefficient | quarter-cell | cell-centre |
+| --- | ---: | ---: |
+| `vv` | 9.8e-15 | exact |
+| `vi` | 4.3e-13 | 9.9e-8 |
+| `ii` | 6.0e-8 | exact |
+| `iv` | 4.8e-15 | 1.1e-13 |
+
+Both cases pass the 1e-6 relative bound. Unit tests cover the quarter-vs-centre
+difference on a thin slab and the setup switch; `openems-core` has 278 passing
+lib tests.
+
 ## CST cross-validation (E-009, 2026-10-31)
 
 CST Studio Suite 2026 ran the MSL notch fixture through
