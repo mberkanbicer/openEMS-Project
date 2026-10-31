@@ -2,14 +2,15 @@
 """Gate a performance run against the recorded native baseline.
 
 Reads the CSV produced by ``scripts/ci/run_performance_baseline_wsl.sh`` and
-checks two proposed limits per case:
+enforces two accepted limits per case:
 
-* wall time (Rust best / native best) <= ``--max-wall-ratio`` (default 4.0)
-* peak RSS (Rust max / native max) <= ``--max-rss-ratio`` (default 3.25)
+* wall time (Rust best / native best) <= ``--max-wall-ratio`` (4.0)
+* peak RSS (Rust max / native max) <= ``--max-rss-ratio`` (3.25)
 
-The limits are a proposal pending owner approval; this script only reports what
-the recorded data shows. It exits non-zero when a limit is exceeded so it can be
-wired into CI once the limits are accepted.
+The limits were approved by the project owner on 2026-10-31 (PERF-001) and are
+part of the acceptance run, which measures them fresh on every run. Passing
+here means the recorded data stays inside the signed limits; it is not a
+substitute for the fresh measurement.
 """
 
 from __future__ import annotations
@@ -73,7 +74,7 @@ def main() -> int:
 
     print(
         f"\nlimits: wall <= {args.max_wall_ratio:.2f}x, RSS <= {args.max_rss_ratio:.2f}x "
-        "(proposed; owner approval pending)"
+        "(accepted 2026-10-31, PERF-001)"
     )
     if failures:
         print(f"performance gate: FAIL ({failures} case(s))")

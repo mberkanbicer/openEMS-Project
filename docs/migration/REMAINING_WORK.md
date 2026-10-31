@@ -24,12 +24,13 @@ Ctrl+K palette) and RM-177 (time-step self-convergence, order 2.32 against the
 fixed-mesh limit).
 
 The remaining limits are now recorded as explicit exceptions, not silent gaps:
-E-009 (no CST data), E-010 (hosted platform matrix), E-011 (performance gate
-approval) and E-012 (Windows package run). The owner accepted the tab/split dock
-workflow on 2026-10-31, so E-013 (no floating dock windows) is closed as a scope
-decision. Miri (RM-180), a 120 s parser fuzz pass (RM-182) and an ASan pass
-(RM-183) are recorded; the MSL notch is converged (RM-179) and drag-docking is
-implemented (RM-181).
+E-009 (no CST data) and E-010 (hosted platform matrix). The owner accepted the
+tab/split dock workflow on 2026-10-31, so E-013 (no floating dock windows) is
+closed as a scope decision; E-011 (performance gate) closed with the owner's
+4.0x/3.25x acceptance wired into acceptance, and E-012 closed with a verified
+Rust-native Windows package. Miri (RM-180), a 120 s parser fuzz pass (RM-182)
+and an ASan pass (RM-183) are recorded; the MSL notch is converged (RM-179) and
+drag-docking is implemented (RM-181).
 
 ## Status update 2026-10-29 (final)
 

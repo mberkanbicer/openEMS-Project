@@ -1,0 +1,77 @@
+name: Windows Rust package
+
+# Build the Rust-native Windows package (binaries + PyO3 wheels) and smoke-test
+# it. This is the migration artifact; .github/workflows/windows-package.yml is
+# the native C++ reference workflow and is not replaced by this one.
+#
+# The same steps run locally through scripts/ci/build_windows_package.ps1, so a
+# green local run and a green CI run assemble the same layout.
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+    branches:
+      - CI_testing
+  pull_request:
+    paths:
+      - "**/*.rs"
+      - "**/Cargo.toml"
+      - "Cargo.lock"
+      - "scripts/ci/build_windows_package.ps1"
+      - ".github/workflows/windows-rust-package.yml"
+
+jobs:
+  package:
+    name: Build and smoke-test (Windows x64, Rust)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout openEMS-Project.git
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Miniconda (HDF5 + numpy)
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: "3.12"
+          activate-environment: openems-rust
+          channels: conda-forge
+          auto-activate-base: false
+
+      - name: Install HDF5, numpy and maturin
+        shell: pwsh
+        run: |
+          conda install -y -n openems-rust -c conda-forge hdf5 numpy
+          if ($LASTEXITCODE -ne 0) { throw "conda install failed" }
+          conda run -n openems-rust python -m pip install --quiet maturin
+          if ($LASTEXITCODE -ne 0) { throw "maturin install failed" }
+
+      - name: Build, smoke-test and archive
+        shell: pwsh
+        run: |
+          $prefix = (conda run -n openems-rust python -c "import sys; print(sys.prefix)").Trim()
+          $env:HDF5_LIB_DIR = Join-Path $prefix "Library\lib"
+          $env:HDF5_INCLUDE_DIR = Join-Path $prefix "Library\include"
+          $env:PATH = (Join-Path $prefix "Library\bin") + ";" + $env:PATH
+          $python = (conda run -n openems-rust python -c "import sys; print(sys.executable)").Trim()
+          $env:PATH = (Split-Path $python) + ";" + (Join-Path $prefix "Scripts") + ";" + $env:PATH
+          pwsh scripts/ci/build_windows_package.ps1 -Python $python
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: openEMS-rust-windows-x64
+          path: |
+            dist/*.zip
+            dist/*.sha256
+          if-no-files-found: error

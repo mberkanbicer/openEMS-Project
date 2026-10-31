@@ -23,14 +23,14 @@ reach the operator/engine or the writer.
 | REC-001 | E-005 describes a nightly task the owner deleted; no nightly runs now | `EXCEPTIONS.md` E-005 | corrected in this audit |
 | REC-002 | `FINAL_AUDIT.md` headline counts are stale (96/53 vs 166/0) | `FINAL_AUDIT.md` | re-issue or point to the register |
 | PY-001 | Python façade drifted from the carried upstream tests (`dc_free`, engine diagnostics, `Write2XML` completeness) | acceptance log `python_suites.log` (3 failures, 3 errors) | **FIXED** in RM-168; rebuild + rerun required |
-| PKG-001 | Windows installer workflow has no recorded run at this HEAD | `.github/workflows/windows-package.yml` | run it or mark unverified |
+| PKG-001 | **FIXED 2026-10-31:** the Rust-native Windows package is built and smoke-tested (CLI run, extracted-zip run, wheel import/XML write); the native C++ workflow remains a reference path. | `docs/migration/WINDOWS_PACKAGE.md`; `scripts/ci/build_windows_package.ps1` | none |
 
 ## P2 — validation strength and product polish
 
 | ID | Risk | Evidence | Next |
 |---|---|---|---|
 | VAL-001 | Independent validation is covered for the recorded cases: cavity TE101 2.05/2.03, dt 2.32, dielectric monotone, MSL notch 3.0e-4 spread, analytic SAR 9.4e-4; no CST data | `audit/numerics/CONVERGENCE.md` | CST comparison when data is available |
-| PERF-001 | Baseline refreshed at `c54f55d` (default 2.45x / 2.23x / 2.90x; basic 1.61x / 1.67x / 1.65x; RSS ≤3.08x). The proposed 4.0x / 3.25x gate passes, but no threshold is formally accepted. | `audit/performance/CPU_BASELINE.md`; `scripts/ci/check_performance_baseline.py` | Owner approves the gate and wires it into release CI |
+| PERF-001 | **FIXED 2026-10-31:** owner accepted wall ≤4.0x / RSS ≤3.25x. Baseline at `c54f55d` (default 2.45x / 2.23x / 2.90x; basic 1.61x / 1.67x / 1.65x; RSS ≤3.08x), and the acceptance run now measures both solvers fresh. | `audit/performance/CPU_BASELINE.md`; `scripts/ci/check_performance_baseline.py`; `scripts/ci/run_full_acceptance_wsl.sh` | none |
 | DOC-001 | No rustfmt/clippy baseline | `cargo fmt --check` fails on pre-existing code | separate cleanup PR |
 
 ## P3 / accepted scope

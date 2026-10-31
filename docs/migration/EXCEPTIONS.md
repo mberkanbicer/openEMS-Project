@@ -18,13 +18,28 @@ with M-file wrappers, so the omission no longer exists.
 | E-004 | `hyp2mat` is not built on FreeBSD: its Clipper2 backend (`clipper2c-sys`) has no FreeBSD target | RM-120/RM-121 platform matrix | FreeBSD builds and tests fparser, CSXCAD, openEMS, CTB and the GUI crates; only the offline PCB converter is unavailable there | Use the native hyp2mat, a Linux/macOS/Windows build, or replace the Clipper2 backend with a portable implementation if FreeBSD conversion is required |
 | E-007 | Cylindrical multi-grid (`MultiGrid`) is not implemented | Owner decision 2026-10-30 (RM-061/D-02: implement or fail loudly) | `set_multi_grid` / Python `SetMultiGrid` keeps the native setter contract (validate and store), but `setup_fdtd` refuses a model with radii: it stops with an explicit error instead of silently running as a single-grid model | Use the native solver for multi-grid models, or implement the cylindrical multi-grid operator/engine and remove this exception |
 | E-008 | `CellConstantMaterial` (cell-centre material probing) is not implemented | Owner decision 2026-10-30 (RM-167/D-02) | A model that sets `CellConstantMaterial` stops in `setup_fdtd` with an explicit error; the port only implements native `AverageMatQuarterCell` | Implement `AverageMatCellCenter` with a differential fixture and remove this exception |
-| E-009 | No CST Microwave Studio cross-validation: no CST project, licence or exported fields were supplied | CST-001 / VAL-001; owner data dependency | The port is not CST-validated; analytic and native differential evidence is unaffected | Provide the CST project or exported fields and run the same geometry and probes; record the comparison and exit this exception |
+| E-009 | No CST Microwave Studio cross-validation: no CST project, licence or exported fields were supplied | CST-001 / VAL-001; owner data dependency | The port is not CST-validated; analytic and native differential evidence is unaffected. Prepared 2026-10-31: `docs/migration/cst/msl_notch.bas` (model macro), the manual recipe in `docs/migration/cst/README.md` and the self-tested comparison harness `scripts/ci/run_cst_comparison.py` | Run the CST model locally, export the 1-7 GHz Touchstone file, run the harness, and record the comparison and exit this exception |
 | E-010 | No hosted CI or macOS/FreeBSD/Windows run at this HEAD: GitHub Actions is disabled at the account level (dispatch returns HTTP 422) | E-005 / CI-001; owner/environment | Platform claims rest on runs before this HEAD; the current tree is verified on Windows and WSL2 only | Enable Actions at the account level (or run the workflows on hosted runners) and attach the platform matrix |
-| E-011 | The proposed performance gate (wall <=4.0x, peak RSS <=3.25x native) is not formally accepted | PERF-001; owner decision | The gate passes on the recorded baseline (`check_performance_baseline.py`) but is not an acceptance criterion and is not wired into release CI | Owner signs off on the thresholds; wire the script into the release job |
-| E-012 | `windows-package.yml` has not run at this HEAD | PKG-001; requires a Windows runner with vcpkg/Qt (a local run is a multi-hour C++ build) | No Windows installer artifact is verified at this HEAD; the workflow source is present | Run the workflow on a Windows runner and attach the resulting artifact |
 
 ### Resolved
 
+- **E-012 (no Windows package) closed 2026-10-31 (PKG-001):**
+  `scripts/ci/build_windows_package.ps1` and
+  `.github/workflows/windows-rust-package.yml` build the Rust-native Windows
+  x64 package (six executables, the HDF5/MSVC DLL closure and both PyO3
+  wheels). The package was built and smoke-tested locally: CLI help, a 20-step
+  FDTD run, a re-run from the extracted zip with conda removed from `PATH`, and
+  a wheel import plus XML write. Artifact details, hash and limits are in
+  `docs/migration/WINDOWS_PACKAGE.md`. The native C++ `windows-package.yml` is
+  untouched and remains an unrun reference path; it is not the migration
+  deliverable.
+- **E-011 (performance gate not accepted) closed 2026-10-31 (PERF-001, owner
+  decision):** the owner accepted **wall <= 4.0x** and **peak RSS <= 3.25x** of
+  the native solver. The measured worst cases are 2.90x wall (`msl_port`) and
+  3.08x RSS (`Coax`, basic), so the accepted limits hold with margin. The gate
+  is part of `scripts/ci/run_full_acceptance_wsl.sh`: it measures both solvers
+  fresh on every run and fails on any case outside the limits, instead of
+  trusting the committed CSV.
 - **E-013 (no floating dock windows) closed 2026-10-31 (owner decision,
   ADR 0010):** `egui_tiles` docks panes as tabs/splits with drag grips and
   persists the tree, but cannot float panes outside the main window. The owner

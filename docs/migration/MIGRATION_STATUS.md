@@ -22,7 +22,10 @@ Two limitations are recorded exceptions, not open work: E-005 (the hosted
 platform matrix and nightly run are unavailable, replaced by the local job)
 and E-006 (no native Qt side-by-side and no macOS/Linux-X11 desktop session;
 the parity rows are verified by workflow and evidence).
-Performance has a recorded baseline but no agreed threshold.
+The full-stack acceptance run now carries the performance gate and the CST
+harness self-test in addition to the listed checks; the owner accepted the
+performance threshold (4.0x wall / 3.25x peak RSS) on 2026-10-31 and the run
+measures it fresh on every invocation.
 
 ### Status and evidence policy
 

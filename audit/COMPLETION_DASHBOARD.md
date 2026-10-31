@@ -68,14 +68,14 @@ convergence evidence exists.
 | REC-001 | E-005 still describes the nightly Windows task as installed; the owner deleted it on 2026-10-30, so no nightly runs now. Hosted Actions remain disabled. | `docs/migration/EXCEPTIONS.md` E-005 | Correct E-005; state "no nightly scheduled"; keep the script as the job body |
 | REC-002 | `FINAL_AUDIT.md` header still reports 96 Verified / 53 Implemented although the register is 166/0/0; it carries later notes but the headline is stale. | `docs/migration/FINAL_AUDIT.md` | Re-issue the final audit against this HEAD or point it at the register as the only count |
 | CI-001 | No hosted run exists at this HEAD; macOS/FreeBSD/Windows claims rest on a pre-`f69ed4d` run. | E-005, `.github/workflows` | Enable Actions at account level, or publish the platform limitation in the release note |
-| PKG-001 | `windows-package.yml` is present but has no recorded run at this HEAD. | workflow file, no artefact | Run it or mark `IMPLEMENTED_UNVERIFIED` |
+| PKG-001 | **FIXED 2026-10-31:** Rust-native Windows package built and smoke-tested (`WINDOWS_PACKAGE.md`); native C++ workflow untouched, reference-only. | `scripts/ci/build_windows_package.ps1`; `dist/*.zip` (ignored); `WINDOWS_PACKAGE.md` | none |
 
 ## 4. P2 — validation strength, performance, GUI
 
 | ID | Finding | Evidence | Next action |
 |---|---|---|---|
 | VAL-001 | Independent validation is now broad: analytic wave-speed tests, a **cavity TE101 mesh study (2.05/2.03)**, a **time-step study (2.32 vs the dt->0 limit)**, a monotone dielectric speed study, a **converged MSL notch (3.6700 GHz, 3.0e-4 spread)** and an **analytic SAR lossy line (9.4e-4)**. No CST data and no SAR-averaging convergence claim. | `audit/numerics/CONVERGENCE.md`; `reference-data/convergence/` | CST data when available |
-| PERF-001 | Baseline refreshed at `c54f55d`: default 2.45x / 2.23x / 2.90x, basic 1.61x / 1.67x / 1.65x; RSS ≤3.08x. The proposed 4.0x / 3.25x gate passes but is not formally accepted. | `audit/performance/CPU_BASELINE.md`; `scripts/ci/check_performance_baseline.py` | Owner approval + release CI wiring |
+| PERF-001 | **FIXED 2026-10-31:** owner accepted wall <=4.0x / RSS <=3.25x; the acceptance run measures both solvers fresh and enforces the limits (worst recorded 2.90x/3.08x). | udit/performance/CPU_BASELINE.md; scripts/ci/check_performance_baseline.py; scripts/ci/run_full_acceptance_wsl.sh | none |
 | DOC-001 | The repository is hand-formatted; `cargo fmt --check` fails on pre-existing code, and clippy has no baseline. | `00_baseline.md` §3 | Separate formatting PR; establish clippy baseline |
 
 ## 5. Working code that must not be disturbed

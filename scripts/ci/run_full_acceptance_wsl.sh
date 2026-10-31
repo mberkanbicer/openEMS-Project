@@ -138,10 +138,27 @@ echo "== analytic SAR"
 log=$(run "analytic SAR" bash scripts/ci/run_analytic_sar_check_wsl.sh)
 record "analytic SAR (lossy line)" "$log" "$(grep -E 'measured alpha' "$log" | tail -1)"
 
+# E-009: the CST comparison needs a CST export, which this environment cannot
+# produce; the harness itself is verified on synthetic Touchstone data here.
+echo "== CST comparison harness"
+log=$(run "cst harness" python3 scripts/ci/run_cst_comparison.py --self-test)
+record "CST comparison harness self-test" "$log" "$(grep -E '^self-test:' "$log" | tail -1)"
+
 echo "== CTB Octave delivery"
 log=$(run "ctb build" cargo build -p ctb-rs)
 log=$(run "ctb octave" env CTB_BIN="$REPO_ROOT/target/debug/ctb" octave --no-gui --quiet "$REPO_ROOT/CTB/rust/tests/octave/cli_exercise.m")
 record "CTB Octave delivery" "$log" "$(grep -E 'CTB CLI Octave exercise' "$log" | tail -1)"
+
+# E-011 / PERF-001: the owner accepted 4.0x wall and 3.25x peak RSS on
+# 2026-10-31. The gate measures both solvers here instead of trusting the
+# committed CSV, so a code regression cannot hide behind old numbers. The
+# native reference binary is required; without it the check fails loudly.
+echo "== performance gate"
+log=$(run "performance measurement" bash scripts/ci/run_performance_baseline_wsl.sh --out "$LOG_DIR/perf" --runs 2)
+record "performance measurement (fresh)" "$log" "$(grep -cE '^(default|basic),' "$LOG_DIR/perf/performance-baseline.csv" 2>/dev/null || echo 0) measured runs"
+
+log=$(run "performance gate" python3 scripts/ci/check_performance_baseline.py --csv "$LOG_DIR/perf/performance-baseline.csv")
+record "performance gate (4.0x wall / 3.25x RSS)" "$log" "$(grep -c 'PASS$' "$log" || true) cases within limits"
 
 echo "== install layout and records"
 log=$(run "cmake install layout" bash scripts/ci/check_cmake_install.sh)

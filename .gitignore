@@ -43,3 +43,5 @@ build-venv/
 # native excitation sample dumps written next to the solver output
 /et
 /ht
+# Rust packaging output (scripts/ci/build_windows_package.ps1)
+/dist/

@@ -83,3 +83,13 @@ Both solvers simulated the same input, so the stop timestep and the produced out
 | basic | msl_port | 1716 | 1716 | 12 | identical row counts |
 
 Solver differences found while producing this table are recorded in `observed-differences.md` next to this file.
+
+## Acceptance gate (PERF-001, closed 2026-10-31)
+
+The project owner accepted **wall <= 4.0x** and **peak RSS <= 3.25x** of the
+native solver on 2026-10-31. `scripts/ci/run_full_acceptance_wsl.sh` runs the
+measurement fresh (`--runs 2`, both engine configurations) and then executes
+`scripts/ci/check_performance_baseline.py` on that CSV, so a performance
+regression fails the acceptance run instead of being hidden by the committed
+baseline. The recorded worst cases are 2.90x wall (`msl_port`, default) and
+3.08x RSS (`Coax`, basic).

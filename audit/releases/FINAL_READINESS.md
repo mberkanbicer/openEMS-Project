@@ -35,9 +35,9 @@ CST-validated or production-ready replacement.
 | CST MWS comparison | **blocked** (CST-001, E-009): no data |
 | GPU compute | **not implemented** (scope, ADR 0002) |
 | macOS/FreeBSD/Windows run at this HEAD | **blocked** (E-005/E-010; no hosted CI) |
-| Windows installer | workflow present, no run at this HEAD (`PKG-001`, E-012) |
+| Windows installer | **DONE** 2026-10-31: Rust-native package built and smoke-tested (`WINDOWS_PACKAGE.md`, 15.4 MB, sha256 `614f5d0b…`); native C++ workflow remains reference-only |
 | GUI drag-docking | **PASS** (ADR 0010): tabs/splits/drag grips, persisted; tab/split workflow accepted, floating panes out of scope (E-013 closed) |
-| Performance threshold | refreshed baseline; proposed 4.0x/3.25x gate passes; approval pending (`PERF-001`, E-011) |
+| Performance threshold | **PASS, accepted 2026-10-31** (PERF-001): 4.0x wall / 3.25x RSS measured fresh in acceptance; worst 2.90x/3.08x |
 | Analytic SAR | **PASS** (`VAL-002`): lossy line alpha 9.3513 vs 9.3601 Np/m, beta 84.3651 vs 84.3547 rad/m, SAR slope rel 9.4e-4 |
 | MATLAB (as opposed to Octave) | smoke PASS (R2025b: XML write, setup, 50-step run) |
 | Fuzzing/Miri/sanitizers | **Miri PASS** (21 parser + 3 operator), **cargo-fuzz PASS** (126 963 runs/121 s, 0 crashes) and **ASan PASS** (53 parser + 58 operator, no report); TSan not claimed |
@@ -74,10 +74,12 @@ action that removes it; none is silently treated as verified.
   no CST cross-validation. The native differential and analytic evidence stands.
 - **E-010 / E-005 / CI-001** - GitHub Actions is disabled at the account level;
   no hosted macOS/FreeBSD/Windows run exists at this HEAD.
-- **E-011 / PERF-001** - the 4.0x wall / 3.25x RSS gate passes on the recorded
-  baseline but is not formally accepted; it is not used as a release gate.
-- **E-012 / PKG-001** - `windows-package.yml` has not run at this HEAD, so no
-  Windows installer artifact is verified.
+- **E-011 (closed 2026-10-31)** - the owner accepted the 4.0x wall / 3.25x RSS
+  gate; `run_full_acceptance_wsl.sh` now measures it fresh and fails outside the
+  limits (recorded worst: 2.90x wall, 3.08x RSS).
+- **E-012 (closed 2026-10-31)** - the Rust-native Windows package is built and
+  smoke-tested (`WINDOWS_PACKAGE.md`); the native C++ packaging workflow is
+  untouched and remains a reference path.
 - **E-013 (closed 2026-10-31)** - the owner accepted the tab/split dock
   workflow (ADR 0010); `egui_tiles` has no floating panes, so Qt-style floating
   panels stay out of scope rather than being tracked as missing work.
@@ -90,7 +92,7 @@ action that removes it; none is silently treated as verified.
    re-run at the final tagged commit.
 2. ~~A converged MSL notch model.~~ Met (RM-179): notch 3.6700 GHz, 3.0e-4 mesh spread.
 3. Hosted or local macOS/FreeBSD/Windows runs at the release commit.
-4. Owner approval of the proposed performance gate (the release-tree run already passes it).
+4. ~~Owner approval of the proposed performance gate.~~ Met 2026-10-31: 4.0x wall / 3.25x RSS accepted and measured fresh in acceptance.
 5. ~~The sRGB material-colour fix.~~ Met (RM-171).
 6. A decision on multi-grid and cell-constant materials: implement, or keep the
    explicit rejection in the release notes.
