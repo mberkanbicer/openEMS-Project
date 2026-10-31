@@ -40,7 +40,7 @@ CST-validated or production-ready replacement.
 | Performance threshold | refreshed baseline; proposed 4.0x/3.25x gate passes; approval pending (`PERF-001`, E-011) |
 | Analytic SAR | **PASS** (`VAL-002`): lossy line alpha 9.3513 vs 9.3601 Np/m, beta 84.3651 vs 84.3547 rad/m, SAR slope rel 9.4e-4 |
 | MATLAB (as opposed to Octave) | smoke PASS (R2025b: XML write, setup, 50-step run) |
-| Fuzzing/Miri/sanitizers | **Miri PASS** (21 parser + 3 operator, 0 UB; 32 exact-FP tests excluded) and **cargo-fuzz PASS** (126 963 runs/121 s, 0 crashes, 1 988 units); ASan/TSan not run |
+| Fuzzing/Miri/sanitizers | **Miri PASS** (21 parser + 3 operator), **cargo-fuzz PASS** (126 963 runs/121 s, 0 crashes) and **ASan PASS** (53 parser + 58 operator, no report); TSan not claimed |
 
 ## 3. Checklist (protocol §13)
 
@@ -60,7 +60,7 @@ CST-validated or production-ready replacement.
 | CST comparison | **Blocked** |
 | Python/MATLAB/Octave compatibility | Python/Octave met; MATLAB smoke PASS (R2025b) |
 | GUI edit/validate/export | Met; dock layout (tabs/splits) is draggable and persisted; no solver run by design |
-| Security/unsafe/fuzz review | Mostly: source review + Miri + a 120 s parser fuzz pass; no ASan/TSan |
+| Security/unsafe/fuzz review | Met for the recorded surface: source review + Miri + fuzz + ASan; TSan not claimed |
 | Cross-platform builds | **Blocked at HEAD** |
 | Final report links evidence | Met (this tree) |
 
@@ -80,8 +80,8 @@ action that removes it; none is silently treated as verified.
   Windows installer artifact is verified.
 - **E-013 / ADR 0010** - egui_tiles docks panes as tabs/splits but has no floating
   windows; the Qt floating-panel behaviour is not reproduced.
-- **E-014 / RM-180/RM-182** - no ASan/TSan pass; Miri (24 tests) and cargo-fuzz
-  (126 963 runs) are the memory-safety evidence, not sanitizer instrumentation.
+- **E-014 (closed 2026-10-31)** - ASan now passes 53 parser + 58 operator
+  tests; TSan is not claimed for the single-threaded selection.
 
 ## 4. Conditions to move to READY_FOR_RELEASE
 

@@ -2502,7 +2502,28 @@ stat::peak_rss_mb:              474
 ```
 
 No crash, timeout or OOM artifact was produced (`artifacts/parse_expression`
-is empty). AddressSanitizer/ThreadSanitizer runs are still not recorded.
+is empty).
+
+## AddressSanitizer (RM-183)
+
+`scripts/ci/run_asan_checks_wsl.sh`:
+
+```
+RUST_MIN_STACK=67108864 RUSTFLAGS=-Zsanitizer=address \
+  cargo +nightly test -Zbuild-std --target x86_64-unknown-linux-gnu -p fparser-rs
+RUST_MIN_STACK=67108864 RUSTFLAGS=-Zsanitizer=address \
+  cargo +nightly test -Zbuild-std --target x86_64-unknown-linux-gnu \
+    -p openems-core --lib operator::
+```
+
+- fparser: **53 passed, 0 failed**, no ASan report.
+- openems-core `operator::`: **58 passed, 0 failed**, no ASan report.
+- `RUST_MIN_STACK=64 MiB` is required: ASan's larger frames exhaust the default
+  8 MiB test-thread stack on the deliberate 4000-level nesting test before the
+  parser's 512-level guard fires. With the larger stack the guard is reached
+  and the suite passes; this is instrumentation stack pressure, not a memory
+  error. TSan is not enabled for this single-threaded selection and is not
+  claimed.
 
 ## Analytic SAR (VAL-002, RM-178)
 

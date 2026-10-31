@@ -23,7 +23,14 @@ with M-file wrappers, so the omission no longer exists.
 | E-011 | The proposed performance gate (wall <=4.0x, peak RSS <=3.25x native) is not formally accepted | PERF-001; owner decision | The gate passes on the recorded baseline (`check_performance_baseline.py`) but is not an acceptance criterion and is not wired into release CI | Owner signs off on the thresholds; wire the script into the release job |
 | E-012 | `windows-package.yml` has not run at this HEAD | PKG-001; requires a Windows runner with vcpkg/Qt (a local run is a multi-hour C++ build) | No Windows installer artifact is verified at this HEAD; the workflow source is present | Run the workflow on a Windows runner and attach the resulting artifact |
 | E-013 | No floating dock windows: `egui_tiles` provides tabs, splits and drag-docking, not panes floating outside the main window | ADR 0010; toolkit capability | Panels dock as tabs/splits and persist; the native Qt floating-panel behaviour is not reproduced | Use tabs/splits, or add a separate viewport for floating panes if that workflow is required |
-| E-014 | No AddressSanitizer or ThreadSanitizer pass: only Miri and cargo-fuzz were executed | RM-180/RM-182; the sanitizer run needs a nightly `-Zsanitizer` build (and `-Zbuild-std` for std instrumentation) | The parser/operator memory-safety evidence is Miri (24 tests) + fuzz (126 963 runs); sanitizer-only defects are not excluded | Run `-Zsanitizer=address`/`thread` with `-Zbuild-std` on nightly and record the result |
+
+### Resolved
+
+- **E-014 (no sanitizer pass) closed 2026-10-31 (RM-183):**
+  `scripts/ci/run_asan_checks_wsl.sh` runs the fparser suite and the
+  `operator::` tests under `-Zsanitizer=address` with `-Zbuild-std` and a
+  64 MiB test-thread stack: **53 + 58 passed**, no ASan report. TSan is not
+  enabled for this single-threaded selection and is not claimed.
 
 ## Change rule
 

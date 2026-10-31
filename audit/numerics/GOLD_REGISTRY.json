@@ -17,8 +17,8 @@
     {
       "category": "D",
       "path": "docs/migration/VALIDATION.md",
-      "sha256": "a5726556207185777f9889bef895dcdc1ba33cc602920743a2bfec4076ad99c4",
-      "bytes": 153281,
+      "sha256": "e3d9037c6344dddec19323445bb223086a4819cd5751d57e0840a9c755206e97",
+      "bytes": 154140,
       "provenance": "recorded validation sections"
     },
     {
@@ -125,6 +125,13 @@
       "sha256": "b6795d2ae195e7117a19989e218c898c48fb15123b6674227c4e1c39211cc890",
       "bytes": 2385,
       "provenance": "fuzz crate lockfile"
+    },
+    {
+      "category": "A",
+      "path": "scripts/ci/run_asan_checks_wsl.sh",
+      "sha256": "ab8735a9d0f157a4b02fa358b322e94d3a15a0ffaf8c80dfdbb5b2e49d7af462",
+      "bytes": 1017,
+      "provenance": "AddressSanitizer gate"
     },
     {
       "category": "A",
