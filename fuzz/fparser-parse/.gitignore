@@ -1,2 +1,10 @@
 /target
 /artifacts
+/corpus/parse_expression/*
+!/corpus/parse_expression/sin
+!/corpus/parse_expression/composite
+!/corpus/parse_expression/conditional
+!/corpus/parse_expression/nested
+!/corpus/parse_expression/atan2
+!/corpus/parse_expression/overflow
+!/corpus/parse_expression/domain
