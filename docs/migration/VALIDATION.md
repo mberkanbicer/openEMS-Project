@@ -2502,7 +2502,9 @@ stat::peak_rss_mb:              474
 ```
 
 No crash, timeout or OOM artifact was produced (`artifacts/parse_expression`
-is empty).
+is empty). A re-verification run on 2026-10-31 (same command, retained corpus)
+executed **324 073 runs** with 3 208 new units and 498 MB peak, again with no
+crash.
 
 ## AddressSanitizer (RM-183)
 

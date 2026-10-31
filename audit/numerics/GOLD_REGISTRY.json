@@ -17,14 +17,14 @@
     {
       "category": "D",
       "path": "docs/migration/VALIDATION.md",
-      "sha256": "e3d9037c6344dddec19323445bb223086a4819cd5751d57e0840a9c755206e97",
-      "bytes": 154140,
+      "sha256": "01f14f74809708bd95fd488b3fd50f034f1c267b31de8f4ef0ac0ae80a28131c",
+      "bytes": 154295,
       "provenance": "recorded validation sections"
     },
     {
       "category": "D",
       "path": "docs/migration/ACCEPTANCE.md",
-      "sha256": "e428b3c916de96382ee9cfa09575bed80ed40011d48cd9be0b8b5d8cbffaa09c",
+      "sha256": "5f292444f2d470be6da3dc03269523cc2592d9bfa7ff804b4d6d6cf36113470f",
       "bytes": 1661,
       "provenance": "last full acceptance report"
     },
