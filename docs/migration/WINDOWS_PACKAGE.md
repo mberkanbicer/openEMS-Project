@@ -16,7 +16,9 @@ Rust migration, the counterpart of the native `windows-package.yml` artifact.
 | Python wheel | `cp311-cp311-win_amd64` |
 
 The zip is build output and is not committed (`/dist/` is ignored); the script
-and the recorded hash make it reproducible.
+and the recorded hash make it reproducible. The hash pins this build because zip
+timestamps change between runs; a rebuild reproduces the contents, not the exact
+archive bytes.
 
 ## Contents
 
