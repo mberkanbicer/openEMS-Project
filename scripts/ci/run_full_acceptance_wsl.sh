@@ -106,7 +106,7 @@ log=$(run "workspace build" cargo build --workspace --release)
 record "workspace build (release)" "$log" "$(grep -c 'Finished' "$log" || true) build(s)"
 
 echo "== crate tests"
-log=$(run "crate tests" cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs -p qcsxcad-core -p appcsxcad)
+log=$(run "crate tests" cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs -p qcsxcad-core -p qcsxcad-egui -p appcsxcad)
 record "crate unit + integration tests" "$log" "$(sum_passed "$log")"
 
 echo "== HDF5 feature"
