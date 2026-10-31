@@ -31,8 +31,8 @@ Sub Main()
     Dim MeshLinesPerWave As Long
 
     ' ---------------------------------------------------------------- inputs
-    ProjectPath = "C:\openems-cst\msl_notch.cst"   ' <-- edit
-    ExportDir = "C:\openems-cst\export\"           ' <-- edit (trailing \)
+    ProjectPath = "C:\Users\mberkanbicer\Projects\openEMS-Project-rust\docs\migration\cst\msl_cst\msl_notch.cst"   ' <-- edit
+    ExportDir = "C:\Users\mberkanbicer\Projects\openEMS-Project-rust\docs\migration\cst\msl_cst\export\"           ' <-- edit (trailing \)
     FMinGHz = 1.0
     FMaxGHz = 7.0
     MeshLinesPerWave = 20
@@ -121,6 +121,20 @@ Sub Main()
         .Create
     End With
 
+    ' ------------------------------------------------------------ air volume
+    ' The openEMS domain is 3 mm tall; without this brick the open zmax
+    ' boundary would sit 35 um above the strip and detune the line.
+    With Brick
+        .Reset
+        .Name "air"
+        .Component "air"
+        .Material "Vacuum"
+        .Xrange "-50000", "50000"
+        .Yrange "-9000", "21000"
+        .Zrange "289", "3000"
+        .Create
+    End With
+
     ' ----------------------------------------------------------------- ports
     ' Waveguide ports over the substrate cross-section at both line ends.
     ' The y span is wider than the strip so the fringing field is included.
@@ -139,7 +153,7 @@ Sub Main()
         .ClipPickedPortToBound "False"
         .Xrange "-50000", "-50000"
         .Yrange "-3000", "3000"
-        .Zrange "0", "254"
+        .Zrange "0", "500"
         .Create
     End With
 
@@ -158,7 +172,7 @@ Sub Main()
         .ClipPickedPortToBound "False"
         .Xrange "50000", "50000"
         .Yrange "-3000", "3000"
-        .Zrange "0", "254"
+        .Zrange "0", "500"
         .Create
     End With
 

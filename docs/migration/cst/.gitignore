@@ -1,0 +1,4 @@
+# CST project folders and model caches are large and reproducible; the
+# Touchstone exports, reports and metadata stay trackable.
+run*/*.cst
+run*/msl_notch/

@@ -2,24 +2,25 @@
 
 Audit of the **existing** Rust port. Basis: `component_matrix.csv` (49
 subsystem rows) plus the executed commands in `00_baseline.md`. This is not a
-file-count percentage; 41 of 49 audited subsystems have executed verification
+file-count percentage; 42 of 49 audited subsystems have executed verification
 evidence, consistent with the register's **183 `Verified`** rows.
 
 ## 1. Status counts (subsystem level)
 
 | Status | Count | Meaning here |
 |---|---:|---|
-| `VERIFIED_COMPLETE` | 41 | implementation + executed comparison/analytic result recorded |
+| `VERIFIED_COMPLETE` | 42 | implementation + executed comparison/analytic result recorded |
 | `INTENTIONALLY_DIFFERENT` | 1 | fparser extended-precision variants (E-001/ADR 0006) |
 | `INTENTIONALLY_UNSUPPORTED` | 5 | GPU compute (ADR 0002), FreeBSD hyp2mat (E-004), GUI solver control, multi-grid (E-007), cell-constant material (E-008) |
-| `BLOCKED` | 2 | hosted CI/platform matrix (E-010), CST comparison (E-009) |
+| `BLOCKED` | 1 | hosted CI/platform matrix (E-010) |
 | **Total** | **49** | |
 
 Trust level: high for the default Cartesian/homogeneous/differential paths
 (51-case native harness + analytic wave-speed + Octave/Python suites). Models
 that set `CellConstantMaterial` or `MultiGrid` now stop with an explicit setup
-error (E-007/E-008) instead of silently simulating something else. No CST or
-convergence evidence exists.
+error (E-007/E-008) instead of silently simulating something else. Convergence
+studies and a CST 2026 notch comparison are recorded in
+`docs/migration/VALIDATION.md` and `docs/migration/cst/`.
 
 ## 2. P0 — silent wrong physics (fixed in this audit)
 
@@ -72,7 +73,7 @@ convergence evidence exists.
 
 | ID | Finding | Evidence | Next action |
 |---|---|---|---|
-| VAL-001 | Independent validation is now broad: analytic wave-speed tests, a **cavity TE101 mesh study (2.05/2.03)**, a **time-step study (2.32 vs the dt->0 limit)**, a monotone dielectric speed study, a **converged MSL notch (3.6700 GHz, 3.0e-4 spread)** and an **analytic SAR lossy line (9.4e-4)**. No CST data and no SAR-averaging convergence claim. | `audit/numerics/CONVERGENCE.md`; `reference-data/convergence/` | CST data when available |
+| VAL-001 | Independent validation is broad: analytic wave-speed tests, a **cavity TE101 mesh study (2.05/2.03)**, a **time-step study (2.32 vs the dt->0 limit)**, a monotone dielectric speed study, a **converged MSL notch (3.6700 GHz, 3.0e-4 spread)**, a **CST 2026 notch comparison (0.749 %)** and an **analytic SAR lossy line (9.4e-4)**. No SAR-averaging convergence claim. | `audit/numerics/CONVERGENCE.md`; `reference-data/convergence/`; `docs/migration/cst/` | none |
 | PERF-001 | **FIXED 2026-10-31:** owner accepted wall <=4.0x / RSS <=3.25x; the acceptance run measures both solvers fresh and enforces the limits (worst recorded 2.90x/3.08x). | udit/performance/CPU_BASELINE.md; scripts/ci/check_performance_baseline.py; scripts/ci/run_full_acceptance_wsl.sh | none |
 | DOC-001 | The repository is hand-formatted; `cargo fmt --check` fails on pre-existing code, and clippy has no baseline. | `00_baseline.md` §3 | Separate formatting PR; establish clippy baseline |
 
@@ -96,7 +97,7 @@ No module above is to be replaced while closing the two P0 rows.
 3. **P2 validation:** convergence study, then the performance gate (analytic SAR
    done, RM-178). Each needs its own recorded run.
 4. **P2 GUI:** colour management, layout persistence.
-5. **Deferred/blocked:** CST (no data), GPU (scope), multi-grid implementation
+5. **Deferred/blocked:** GPU (scope), multi-grid implementation
    (feature, not a patch), macOS/FreeBSD desktop sessions.
 
 ## 7. No-change decisions
@@ -112,7 +113,8 @@ No module above is to be replaced while closing the two P0 rows.
 ## 8. Must not be portrayed as finished
 
 - Any multigrid or cell-constant-material model result (currently silent).
-- CST equivalence (no data).
+- A general CST equivalence: the MSL notch is validated (0.749 %), not every
+  solver feature.
 - GPU acceleration (not implemented; out of scope).
 - macOS/FreeBSD desktop verification at this HEAD.
 - A performance "pass" (only a baseline).

@@ -2545,21 +2545,25 @@ the peak. Record: `reference-data/convergence/analytic_sar.json`. Tolerance is
 SAR scale is the engine's DFT convention (validated pointwise), so the analytic
 claim is the spatial decay and phase, not an independent W/kg calibration.
 
-## CST cross-validation preparation (E-009, 2026-10-31)
+## CST cross-validation (E-009, 2026-10-31)
 
-The CST comparison cannot be produced in this environment (no CST installation),
-but its fixture and harness are now in place and the harness is verified:
+CST Studio Suite 2026 ran the MSL notch fixture through
+`docs/migration/cst/run_msl_notch_cst.py` (waveguide ports at the line ends,
+160 steps/wavelength, fixed mesh, 1-7 GHz). The harness reports **PASS**:
 
-- `docs/migration/cst/msl_notch.bas` builds the MSL notch model (same geometry
-  as `MSL_NotchFilter.py`) and `docs/migration/cst/README.md` carries the manual
-  build and export recipe as the authoritative fallback;
-- `scripts/ci/run_cst_comparison.py` parses a 1-7 GHz Touchstone export,
-  compares the notch frequency, depth, rejection and the |S11| RMS shape with
-  the converged openEMS curve, and writes a Markdown report;
-- `--self-test` passes on the recorded curve with 0 %, 0.2 % and 3 % shifts
-  (PASS/PASS/FAIL as intended) and on `MA` input, so the parser and gates are
-  exercised without inventing CST data. A missing CST file exits 2.
+| observable | openEMS | CST 2026 | difference |
+| --- | ---: | ---: | ---: |
+| notch frequency | 3.6700 GHz | 3.6425 GHz | 0.749 % (gate 1 %) |
+| \|S11\| at notch | 0.9921 | 0.9981 | gate >= 0.8 |
+| \|S21\| at notch | -50.07 dB | -29.76 dB | gate <= -20 dB |
+| \|S11\| RMS, 1-7 GHz | - | 1.42 dB | gate 3 dB |
 
-The exception stays open until a real CST export is compared; the model macro
-has not been executed against a live CST installation.
+Mesh convergence (same ports and geometry, fixed mesh): 80 steps/wavelength
+gives 3.6327 GHz (1.018 %), 160 gives 3.6425 GHz (0.749 %), moving toward the
+openEMS/quarter-wave value. The 69 MB CST project is reproducible and ignored;
+the Touchstone export, metadata, CST messages and report are committed under
+`docs/migration/cst/run_wg160/`. The low-frequency power balance (0.68 at
+1 GHz, 0.95 at 7 GHz) is a band-edge port limitation and is recorded, not
+gated. Earlier failed attempts (port plane below the strip, ignored mesh
+property) are documented in `docs/migration/cst/PREPARATION.md`.
 

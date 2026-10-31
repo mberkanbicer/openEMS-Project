@@ -144,6 +144,11 @@ echo "== CST comparison harness"
 log=$(run "cst harness" python3 scripts/ci/run_cst_comparison.py --self-test)
 record "CST comparison harness self-test" "$log" "$(grep -E '^self-test:' "$log" | tail -1)"
 
+# E-009: re-run the comparison on the recorded CST 2026 Touchstone export. This
+# does not need CST; it proves the committed result still passes the gates.
+log=$(run "cst recorded comparison" python3 scripts/ci/run_cst_comparison.py --cst docs/migration/cst/run_wg160/msl_notch.s2p --out "$LOG_DIR/cst_comparison.md")
+record "CST comparison (recorded export)" "$log" "$(grep -E 'CST comparison:' "$log" | tail -1)"
+
 echo "== CTB Octave delivery"
 log=$(run "ctb build" cargo build -p ctb-rs)
 log=$(run "ctb octave" env CTB_BIN="$REPO_ROOT/target/debug/ctb" octave --no-gui --quiet "$REPO_ROOT/CTB/rust/tests/octave/cli_exercise.m")

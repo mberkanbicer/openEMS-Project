@@ -18,11 +18,20 @@ with M-file wrappers, so the omission no longer exists.
 | E-004 | `hyp2mat` is not built on FreeBSD: its Clipper2 backend (`clipper2c-sys`) has no FreeBSD target | RM-120/RM-121 platform matrix | FreeBSD builds and tests fparser, CSXCAD, openEMS, CTB and the GUI crates; only the offline PCB converter is unavailable there | Use the native hyp2mat, a Linux/macOS/Windows build, or replace the Clipper2 backend with a portable implementation if FreeBSD conversion is required |
 | E-007 | Cylindrical multi-grid (`MultiGrid`) is not implemented | Owner decision 2026-10-30 (RM-061/D-02: implement or fail loudly) | `set_multi_grid` / Python `SetMultiGrid` keeps the native setter contract (validate and store), but `setup_fdtd` refuses a model with radii: it stops with an explicit error instead of silently running as a single-grid model | Use the native solver for multi-grid models, or implement the cylindrical multi-grid operator/engine and remove this exception |
 | E-008 | `CellConstantMaterial` (cell-centre material probing) is not implemented | Owner decision 2026-10-30 (RM-167/D-02) | A model that sets `CellConstantMaterial` stops in `setup_fdtd` with an explicit error; the port only implements native `AverageMatQuarterCell` | Implement `AverageMatCellCenter` with a differential fixture and remove this exception |
-| E-009 | No CST Microwave Studio cross-validation: no CST project, licence or exported fields were supplied | CST-001 / VAL-001; owner data dependency | The port is not CST-validated; analytic and native differential evidence is unaffected. Prepared 2026-10-31: `docs/migration/cst/msl_notch.bas` (model macro), the manual recipe in `docs/migration/cst/README.md` and the self-tested comparison harness `scripts/ci/run_cst_comparison.py` | Run the CST model locally, export the 1-7 GHz Touchstone file, run the harness, and record the comparison and exit this exception |
 | E-010 | No hosted CI or macOS/FreeBSD/Windows run at this HEAD: GitHub Actions is disabled at the account level (dispatch returns HTTP 422) | E-005 / CI-001; owner/environment | Platform claims rest on runs before this HEAD; the current tree is verified on Windows and WSL2 only | Enable Actions at the account level (or run the workflows on hosted runners) and attach the platform matrix |
 
 ### Resolved
 
+- **E-009 (no CST cross-validation) closed 2026-10-31 (CST-001 / VAL-001):**
+  CST Studio Suite 2026 ran the MSL notch fixture (waveguide ports, 160
+  steps/wavelength, fixed mesh) and the comparison harness reports **PASS**:
+  notch **3.6425 vs 3.6700 GHz (0.749 %)**, |S11| 0.9981 vs 0.9921, |S21|
+  -29.8 vs -50.1 dB, |S11| RMS 1.42 dB (gate 3 dB). Mesh convergence 80 -> 160
+  steps moved the notch 3.6327 -> 3.6425 GHz toward openEMS, so the result is
+  not mesh noise. Evidence: `docs/migration/cst/PREPARATION.md` and
+  `run_wg160/` (Touchstone, report, CST messages). The low-frequency power
+  balance (0.68 at 1 GHz) is recorded as a band-edge port limitation and is not
+  gated.
 - **E-012 (no Windows package) closed 2026-10-31 (PKG-001):**
   `scripts/ci/build_windows_package.ps1` and
   `.github/workflows/windows-rust-package.yml` build the Rust-native Windows
