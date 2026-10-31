@@ -80,6 +80,8 @@ action that removes it; none is silently treated as verified.
   Windows installer artifact is verified.
 - **E-013 / ADR 0010** - egui_tiles docks panes as tabs/splits but has no floating
   windows; the Qt floating-panel behaviour is not reproduced.
+- **E-014 / RM-180/RM-182** - no ASan/TSan pass; Miri (24 tests) and cargo-fuzz
+  (126 963 runs) are the memory-safety evidence, not sanitizer instrumentation.
 
 ## 4. Conditions to move to READY_FOR_RELEASE
 
