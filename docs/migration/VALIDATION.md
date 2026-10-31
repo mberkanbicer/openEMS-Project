@@ -2478,7 +2478,31 @@ floating-point parity tests (`optimization*`, `optimized*`). Miri's float
 emulation differs from the host in the final bit (for example
 `-0.5463024898437903` vs `-0.5463024898437905`, or `0.9999999999999998` vs
 `1.0`), so those tests cannot be used as a Miri gate. The full suite still
-passes natively (53/53). No fuzzing or sanitizer run is recorded.
+passes natively (53/53).
+
+## Fuzzing (RM-182)
+
+`fuzz/fparser-parse` is a cargo-fuzz crate (its own workspace, not part of
+the product build) with the target `parse_expression`: arbitrary UTF-8 is
+parsed, optimized, evaluated with `[1, 2, 3]` and `[0, -0, 1e300]`, and also
+fed to `parse_and_deduce_variables`. Inputs are capped at 4 KiB; seven seed
+expressions include a conditional, nested parentheses, `atan2`, an overflow
+and a domain error.
+
+Run on 2026-10-31 (nightly 1.101, cargo-fuzz 0.13.2):
+
+```
+cargo +nightly fuzz run --fuzz-dir . parse_expression -- \
+    -max_total_time=120 -rss_limit_mb=2048 -print_final_stats=1
+Done 126963 runs in 121 second(s)
+stat::number_of_executed_units: 126963
+stat::average_exec_per_sec:     1049
+stat::new_units_added:          1988
+stat::peak_rss_mb:              474
+```
+
+No crash, timeout or OOM artifact was produced (`artifacts/parse_expression`
+is empty). AddressSanitizer/ThreadSanitizer runs are still not recorded.
 
 ## Analytic SAR (VAL-002, RM-178)
 

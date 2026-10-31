@@ -23,10 +23,11 @@ speed refinement), RM-175 (MATLAB smoke), RM-176 (keyboard navigation and the
 Ctrl+K palette) and RM-177 (time-step self-convergence, order 2.32 against the
 fixed-mesh limit).
 
-The remaining limits are now decision- or environment-bound: CST data (none
-available), hosted platform matrix (E-005), owner approval of the proposed
-performance gate, a converged MSL notch model (the smoke model has no interior
-notch), and drag-docking (ADR 0010, Proposed).
+The remaining limits are now recorded as explicit exceptions, not silent gaps:
+E-009 (no CST data), E-010 (hosted platform matrix), E-011 (performance gate
+approval), E-012 (Windows package run) and E-013 (no floating dock windows).
+Miri (RM-180) and a 120 s parser fuzz pass (RM-182) are recorded; the MSL notch
+is converged (RM-179) and drag-docking is implemented (RM-181).
 
 ## Status update 2026-10-29 (final)
 

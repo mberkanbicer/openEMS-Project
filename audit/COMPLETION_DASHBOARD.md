@@ -10,11 +10,11 @@ evidence, consistent with the register's **179 `Verified`** rows.
 | Status | Count | Meaning here |
 |---|---:|---|
 | `VERIFIED_COMPLETE` | 39 | implementation + executed comparison/analytic result recorded |
-| `IMPLEMENTED_UNVERIFIED` | 1 | Windows installer workflow; no run at this HEAD |
-| `PARTIAL` | 1 | performance threshold |
+| `IMPLEMENTED_UNVERIFIED` | 1 | Windows installer workflow; no run at this HEAD (E-012) |
+| `PARTIAL` | 1 | performance threshold (E-011) |
 | `INTENTIONALLY_DIFFERENT` | 1 | fparser extended-precision variants (E-001/ADR 0006) |
 | `INTENTIONALLY_UNSUPPORTED` | 5 | GPU compute (ADR 0002), FreeBSD hyp2mat (E-004), GUI solver control, multi-grid (E-007), cell-constant material (E-008) |
-| `BLOCKED` | 2 | hosted CI/platform matrix (E-005), CST comparison (no data) |
+| `BLOCKED` | 2 | hosted CI/platform matrix (E-010), CST comparison (E-009) |
 | **Total** | **49** | |
 
 Trust level: high for the default Cartesian/homogeneous/differential paths

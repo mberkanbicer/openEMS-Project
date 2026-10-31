@@ -22,6 +22,7 @@ All commands ran in `C:\Users\mberkanbicer\Projects\openEMS-Project-rust` with
 | 13 | `scripts/ci/run_msl_convergence_wsl.sh` | MSL notch (\|S11\| peak / \|S21\| dip): 3.6700 / 3.6712 / 3.6703 GHz at 373/448/560 um, spread 3.0e-4; quarter-wave 3.6871 GHz (0.46%) | `docs/migration/reference-data/convergence/msl_notch.json` |
 | 14 | `scripts/ci/run_miri_checks_wsl.sh` | Miri: fparser 21 passed / 0 failed (32 optimizer FP tests filtered), openems-core 3 operator tests passed; no UB | `%TEMP%\opencode\miri_all2.log` |
 | 15 | `cargo test -p qcsxcad-egui --features docking` / `cargo test -p appcsxcad` | 32 + 18 passed (4 docking tests); default and tabbed layouts captured | `docs/migration/audits/gui-docking-1440.png`, `gui-docking-docked-1440.png` |
+| 16 | `cargo +nightly fuzz run --fuzz-dir . parse_expression -- -max_total_time=120` | 126 963 runs, 1 988 new units, 0 crashes/timeouts; 474 MB peak | `fuzz/fparser-parse`, `docs/migration/VALIDATION.md` |
 
 The workspace test run used default features. The HDF5 feature suite is a
 separate run inside the acceptance script (475 tests at the last recorded

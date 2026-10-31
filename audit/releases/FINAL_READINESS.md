@@ -32,15 +32,15 @@ CST-validated or production-ready replacement.
 | Item | Status |
 |---|---|
 | Mesh/time convergence | **measured**: cavity TE101 2.05/2.03; dt 2.32 vs the fixed-mesh limit; dielectric monotone 0.90/0.31; MSL notch 3.6700 GHz with 3.0e-4 mesh spread (`numerics/CONVERGENCE.md`) |
-| CST MWS comparison | **blocked**, no data (`cst/`) |
+| CST MWS comparison | **blocked** (CST-001, E-009): no data |
 | GPU compute | **not implemented** (scope, ADR 0002) |
-| macOS/FreeBSD/Windows run at this HEAD | **blocked** (E-005; no hosted CI) |
-| Windows installer | workflow present, no run at this HEAD (`PKG-001`) |
-| GUI drag-docking | **PASS** (ADR 0010 implemented): egui_tiles 0.18 tree, drag grips, tab groups, persisted in `settings.json`; no floating windows |
-| Performance threshold | refreshed baseline; proposed 4.0x/3.25x gate passes; approval pending (`PERF-001`) |
+| macOS/FreeBSD/Windows run at this HEAD | **blocked** (E-005/E-010; no hosted CI) |
+| Windows installer | workflow present, no run at this HEAD (`PKG-001`, E-012) |
+| GUI drag-docking | **PASS** (ADR 0010): tabs/splits/drag grips, persisted; no floating windows (E-013) |
+| Performance threshold | refreshed baseline; proposed 4.0x/3.25x gate passes; approval pending (`PERF-001`, E-011) |
 | Analytic SAR | **PASS** (`VAL-002`): lossy line alpha 9.3513 vs 9.3601 Np/m, beta 84.3651 vs 84.3547 rad/m, SAR slope rel 9.4e-4 |
 | MATLAB (as opposed to Octave) | smoke PASS (R2025b: XML write, setup, 50-step run) |
-| Fuzzing/Miri/sanitizers | **Miri PASS**: 21 parser + 3 operator tests, 0 UB; 32 optimizer exact-FP tests excluded (Miri float emulation); no fuzz/sanitizer run |
+| Fuzzing/Miri/sanitizers | **Miri PASS** (21 parser + 3 operator, 0 UB; 32 exact-FP tests excluded) and **cargo-fuzz PASS** (126 963 runs/121 s, 0 crashes, 1 988 units); ASan/TSan not run |
 
 ## 3. Checklist (protocol §13)
 
@@ -60,9 +60,26 @@ CST-validated or production-ready replacement.
 | CST comparison | **Blocked** |
 | Python/MATLAB/Octave compatibility | Python/Octave met; MATLAB smoke PASS (R2025b) |
 | GUI edit/validate/export | Met; dock layout (tabs/splits) is draggable and persisted; no solver run by design |
-| Security/unsafe/fuzz review | Partly: source review + a Miri pass on parser/operator; no fuzz or sanitizer run |
+| Security/unsafe/fuzz review | Mostly: source review + Miri + a 120 s parser fuzz pass; no ASan/TSan |
 | Cross-platform builds | **Blocked at HEAD** |
 | Final report links evidence | Met (this tree) |
+
+## 3a. Accepted exceptions (release note)
+
+These items are consciously not closed in this tree. Each is recorded in
+`docs/migration/EXCEPTIONS.md` with its decision record, impact and the exact
+action that removes it; none is silently treated as verified.
+
+- **E-009 / CST-001** - no CST project or exported data was supplied, so there is
+  no CST cross-validation. The native differential and analytic evidence stands.
+- **E-010 / E-005 / CI-001** - GitHub Actions is disabled at the account level;
+  no hosted macOS/FreeBSD/Windows run exists at this HEAD.
+- **E-011 / PERF-001** - the 4.0x wall / 3.25x RSS gate passes on the recorded
+  baseline but is not formally accepted; it is not used as a release gate.
+- **E-012 / PKG-001** - `windows-package.yml` has not run at this HEAD, so no
+  Windows installer artifact is verified.
+- **E-013 / ADR 0010** - egui_tiles docks panes as tabs/splits but has no floating
+  windows; the Qt floating-panel behaviour is not reproduced.
 
 ## 4. Conditions to move to READY_FOR_RELEASE
 

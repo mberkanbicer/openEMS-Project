@@ -17,8 +17,8 @@
     {
       "category": "D",
       "path": "docs/migration/VALIDATION.md",
-      "sha256": "975d0dd350f00a9c4842a22df9939f0658eef3f26e29523f997be91ebc2058f9",
-      "bytes": 152357,
+      "sha256": "a5726556207185777f9889bef895dcdc1ba33cc602920743a2bfec4076ad99c4",
+      "bytes": 153281,
       "provenance": "recorded validation sections"
     },
     {
@@ -104,6 +104,27 @@
       "sha256": "80d606366a024fb2572998a36e3860c39314aed7eb5bc88eff725809c4ad2fd4",
       "bytes": 157693,
       "provenance": "persisted tabbed dock layout capture"
+    },
+    {
+      "category": "A",
+      "path": "fuzz/fparser-parse/Cargo.toml",
+      "sha256": "7f433cd0df3776c9b98a1eb98efd27e47bdc58b49608767b4b7b1d3b76aec0da",
+      "bytes": 333,
+      "provenance": "cargo-fuzz crate"
+    },
+    {
+      "category": "A",
+      "path": "fuzz/fparser-parse/fuzz_targets/parse_expression.rs",
+      "sha256": "ce6b79c528cdaaf3aa6b466aa6e9886913aa445c269c119b8495f8926cbfbd2e",
+      "bytes": 773,
+      "provenance": "parser fuzz target"
+    },
+    {
+      "category": "A",
+      "path": "fuzz/fparser-parse/Cargo.lock",
+      "sha256": "b6795d2ae195e7117a19989e218c898c48fb15123b6674227c4e1c39211cc890",
+      "bytes": 2385,
+      "provenance": "fuzz crate lockfile"
     },
     {
       "category": "A",
