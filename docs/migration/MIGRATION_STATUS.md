@@ -12,7 +12,7 @@ and pinned by the root repository; the archived three-crate tree is tagged
 
 The full-stack acceptance run is **21/21 PASS** and covers the release
 workspace build, 844 crate tests, 506 HDF5 tests, 459 native Python cases (2
-GPU skips), the unmodified Octave testsuite 10/10, the f32 parser feature build (3 tests), the GPU stage-1 device/buffer test,
+GPU skips), the unmodified Octave testsuite 10/10, the f32 parser feature build (3 tests), the GPU stage 1-2 device and E/H kernel tests,
 the quarter and cell-centre operator dumps, the 51-case differential
 harness, the cylindrical SAR and curve-excitation gates, the analytic SAR, the
 CST comparison harness self-test and the recorded CST 2026 comparison, CTB, a
