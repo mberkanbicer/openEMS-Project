@@ -2561,8 +2561,13 @@ base fixture, PEC and MUR boundaries, 6 rho x 5 alpha x 5 z):
 | --- | ---: |
 | `vv` | 0.0 |
 | `vi` | 2.03 |
-| `ii` | 1.00 |
-| `iv` | 4.58 |
+| `ii` | 0.0 |
+| `iv` | 2.68 |
+
+After switching the EC geometry to the native unscaled (no-rho) cylindrical
+metric, `vi`/`iv` are rho-independent like native; the residual is a constant
+factor (~2x for the rho/alpha components, ~0.2x for z at rho=0.1). The
+differential still fails, so the pair is not validated and E-007 stays open.
 
 The split operators therefore still differ from native `Operator_Cylinder` on
 this mesh; the pair is **not** validated and E-007 stays open. The next task is

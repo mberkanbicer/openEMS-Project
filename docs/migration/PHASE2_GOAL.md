@@ -45,11 +45,12 @@ already verified and are not reopened.
   pads to 11 (`cylindrical_full_turn_is_accepted_and_padded`). This changes the
   operand shape of the differential; a shape-aware comparison or a padding
   decision is required.
-- Open-alpha, rho > 0 base: `vv` and `ii` match exactly; `vi` and `iv` still
-  differ. Node-level inspection confines the differences to rho index 0/1 and
-  shows a `1/rho` scale on the alpha component (native 522.08 vs Rust 25.90 at
-  rho index 1), i.e. the dual-mesh rho factor in `GetEdgeArea(..., true)` /
-  `GetEdgeLength(..., true)`, not the material data.
+- Open-alpha, rho > 0 base: the EC geometry now uses the native unscaled
+  (no rho) edge lengths/node areas, so Rust `vi`/`iv` are rho-independent like
+  native (`vi` alpha: 259.04 constant vs native 522.08 constant). The remaining
+  differences are constant factors: n=0/1 are ~2x low, n=2 is ~0.2x at rho=0.1
+  (the native annulus `da` uses the rho-scaled alpha length). This is the next
+  target; no fudge factors were added.
 - Open-alpha, rho = 0 base: `ii` also differs, so the axis (`rho = 0`) handling
   is a second discrepancy.
 
