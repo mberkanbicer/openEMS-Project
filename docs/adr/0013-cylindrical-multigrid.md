@@ -1,6 +1,6 @@
 # ADR 0013: cylindrical multi-grid
 
-**Status:** Proposed 2026-11-01 (implementation not started)
+**Status:** Stage 1 implemented 2026-11-01 (radii plan, split rules, base/child line derivation, extension compatibility matrix); engine pending, E-007 still rejected at setup
 **Decision owner:** Project owner
 **Related:** E-007, native `Operator_CylinderMultiGrid`, `Engine_CylinderMultiGrid`
 

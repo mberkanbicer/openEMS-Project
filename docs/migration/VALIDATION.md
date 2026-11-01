@@ -2545,6 +2545,23 @@ the peak. Record: `reference-data/convergence/analytic_sar.json`. Tolerance is
 SAR scale is the engine's DFT convention (validated pointwise), so the analytic
 claim is the spatial decay and phase, not an independent W/kg calibration.
 
+## Cylindrical multi-grid plan (E-007 stage 1, 2026-11-01)
+
+`openEMS/rust/src/multigrid.rs` ports the native placement and compatibility
+rules without wiring the engine:
+
+- radii validation (1..20 levels, finite, positive, strictly increasing);
+- `find_grid_split`: first rho line above the split, at least four lines from
+  both ends, odd alpha count (minus a closed alpha plane);
+- `split_lines`: base keeps rho lines up to the split and every second alpha
+  line, the child keeps the full mesh (native `SetGeometryCSX`);
+- `IsCylindricalMultiGridSave` matrix per extension family, including the
+  Mur z/rho and UPML base-only cases.
+
+`cargo test -p openems-core --lib multigrid`: **4 tests pass**; `setup_fdtd`
+still rejects a valid plan with an explicit "engine not wired" error (E-007
+remains open). The full lib suite is green.
+
 ## GPU stage 1 (ADR 0012, 2026-11-01)
 
 The optional `gpu` feature acquires a `wgpu` adapter and runs a compute shader
