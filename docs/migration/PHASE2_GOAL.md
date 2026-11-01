@@ -35,7 +35,7 @@ already verified and are not reopened.
 | item | state | last evidence |
 | --- | --- | --- |
 | E-001 | f32 implemented; long double/MPFR/long integer open | f64 53/53, f32 3/3 |
-| E-007 | plan + base/child pair + alpha interpolation tables; coefficient parity/engine open | pair `6x5`/`7x11`; `AlphaInterpolation` positions/weights unit-tested |
+| E-007 | plan + native-layout pair + native interpolation tables + `MultiGridEngine`; coefficient dump parity and setup integration open | 10/10 multigrid tests; 5-step TEM parity voltage 6.7e-3, current 3.3e-2, radial profile 2.8e-4 |
 | GPU | stages 1-3 (device, kernels, Engine) for extension-free models | 48³/120 steps: CPU 5.00 s vs GPU 97 ms, fields identical |
 | E-010 | blocked | Actions disabled at account level |
 
@@ -59,12 +59,43 @@ already verified and are not reopened.
   one coordinated change; changing the coefficients alone breaks the coaxial
   TEM gate (reverted in `4f97545`).
 
+## E-007 multi-grid engine (2026-11-01)
+
+The operator pair now follows the native layout instead of the previous
+inverted one: the base keeps the full rho/alpha mesh and the child gets the rho
+lines up to the split plus every second alpha line
+(`Operator_CylinderMultiGrid::SetGeometryCSX`). `AlphaInterpolation` was
+rewritten against `SetupInterpolation`, including the single-weight `p == pp`
+cases and the closed-mesh padding plane.
+
+`MultiGridEngine` ports `Engine_CylinderMultiGrid` + `Engine_Ext_
+CylinderMultiGrid` with the native barrier order: base/child voltage half-step,
+interface voltage sync (`split_pos - 1`), base/child current half-step,
+interface current sync (`split_pos - 2`), then the child-to-base interpolation
+of the overlap rows. The base EC coefficients below `split_pos - 1` are zeroed
+exactly like `CalcStartStopLines`.
+
+Validation (openEMS-core lib tests, closed alpha, manufactured coaxial TEM
+pulse, 5 steps):
+
+- voltage parity against the single-grid reference: **6.7e-3** relative,
+- current parity: **3.3e-2** relative,
+- peak position: multigrid z=7, reference z=7,
+- normalized radial voltage profile: **2.8e-4** relative.
+
+Over 40 steps the same case drifts to ~30% because the native interface
+coupling is first order and generates a small `E_z` at the split. That is not
+accepted as a completed validation: the `coax_cylindrical` probe/phase oracle
+and the setup integration (extensions and probes for both grids) are still
+required before the setup rejection can be removed.
+
 ## Order of work
 
-1. Fix the cylindrical dual-mesh `vi`/`iv` parity and the closed-alpha seam/
-   padding rule; make the base/child operator differential pass.
-2. Port the interface interpolation and the multi-grid engine; run the native
-   multigrid case.
+1. Match the cylindrical dual-mesh `vi`/`iv` dump normalization and the
+   closed-alpha seam/padding rule without breaking the coaxial TEM gate.
+2. Validate `MultiGridEngine` with the `coax_cylindrical` phase/profile probes,
+   then build the extensions/probes for both grids and remove the setup
+   rejection.
 3. E-001: scalar refactor for non-`Copy` MPFR, then long double and long integer.
 4. GPU: extension-aware kernels or a documented host-sync path with a measured
    speed check.

@@ -2545,6 +2545,37 @@ the peak. Record: `reference-data/convergence/analytic_sar.json`. Tolerance is
 SAR scale is the engine's DFT convention (validated pointwise), so the analytic
 claim is the spatial decay and phase, not an independent W/kg calibration.
 
+## Cylindrical multi-grid engine (E-007 stage 4, 2026-11-01)
+
+`MultiGridEngine` (`openEMS/rust/src/multigrid.rs`) runs the native
+`Engine_CylinderMultiGrid` barrier order sequentially:
+
+1. base voltage half-step, then child voltage half-step,
+2. `SyncVoltages` (base row `split_pos - 1` -> child: `E_rho = 0`,
+   `E_z`, `E_alpha = E_alpha(a) + E_alpha(a+1)`),
+3. base current half-step, then child current half-step,
+4. `SyncCurrents` (child row `split_pos - 2` -> base),
+5. child-to-base interpolation of the overlap rows.
+
+The pair now uses the native layout: base = full mesh, child = rho up to the
+split and every second alpha line. The base EC coefficients below
+`split_pos - 1` are zero and the child runs on the base timestep.
+
+Evidence (openEMS-core lib tests, closed alpha, manufactured coaxial TEM pulse,
+10/10 multigrid tests):
+
+| check | result |
+| --- | ---: |
+| voltage parity vs single-grid, 5 steps | 6.7e-3 |
+| current parity vs single-grid, 5 steps | 3.3e-2 |
+| TEM peak position | multigrid z=7, reference z=7 |
+| normalized radial voltage profile | 2.8e-4 |
+
+Long-run limitation: after 40 steps the same case drifts to ~30% (a small
+`E_z` is generated at the split by the native first-order coupling). The
+`coax_cylindrical` probe/phase oracle and the setup integration are still
+required; the `MultiGrid` setup rejection stays in place.
+
 ## Child-to-base field interpolation (E-007 stage 3b, 2026-11-01)
 
 \interpolate_child_to_base\ applies the alpha tables for one rho row and z
