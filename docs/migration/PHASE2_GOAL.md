@@ -45,12 +45,11 @@ already verified and are not reopened.
   pads to 11 (`cylindrical_full_turn_is_accepted_and_padded`). This changes the
   operand shape of the differential; a shape-aware comparison or a padding
   decision is required.
-- Open-alpha, rho > 0 base: the EC geometry now uses the native unscaled
-  (no rho) edge lengths/node areas, so Rust `vi`/`iv` are rho-independent like
-  native (`vi` alpha: 259.04 constant vs native 522.08 constant). The remaining
-  differences are constant factors: n=0/1 are ~2x low, n=2 is ~0.2x at rho=0.1
-  (the native annulus `da` uses the rho-scaled alpha length). This is the next
-  target; no fudge factors were added.
+- Open-alpha, rho > 0 base: an unscaled (no-rho) EC experiment matched the
+  dump's rho independence but failed the authoritative coaxial cylindrical gate
+  (`beta = k0` deviation 1.37 vs 0.01) and was reverted (`4f97545`). The dump is
+  not yet a safe oracle for the rho convention; the coaxial propagation gate
+  must keep passing while the dump parity is investigated.
 - Open-alpha, rho = 0 base: `ii` also differs, so the axis (`rho = 0`) handling
   is a second discrepancy.
 
