@@ -2545,6 +2545,14 @@ the peak. Record: `reference-data/convergence/analytic_sar.json`. Tolerance is
 SAR scale is the engine's DFT convention (validated pointwise), so the analytic
 claim is the spatial decay and phase, not an independent W/kg calibration.
 
+## Child-to-base field interpolation (E-007 stage 3b, 2026-11-01)
+
+\interpolate_child_to_base\ applies the alpha tables for one rho row and z
+index: the alpha component uses the alpha table, rho/z use the companion table.
+Unit test: 0.25/0.75 weights on a constant child field reproduce the constant in
+all components. The multi-grid engine and the physical coax probe oracle remain
+open; the tables are not yet driven by a simulation.
+
 ## Cylindrical multi-grid interpolation tables (E-007 stage 3, 2026-11-01)
 
 `AlphaInterpolation::new` ports the native `SetupInterpolation` positions and
