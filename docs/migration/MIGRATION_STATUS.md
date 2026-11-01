@@ -875,3 +875,35 @@ outside the tree and were unaffected.
   The native Python package is ~6k lines of Cython plus ~2.3k lines of
   pure-Python modules; porting the class surface to PyO3 is the next block of
   work and was not started in this session.
+
+## Session record 2026-11-02 (tutorials, dump-writer performance, --disable-dumps)
+
+- **Completed:** three self-contained tutorial projects in `tutorials/` (root
+  repository, outside the submodules): free-space pulse vs `100 mm / c`,
+  dielectric half-space vs Fresnel, PEC cavity vs analytic TE modes. Each opens
+  in the Rust `appcsxcad`, runs with `openems-cli` and is plotted by
+  `tutorials/plot_tutorials.py`; `tutorials/run_tutorial.ps1` wraps the whole
+  workflow. All evidence is in `docs/migration/TUTORIALS.md`.
+- **Solver fixes:** (1) `ProcessIntegral` keeps the TD probe stream open,
+  (2) `HDF5FileWriter`/`ProcessFieldsTD` keep the dump file open, both matching
+  the native lifetime and removing a per-timestep open/close that dominated the
+  runtime (tutorial 1: 61 s -> 0.34 s; `Et.h5` 9.68 MB -> 0.79 MB, same
+  content). (3) `--disable-dumps` now disables the field dumps as native does
+  (`ProcField->SetEnable(Enable_Dumps)`) and writes `et`/`ht` unconditionally;
+  previously every `DumpBox` still ran and `et`/`ht` were wrongly suppressed.
+- **Validation:** tutorial checks re-measured with the final binaries (delay
+  +0.46 %; Gamma -0.3239 vs -1/3, T +0.6707 vs 2/3; TE101 5.209 GHz -0.14 %,
+  TE301 6.715 GHz -0.10 %, mode profile RMS deviation 0.0004). Neutrality of
+  the writer changes: probe/`et`/`ht` files byte-identical (SHA-256) with dumps
+  on vs `--disable-dumps`. FD dump verified separately (`FieldData/FD/f0` at
+  5 GHz). `cargo test --release -p openems-core --features "hdf5 gpu"`:
+  308 + 2 analytic tests pass. GUI: all three projects load in `appcsxcad`
+  (window title carries the project path, process alive).
+- **Records:** `docs/migration/TUTORIALS.md` added; this file updated. No
+  coverage-matrix row changed status (the fixes fall under the existing
+  `openems-core` processing rows).
+- **Commits:** solver fixes in the `openEMS` submodule, tutorials + docs in the
+  root repository, both on `mberkanbicer-rust-migration-audit`, pushed to the
+  fork.
+- **Next:** none from this thread; remaining migration work is tracked in
+  `REMEDIATION_TASKS.md` / `REMAINING_WORK.md`.
