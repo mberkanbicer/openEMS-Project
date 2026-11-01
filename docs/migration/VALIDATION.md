@@ -2545,6 +2545,31 @@ the peak. Record: `reference-data/convergence/analytic_sar.json`. Tolerance is
 SAR scale is the engine's DFT convention (validated pointwise), so the analytic
 claim is the spatial decay and phase, not an independent W/kg calibration.
 
+## fparser extended-precision backends (E-001, 2026-11-01)
+
+The parser scalar seam now has three opt-in backends beside the default `f64`:
+`float` (f32), `long-double` (IEEE binary128 via `f128`/libquadmath) and `mpfr`
+(`rug::Float`, 256-bit, with the non-`Copy` scalar refactor). The default
+workspace build does not compile the new dependencies.
+
+Per-backend evidence:
+
+| backend | unit tests | native differential |
+| --- | --- | --- |
+| f64 (default) | 53/53 | existing 36k-expression corpus |
+| f32 (`float`) | 3/3 | existing float differential |
+| `long-double` | 3/3 | `run_fparser_long_double_check_wsl.sh`: 30 expressions, worst relative **0.000e+00** vs native `FunctionParser_ld` |
+| `mpfr` | 3/3 | `run_fparser_mpfr_check_wsl.sh`: 30 expressions, worst relative **1.806e-29** vs native `FunctionParser_mpfr` |
+
+The extended-precision tests check binary128/256-bit literals directly:
+`0.1 + 0.2` versus the parsed `0.3` is below `1e-30` (binary128) and `1e-70`
+(MPFR), and builtins agree with the `f64` reference inside `1e-15`. The native
+differentials compile the reference `FunctionParser_ld`/`FunctionParser_mpfr`
+against the same corpus and compare the parsed/evaluated values.
+
+Limitation: the long-integer variant (`FunctionParser_gmpint`) is not ported
+yet because it needs the integer-only builtin and optimizer rule set.
+
 ## Cylindrical multi-grid setup + coax probe gate (E-007 stage 5, 2026-11-01)
 
 `setup_fdtd` now builds the child operator, forces its outer rho face to PEC,

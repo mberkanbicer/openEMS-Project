@@ -20,13 +20,16 @@ the default and only backend enabled by dependents unless they opt in:
 | --- | --- | --- |
 | default | `f64` | `double` |
 | `float` | `f32` | `float` |
-| `long-double` | `rug::Float` at 64-bit mantissa (x87 extended precision emulation) | `long double` |
-| `mpfr` | `rug::Float` with runtime precision | MPFR build |
-| `long-integer` | `i128` for the integer-only paths | long integer |
+| `long-double` | IEEE binary128 (`f128`/libquadmath) | `long double` |
+| `mpfr` | `rug::Float` at 256-bit mantissa | MPFR build |
+| `long-integer` | not implemented (integer-only builtins/optimizer rules) | long integer |
 
-Rust has no stable 80-bit float, so `long-double` is an MPFR-backed 64-bit
-mantissa value; the difference from x87 (exponent range only) is documented and
-tested against the native `long double` build at the value level.
+Rust has no stable 80-bit float, so `long-double` uses IEEE binary128 (113-bit
+mantissa) through libquadmath: it carries more precision than the native x87
+long double (64-bit mantissa) and is validated against the native build at the
+value level. The `mpfr` backend uses `rug::Float` at the native 256-bit default
+and required the non-`Copy` scalar refactor; both are feature-gated off the
+default `f64` build.
 
 ## Work breakdown
 

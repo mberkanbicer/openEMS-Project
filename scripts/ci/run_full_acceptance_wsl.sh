@@ -113,6 +113,15 @@ record "crate unit + integration tests" "$log" "$(sum_passed "$log")"
 log=$(run "fparser float" cargo test -p fparser-rs --features float)
 record "fparser float (f32) backend" "$log" "$(sum_passed "$log")"
 
+# E-001: the opt-in extended-precision backends against the native fparser
+# variants (long double and MPFR/GMP).
+log=$(run "fparser long double" bash scripts/ci/run_fparser_long_double_check_wsl.sh)
+record "fparser long-double (native differential)" "$log" \
+    "$(grep -E 'fparser long-double differential: (PASS|FAIL)' "$log" | tail -1)"
+log=$(run "fparser mpfr" bash scripts/ci/run_fparser_mpfr_check_wsl.sh)
+record "fparser MPFR/GMP (native differential)" "$log" \
+    "$(grep -E 'fparser MPFR differential: (PASS|FAIL)' "$log" | tail -1)"
+
 # ADR 0012 stage 1: wgpu device/buffer round-trip. The test skips cleanly when
 # no adapter is available, so a CPU-only runner does not fail.
 log=$(run "gpu stage1" cargo test -p openems-core --features gpu gpu_ -- --nocapture)
