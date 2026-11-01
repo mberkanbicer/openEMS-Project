@@ -27,6 +27,10 @@ Directory for the zip (default: <repo>/dist).
 .PARAMETER SkipBuild
 Reuse the existing release binaries and wheels instead of rebuilding.
 
+.PARAMETER Features
+Extra Cargo features for `openems-cli` (default: `gpu`, so the packaged solver
+accepts `--gpu`). Pass "" to build the CPU-only solver.
+
 .EXAMPLE
 pwsh scripts/ci/build_windows_package.ps1 -Python C:\conda\envs\openems\python.exe
 #>
@@ -34,7 +38,8 @@ pwsh scripts/ci/build_windows_package.ps1 -Python C:\conda\envs\openems\python.e
 param(
     [string]$Python = "",
     [string]$OutDir = "",
-    [switch]$SkipBuild
+    [switch]$SkipBuild,
+    [string]$Features = "gpu"
 )
 
 $ErrorActionPreference = "Stop"
@@ -88,10 +93,21 @@ $packages = @(
 )
 
 if (-not $SkipBuild) {
+    # The GPU feature lives on openems-cli/openems-core only, so it is built
+    # separately; the remaining binaries never take it.
+    $featureArgs = @()
+    if ($Features) { $featureArgs = @("--features", $Features) }
+    Step "cargo build --release (openems-cli, features: $Features)" {
+        Push-Location $repo
+        try {
+            & cargo build --release -p openems-cli @featureArgs
+        } finally { Pop-Location }
+    }
+    $rest = $packages | Where-Object { $_ -ne "openems-cli" }
     Step "cargo build --release" {
         Push-Location $repo
         try {
-            & cargo build --release @($packages | ForEach-Object { "-p"; $_ })
+            & cargo build --release @($rest | ForEach-Object { "-p"; $_ })
         } finally { Pop-Location }
     }
 }
@@ -159,7 +175,18 @@ if ($env:EXTRA_DLL_DIRS) { $searchDirs += ($env:EXTRA_DLL_DIRS -split ";") }
 # bloated the first attempt to 160 files and would ship OS components.
 $searchDirs = $searchDirs | Where-Object { $_ -and (Test-Path $_) } | Select-Object -Unique
 
-$systemPattern = '^(kernel32|user32|advapi32|ole32|oleaut32|shell32|shlwapi|gdi32|ws2_32|bcrypt|crypt32|ntdll|msvcrt|ucrtbase|api-ms-win-|winmm|iphlpapi|psapi|dbghelp|secur32|wldap32|version|imm32|comdlg32|comctl32|setupapi|userenv|dwmapi|d3d|dxgi|opengl32|glu32|vulkan-1|nvapi|dinput|xinput|winhttp|wininet|netapi32|mpr|authz|rpcrt4|cabinet|msi|oleacc|uxtheme|powrprof|pdh|wevtapi|normaliz|wintrust|wtsapi32|cfgmgr32|devobj)'
+$systemPattern = '^(kernel32|user32|advapi32|ole32|oleaut32|shell32|shlwapi|gdi32|ws2_32|bcrypt|crypt32|ntdll|msvcrt|ucrtbase|api-ms-win-|winmm|iphlpapi|psapi|dbghelp|secur32|wldap32|version|imm32|comdlg32|comctl32|setupapi|userenv|dwmapi|d3d|dxgi|opengl32|glu32|vulkan-1|nvapi|dinput|xinput|winhttp|wininet|netapi32|mpr|authz|rpcrt4|cabinet|msi|oleacc|uxtheme|powrprof|pdh|wevtapi|normaliz|wintrust|wtsapi32|cfgmgr32|devobj|combase|shcore|dbgeng|dcomp|dwrite)'
+
+# A DLL that Windows ships in System32 is resolved by the loader and must never
+# be staged. The name test alone is not enough: on a Turkish locale
+# case-insensitive comparison maps "I" to a dotless "i", so "PSAPI.DLL" did not
+# match "psapi" and the walk reported false gaps.
+$system32 = Join-Path $env:SystemRoot "System32"
+function Test-SystemDll([string]$name) {
+    $lower = $name.ToLowerInvariant()
+    if ([regex]::IsMatch($lower, $systemPattern)) { return $true }
+    return Test-Path (Join-Path $system32 $name)
+}
 
 if ($dumpbin) {
     $staged = @{}
@@ -172,7 +199,7 @@ if ($dumpbin) {
             Select-String -Pattern '^\s+([A-Za-z0-9_.\-]+\.dll)\s*$' |
             ForEach-Object { $_.Matches[0].Groups[1].Value }
         foreach ($dll in $imports) {
-            if ($dll -match $systemPattern) { continue }
+            if (Test-SystemDll $dll) { continue }
             $key = $dll.ToLowerInvariant()
             if ($staged.ContainsKey($key)) { continue }
             $source = $null
@@ -235,6 +262,7 @@ Contents
 
 Usage
   bin\openems-cli.exe model.xml
+  bin\openems-cli.exe model.xml --gpu      (GPU update kernels; needs a Vulkan/DX12 adapter)
   python -m pip install python\*.whl
   The Python extensions link the HDF5 DLL shipped in bin\; add that directory
   to PATH before importing them (the smoke test does the same).
@@ -262,6 +290,9 @@ Step "smoke: CLI help" {
     if ($code -ne 0) { throw "openems-cli -h exited $code" }
     $helpText = ($help | Out-String)
     if ($helpText -notmatch "Version:") { throw "openems-cli -h has no version banner" }
+    if ($Features -match "gpu" -and $helpText -notmatch "--gpu") {
+        throw "openems-cli -h does not advertise --gpu although the gpu feature was requested"
+    }
     Write-Host (($helpText -split "`n" | Where-Object { $_ -match "Version:" }) -join "`n")
 }
 
@@ -284,6 +315,38 @@ Step "smoke: CLI solves a tiny model" {
         throw "openems-cli did not report a completed simulation"
     }
     Remove-Item $model -Force
+    Write-Host (($runText -split "`n" | Where-Object { $_ -match "simulation completed" }) -join "`n")
+}
+
+# The point of the DLL walk is a package that runs without conda on PATH, so the
+# last check strips PATH down to the Windows system directories and runs the
+# solver from a copy of bin\.
+Step "smoke: DLL closure without conda on PATH" {
+    $scratch = Join-Path $OutDir "smoke-extract"
+    if (Test-Path $scratch) { Remove-Item $scratch -Recurse -Force }
+    New-Item -ItemType Directory -Force $scratch | Out-Null
+    Copy-Item (Join-Path $binDir "*") $scratch -Recurse -Force
+    $fixture = Join-Path $repo "CSXCAD\rust\tests\fixtures\xml\10_openems_wrapper.xml"
+    $model = Join-Path $scratch "model.xml"
+    $text = (Get-Content $fixture -Raw) `
+        -replace 'NumberOfTimesteps="100"', 'NumberOfTimesteps="20"' `
+        -replace 'PML_8', 'PEC'
+    [IO.File]::WriteAllText($model, $text, (New-Object System.Text.UTF8Encoding($false)))
+    $savedPath = $env:PATH
+    try {
+        $env:PATH = "$env:SystemRoot\System32;$env:SystemRoot"
+        Push-Location $scratch
+        try {
+            $runLog = & (Join-Path $scratch "openems-cli.exe") $model 2>&1
+            $code = $LASTEXITCODE
+        } finally { Pop-Location }
+    } finally { $env:PATH = $savedPath }
+    if ($code -ne 0) { throw "openems-cli failed without conda on PATH (exit $code)" }
+    $runText = ($runLog | Out-String)
+    if ($runText -notmatch "simulation completed: (\d+) timesteps") {
+        throw "the packaged DLL set is incomplete: no completed simulation without conda on PATH"
+    }
+    Remove-Item $scratch -Recurse -Force
     Write-Host (($runText -split "`n" | Where-Object { $_ -match "simulation completed" }) -join "`n")
 }
 
