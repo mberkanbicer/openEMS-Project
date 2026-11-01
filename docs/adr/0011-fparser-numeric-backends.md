@@ -1,6 +1,6 @@
 # ADR 0011: fparser numeric backends (supersedes ADR 0006)
 
-**Status:** Proposed 2026-11-01 (implementation not started)
+**Status:** Partially implemented 2026-11-01 (loat/f32 backend; long double, long integer and MPFR pending)
 **Decision owner:** Project owner
 **Related:** E-001, RM-024, ADR 0006, D-06
 

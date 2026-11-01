@@ -109,6 +109,10 @@ echo "== crate tests"
 log=$(run "crate tests" cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs -p qcsxcad-core -p qcsxcad-egui -p appcsxcad)
 record "crate unit + integration tests" "$log" "$(sum_passed "$log")"
 
+# E-001 stage 1: the f32 backend is a separate feature build.
+log=$(run "fparser float" cargo test -p fparser-rs --features float)
+record "fparser float (f32) backend" "$log" "$(sum_passed "$log")"
+
 echo "== HDF5 feature"
 log=$(run "hdf5 feature" cargo test -p csxcad-core -p openems-core --features hdf5)
 record "HDF5 feature tests" "$log" "$(sum_passed "$log")"
