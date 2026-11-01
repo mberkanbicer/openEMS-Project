@@ -2545,6 +2545,20 @@ the peak. Record: `reference-data/convergence/analytic_sar.json`. Tolerance is
 SAR scale is the engine's DFT convention (validated pointwise), so the analytic
 claim is the spatial decay and phase, not an independent W/kg calibration.
 
+## GPU stage 1 (ADR 0012, 2026-11-01)
+
+The optional `gpu` feature acquires a `wgpu` adapter and runs a compute shader
+over an f32 storage buffer, then reads it back. Test evidence on this host:
+
+```
+GPU round-trip on NVIDIA GeForce RTX 5070 Laptop GPU (Vulkan)
+gpu::tests::gpu_context_and_scale_round_trip ... ok
+```
+
+This is the device/buffer layer only: the FDTD update kernels are not wired to
+the GPU and the CPU engine remains the reference. The test skips with an
+explicit message when no adapter is available.
+
 ## Cell-constant material averaging (E-008, 2026-11-01)
 
 `CellConstantMaterial="1"` now selects native `AverageMatCellCenter`

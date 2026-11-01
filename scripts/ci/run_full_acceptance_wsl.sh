@@ -113,6 +113,11 @@ record "crate unit + integration tests" "$log" "$(sum_passed "$log")"
 log=$(run "fparser float" cargo test -p fparser-rs --features float)
 record "fparser float (f32) backend" "$log" "$(sum_passed "$log")"
 
+# ADR 0012 stage 1: wgpu device/buffer round-trip. The test skips cleanly when
+# no adapter is available, so a CPU-only runner does not fail.
+log=$(run "gpu stage1" cargo test -p openems-core --features gpu gpu_context_and_scale_round_trip -- --nocapture)
+record "GPU stage 1 (device + buffer)" "$log" "$(grep -E 'GPU round-trip|skipping the GPU' "$log" | tail -1)"
+
 echo "== HDF5 feature"
 log=$(run "hdf5 feature" cargo test -p csxcad-core -p openems-core --features hdf5)
 record "HDF5 feature tests" "$log" "$(sum_passed "$log")"
