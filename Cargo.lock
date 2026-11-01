@@ -2146,6 +2146,8 @@ version = "0.1.0"
 dependencies = [
  "csxcad-core",
  "fparser-rs",
+ "pollster",
+ "wgpu",
 ]
 
 [[package]]
