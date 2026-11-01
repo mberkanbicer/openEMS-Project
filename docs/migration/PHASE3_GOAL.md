@@ -18,7 +18,7 @@ the Windows build/package checks recorded in `ACCEPTANCE.md` and
 | E-001 long-integer backend | native `FunctionParser_gmpint` semantics: integer literals (decimal/octal/hex), truncating division, integer-only builtins, integer optimizer mode | Rust/`rug::Integer` backend passes unit tests and the native 52-expression differential; default `f64` unchanged |
 | E-001 extended backends | long-double (binary128) and MPFR/GMP: already implemented and differentially tested | 30/30 native differentials and 3/3 unit tests each |
 | GPU with extension models | host-sync path: E/H kernels on the GPU, extensions on the CPU with downloads/uploads around each phase; `--gpu` CLI wiring | CPU/GPU field parity, a high-level excitation/PML probe run, and a recorded wall-time comparison; explicit failure when `--gpu` is requested without a device |
-| E-015 operator-dump diagnostic | explain or accept the native `vi`/`iv` dump normalization difference | written disposition in `VALIDATION.md`/`EXCEPTIONS.md`; physical gates stay green |
+| E-015 operator-dump diagnostic | **accepted** (diagnostic-only, solver physics unaffected) | written disposition in `VALIDATION.md`/`EXCEPTIONS.md`; physical gates stay green |
 
 ## Gate
 
