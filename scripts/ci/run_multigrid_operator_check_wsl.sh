@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
-# Native differential check for the cylindrical multi-grid operator pair (E-007).
+# Native differential check for the standalone cylindrical coefficient models
+# of E-007.
 #
-# The stage-1 plan is split into its base and child grids at the split radius.
-# Each restricted model is a plain cylindrical operator; run native and Rust
-# `--debug-operator` on it and compare vv/vi/ii/iv node by node. This validates
-# the pair's operator instances before the interface interpolation and engine
-# are wired.
+# The fixtures under tests/fixtures/multigrid are two independent cylindrical
+# operators (an inner and an outer rho range). This script compares the native
+# and Rust `--debug-operator` dumps node by node, which isolates the coefficient
+# normalization problem from the multi-grid engine. The native-layout operator
+# pair (base = full mesh, child = inner rho + every second alpha line) and the
+# engine are constructed and tested in openEMS/rust/src/multigrid.rs.
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
