@@ -2545,6 +2545,30 @@ the peak. Record: `reference-data/convergence/analytic_sar.json`. Tolerance is
 SAR scale is the engine's DFT convention (validated pointwise), so the analytic
 claim is the spatial decay and phase, not an independent W/kg calibration.
 
+## Cylindrical multi-grid operator pair (E-007 stage 2, 2026-11-01)
+
+`MultiGridOperatorPair::from_xml` splits the model at the validated split line
+and builds two `Operator` instances: the base keeps rho up to the split and
+every second alpha line, the child keeps the split rho lines and all alpha
+lines. Unit test: 13 rho / 10 closed-alpha lines -> base `6x5`, child `7x11`
+(CSXCAD pads the closed alpha mesh); `setup_fdtd` now builds the pair and
+reports its cell counts before the explicit "engine not wired" rejection.
+
+Native differential attempt (`scripts/ci/run_multigrid_operator_check_wsl.sh`,
+base fixture, PEC and MUR boundaries, 6 rho x 5 alpha x 5 z):
+
+| coefficient | max relative difference |
+| --- | ---: |
+| `vv` | 0.0 |
+| `vi` | 2.03 |
+| `ii` | 1.00 |
+| `iv` | 4.58 |
+
+The split operators therefore still differ from native `Operator_Cylinder` on
+this mesh; the pair is **not** validated and E-007 stays open. The next task is
+the cylindrical coefficient parity for the split/alpha mesh (likely the
+open-alpha/axis handling), then the interface interpolation and engine.
+
 ## Cylindrical multi-grid plan (E-007 stage 1, 2026-11-01)
 
 `openEMS/rust/src/multigrid.rs` ports the native placement and compatibility
