@@ -16,7 +16,7 @@ production-ready replacement.
 
 - Workspace builds and the crate/Python/Octave tests run on this host:
   **acceptance 21/21 PASS** on a clean worktree; `docs/migration/ACCEPTANCE.md`
-  pins the tested SHA and counts (849 crate tests, 506 HDF5, 459 Python with 2
+  pins the tested SHA and counts (850 crate tests, 506 HDF5, 459 Python with 2
   GPU skips, Octave 10/10, 51 differential cases, the f32 parser feature build, the GPU stage 1-3 device, kernel and engine tests,
   quarter and cell-centre operator dumps, fresh performance gate at
   4.0x wall / 3.25x RSS, CST harness self-test and the recorded CST 2026
