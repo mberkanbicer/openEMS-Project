@@ -35,7 +35,7 @@ already verified and are not reopened.
 | item | state | last evidence |
 | --- | --- | --- |
 | E-001 | f32 implemented; long double/MPFR/long integer open | f64 53/53, f32 3/3 |
-| E-007 | plan + native-layout pair + native interpolation tables + `MultiGridEngine`; coefficient dump parity and setup integration open | 10/10 multigrid tests; 5-step TEM parity voltage 6.7e-3, current 3.3e-2, radial profile 2.8e-4 |
+| E-007 | **verified**: setup integration, child-safe extensions, probes and engine | coax multigrid vs single grid: u1 1.04e-7, u2 9.3e-8, phase 1.0761 rad identical, beta error 6.2e-3, log profile 1.3e-4 |
 | GPU | stages 1-3 (device, kernels, Engine) for extension-free models | 48³/120 steps: CPU 5.00 s vs GPU 97 ms, fields identical |
 | E-010 | blocked | Actions disabled at account level |
 
@@ -83,19 +83,19 @@ pulse, 5 steps):
 - peak position: multigrid z=7, reference z=7,
 - normalized radial voltage profile: **2.8e-4** relative.
 
-Over 40 steps the same case drifts to ~30% because the native interface
-coupling is first order and generates a small `E_z` at the split. That is not
-accepted as a completed validation: the `coax_cylindrical` probe/phase oracle
-and the setup integration (extensions and probes for both grids) are still
-required before the setup rejection can be removed.
+Over 40 steps the same initial-condition case drifts to ~30% because the
+native interface coupling is first order and generates a small `E_z` at the
+split. With the actual `1/rho` excitation and voltage probes the high-level
+run matches the single grid to 1e-7 (see stage 5 in `VALIDATION.md`); the
+multi-grid is integrated in `setup_fdtd`, the setup rejection is gone, and the
+coax phase/profile gates pass. The operator-dump normalization difference is
+tracked as E-015 (diagnostic only).
 
 ## Order of work
 
-1. Match the cylindrical dual-mesh `vi`/`iv` dump normalization and the
-   closed-alpha seam/padding rule without breaking the coaxial TEM gate.
-2. Validate `MultiGridEngine` with the `coax_cylindrical` phase/profile probes,
-   then build the extensions/probes for both grids and remove the setup
-   rejection.
+1. Close E-001 long double/long integer/MPFR-GMP.
+2. Extend the GPU path to extension models, then close E-010 when the
+   environment allows. The E-015 operator-dump diagnostic is optional.
 3. E-001: scalar refactor for non-`Copy` MPFR, then long double and long integer.
 4. GPU: extension-aware kernels or a documented host-sync path with a measured
    speed check.

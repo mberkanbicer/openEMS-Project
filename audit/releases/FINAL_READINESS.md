@@ -27,8 +27,9 @@ production-ready replacement.
 - 459 native Python tests (2 GPU tests skipped), Octave 10/10, install layout.
 - GUI editor workflow with real-click tree → inspector → status evidence;
   arrow-key tree navigation with focus rings and a Ctrl+K command palette.
-- P0 guards: cylindrical `MultiGrid` fails loudly (E-007); `CellConstantMaterial`
-  is implemented and differentially verified against native (E-008 closed).
+- P0 guards: cylindrical `MultiGrid` is implemented end to end and matches the
+  single-grid coax probe/phase gate (E-007 closed); `CellConstantMaterial` is
+  implemented and differentially verified against native (E-008 closed).
 
 ## 2. What is not proven
 

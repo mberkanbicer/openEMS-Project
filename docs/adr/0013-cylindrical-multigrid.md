@@ -1,6 +1,6 @@
 # ADR 0013: cylindrical multi-grid
 
-**Status:** Stages 1-2 implemented 2026-11-01 (plan, split rules, extension matrix, base/child Operator instances); engine and coefficient parity pending, E-007 still rejected at setup
+**Status:** Implemented 2026-11-01 (plan, native-layout pair, interpolation, engine, setup integration, probes); E-007 closed, operator-dump difference tracked as E-015
 **Decision owner:** Project owner
 **Related:** E-007, native `Operator_CylinderMultiGrid`, `Engine_CylinderMultiGrid`
 
@@ -33,8 +33,9 @@ Port the native design rather than invent a new one:
    - a cylindrical cavity mode;
    - a multigrid model that native runs; compare probe traces and S-parameters
      node-by-node at the interface.
-6. **Fallback** — until each piece is validated, `setup_fdtd` keeps rejecting
-   radii (E-007 stays open). No silent single-grid fallback.
+6. **Fallback** - the setup path is now implemented and validated; it rejects
+   the extension combinations native cannot use on the child instead of
+   silently dropping them. No silent single-grid fallback.
 
 ## Acceptance
 

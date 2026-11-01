@@ -16,10 +16,23 @@ with M-file wrappers, so the omission no longer exists.
 | E-006 | **Resolved 2026-10-29.** The all-Rust GUI reached the native layout, workflow, icon set and metrics (RM-152, RM-153) | Owner decision: parity is required; the parity rows are `Verified` | The residual is environmental: no native Qt build for a side-by-side screenshot and no macOS/Linux-X11 desktop session | Build the native Qt application for a side-by-side capture and run the session on macOS/Linux; see `audits/gui-parity.md` and `audits/gui-qa.md` |
 | E-005 | No nightly reference job is currently scheduled | Owner deleted the `openEMS-nightly-reference` Windows Task Scheduler entry on 2026-10-30; hosted Actions remain unavailable at the account level (dispatch returns HTTP 422) | No nightly or cross-platform CI run exists now. The job body is still `scripts/ci/run_nightly_wsl.sh`, but nothing triggers it | Re-enable Actions and place `.github/workflows/reference.yml` on the default branch, or recreate the local scheduled task on explicit owner instruction |
 | E-004 | `hyp2mat` is not built on FreeBSD: its Clipper2 backend (`clipper2c-sys`) has no FreeBSD target | RM-120/RM-121 platform matrix | FreeBSD builds and tests fparser, CSXCAD, openEMS, CTB and the GUI crates; only the offline PCB converter is unavailable there | Use the native hyp2mat, a Linux/macOS/Windows build, or replace the Clipper2 backend with a portable implementation if FreeBSD conversion is required |
-| E-007 | Cylindrical multi-grid (`MultiGrid`) is not integrated into the solver path | Owner decision 2026-10-30 (RM-061/D-02); port plan in ADR 0013 | `set_multi_grid` / Python `SetMultiGrid` keeps the native setter contract (validate and store), but `setup_fdtd` refuses a model with radii: it stops with an explicit error instead of silently running as a single-grid model. The native-layout operator pair, interpolation tables and `MultiGridEngine` (native barrier order) now exist and are unit-tested; extensions/probes for both grids, the `coax_cylindrical` probe validation and the coefficient dump parity are still open | Use the native solver for multi-grid models until the engine is driven by `setup_fdtd` with full probe/extension support |
+| E-015 | The cylindrical operator-dump `vi`/`iv` normalization still differs from native, although the physical gates pass | Diagnostic-only difference left open after E-007 (2026-11-01) | `scripts/ci/run_multigrid_operator_check_wsl.sh` is not clean for the standalone coefficient fixtures. The coaxial single-grid gate, the multi-grid TEM parity and the multi-grid coax probe gate all pass, so this is a debug-dump representation difference, not a solver result difference | Compare against the native SSE-compressed `f4vector` storage or record it as an accepted diagnostic difference |
 | E-010 | No hosted CI or macOS/FreeBSD/Windows run at this HEAD: GitHub Actions is disabled at the account level (dispatch returns HTTP 422) | E-005 / CI-001; owner/environment | Platform claims rest on runs before this HEAD; the current tree is verified on Windows and WSL2 only | Enable Actions at the account level (or run the workflows on hosted runners) and attach the platform matrix |
 
 ### Resolved
+
+- **E-007 (cylindrical multi-grid) closed 2026-11-01:** `setup_fdtd` now builds
+  the native-layout pair (base = full mesh, child = inner rho + every second
+  alpha line), attaches the inner engine through `MultiGridLink`, and runs the
+  native `Engine_CylinderMultiGrid` barrier order. Probes and dumps sample the
+  full base mesh. Child-safe extensions follow the native
+  `IsCylindricalMultiGridSave` matrix; TFSF and Mur on the alpha/rho-min faces
+  are rejected instead of silently dropped, and the child skips UPML exactly
+  like native. Validation: closed-alpha coaxial line with a `1/rho` excitation
+  and three voltage probes, 220 steps, multigrid vs single grid: `u1` 1.04e-7,
+  `u2` 9.3e-8 relative, identical phase (1.0761 rad), `beta` error 6.2e-3 and a
+  log radial profile of 0.5642 vs the analytic 0.5643 (1.3e-4). The operator
+  dump difference is tracked separately as E-015.
 
 - **E-008 (CellConstantMaterial averaging) closed 2026-11-01 (RM-167/D-02):**
   `AverageMatCellCenter` is implemented in `operator.rs`
