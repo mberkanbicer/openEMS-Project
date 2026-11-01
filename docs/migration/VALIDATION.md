@@ -2555,8 +2555,11 @@ GPU round-trip on NVIDIA GeForce RTX 5070 Laptop GPU (Vulkan)
 gpu::tests::gpu_context_and_scale_round_trip ... ok
 ```
 
-This is the device/buffer layer only: the FDTD update kernels are not wired to
-the GPU and the CPU engine remains the reference. The test skips with an
+Stage 2 adds the Yee E/H update kernels (`update_e`, `update_h`) over the same
+component-major layout, with `vv`/`vi`/`ii`/`iv` coefficients. On a 5x4x3 grid
+the GPU result matches the CPU formula: **E 5.96e-8, H 5.96e-8** max absolute
+difference. The engine still uses the CPU path; wiring the buffers into
+`Engine` (and the extension fallback) is the next stage. Both tests skip with an
 explicit message when no adapter is available.
 
 ## Cell-constant material averaging (E-008, 2026-11-01)

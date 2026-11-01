@@ -11,7 +11,7 @@ Status values follow `STATUS_POLICY.md`; only recorded evidence moves a row to
 | Windows wheel version | abi3 wheel | **Verified 2026-11-01** | `cp39-abi3` wheel imports on 3.11 and 3.14; package rebuilt |
 | E-001 fparser backends | ADR 0011 | **Implemented, f32 stage** (not Verified) | native float differential; then `rug`/MPFR and long-double |
 | E-007 cylindrical multi-grid | ADR 0013 | Analyzed (design) | port the operator/engine pair and the extension matrix |
-| GPU acceleration | ADR 0012 | **Stage 1 implemented** (device/buffer/compute round-trip; no solver kernel yet) | E/H kernels on the cavity case, CPU reference bound |
+| GPU acceleration | ADR 0012 | **Stages 1-2 implemented** (device/buffer; E/H kernels match the CPU formula at 6e-8) | engine integration for a real case, extension fallback and speed measurement |
 
 ## Ordered work
 

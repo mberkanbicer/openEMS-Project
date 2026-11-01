@@ -1,6 +1,6 @@
 # ADR 0012: optional GPU acceleration (supersedes ADR 0002 scope note)
 
-**Status:** Stage 1 implemented 2026-11-01 (`gpu` feature: wgpu device, buffers and a compute round-trip on an RTX 5070/Vulkan); FDTD kernels not wired yet
+**Status:** Stages 1-2 implemented 2026-11-01 (`gpu` feature: wgpu device, buffer round-trip and the Yee E/H update kernels, validated against the CPU formula at 6e-8); engine integration pending
 **Decision owner:** Project owner
 **Related:** ADR 0002, component matrix "GPU compute"
 
