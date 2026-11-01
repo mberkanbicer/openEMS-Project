@@ -16,7 +16,7 @@ FIXTURES="$REPO_ROOT/openEMS/rust/tests/fixtures/multigrid"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
-for case in base child; do
+for case in ${CASES:-base child}; do
   model="$FIXTURES/$case.xml"
   if [ ! -f "$model" ]; then
     echo "missing multi-grid fixture: $model" >&2
