@@ -52,6 +52,12 @@ already verified and are not reopened.
   must keep passing while the dump parity is investigated.
 - Open-alpha, rho = 0 base: `ii` also differs, so the axis (`rho = 0`) handling
   is a second discrepancy.
+- Closed-alpha, rho > 0 base: native 5x10x5 = 250 nodes and constant `vi`
+  (259.084) vs Rust 5x11x5 = 275 nodes and rho-scaled `vi` (28.6 -> 57.3).
+  The dump normalization is independent of the alpha closure, so matching it
+  requires porting the native coefficient **and** engine rho normalization as
+  one coordinated change; changing the coefficients alone breaks the coaxial
+  TEM gate (reverted in `4f97545`).
 
 ## Order of work
 
