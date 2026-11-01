@@ -12,7 +12,7 @@ and pinned by the root repository; the archived three-crate tree is tagged
 
 The full-stack acceptance run is **21/21 PASS** and covers the release
 workspace build, 851 crate tests, 506 HDF5 tests, 459 native Python cases (2
-GPU skips), the unmodified Octave testsuite 10/10, the f32 parser feature build (3 tests), the GPU stage 1-3 device, kernel and engine tests,
+GPU skips), the unmodified Octave testsuite 10/10, the f32/long-double/MPFR/long-integer parser backends with native differentials, the GPU device/kernel/engine tests and the host-sync extension path,
 the quarter and cell-centre operator dumps, the 51-case differential
 harness, the cylindrical SAR and curve-excitation gates, the analytic SAR, the
 CST comparison harness self-test and the recorded CST 2026 comparison, CTB, a
@@ -60,7 +60,7 @@ suite is 865 passed / 0 failed. The GUI redesign adds RM-164..RM-166 and the
 audit adds RM-167/RM-168, the parser hardening adds RM-169, the cavity convergence study adds RM-170, the viewport colour fix adds RM-171, the `TimeStepFactor` fix adds RM-172, dock persistence adds RM-173, the dielectric study adds RM-174, and the MATLAB smoke adds RM-175, and the keyboard/palette work adds RM-176, and the time-step study adds RM-177, and the analytic SAR validation adds RM-178, and the corrected MSL notch study
 adds RM-179, the Miri pass adds RM-180, and drag-docking adds RM-181, and the fuzz pass adds RM-182, and the ASan pass adds RM-183, for 183 `Verified`
 rows in total.
-Everything else is classified as already present, not applicable (GPU engine,
+Everything else is classified as already present, not applicable (upstream HIP/Metal GPU backends;
 packaging, CI) or deferred with a reason in
 `audits/upstream-sync-2026-10-30.md`.
 
@@ -236,7 +236,7 @@ the SAR 1 g/10 g averaging-cube search (RM-145), the end-criteria stop time
 
   | Crate | Path | Type | Status |
   |-------|------|------|--------|
-  | fparser-rs | fparser/rust | lib | 52 tests pass, clippy clean, fmt clean |
+  | fparser-rs | fparser/rust | lib | 53 f64 tests, 3 f32, 3 long-double, 3 MPFR, 2 long-integer; native differentials pass |
   | csxcad-core | CSXCAD/rust | lib | 194 tests pass (200 with HDF5), including the native XML corpus, differential model harness and mesh fixtures; clippy and fmt clean |
   | csxcad-python | CSXCAD/rust-py | lib+package | 2 Rust tests plus 36 Python surface/contract tests; the native Python suite (150 tests) passes against it; installs as the native `CSXCAD` package |
   | csxcad-matlab | CSXCAD/rust-matlab | cdylib | 18 FFI functions with 7 contract tests; the Octave M-file surface test checks all 58 public + 12 private native M-files |

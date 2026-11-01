@@ -1,6 +1,6 @@
 # ADR 0012: optional GPU acceleration (supersedes ADR 0002 scope note)
 
-**Status:** Stages 1-3 implemented 2026-11-01 (`gpu` feature: wgpu device, Yee E/H kernels and Engine integration). 48^3, 120 steps: CPU 5.00 s vs GPU 97 ms with identical fields; models with extensions fall back to the CPU explicitly
+**Status:** Implemented 2026-11-01 (`gpu` feature: wgpu device, Yee E/H kernels, Engine integration and the host-sync extension path). 48^3, 120 steps: CPU 5.00 s vs GPU 97 ms with identical fields for extension-free models. Extension models keep the E/H kernels on the GPU and run the extension phases on the host with field transfers; `--gpu` wiring is in the CLI. The host-sync path is correctness-first and slower than the CPU on the current WSL device (48^3, 120 steps: CPU 4.23 s vs GPU 23.07 s in the quiet run), documented in VALIDATION.md
 **Decision owner:** Project owner
 **Related:** ADR 0002, component matrix "GPU compute"
 

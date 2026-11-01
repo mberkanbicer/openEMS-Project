@@ -2545,6 +2545,38 @@ the peak. Record: `reference-data/convergence/analytic_sar.json`. Tolerance is
 SAR scale is the engine's DFT convention (validated pointwise), so the analytic
 claim is the spatial decay and phase, not an independent W/kg calibration.
 
+## fparser long-integer backend (E-001, 2026-11-01)
+
+`long-integer` selects `rug::Integer` and native `FunctionParser_gmpint`
+semantics: decimal/octal/hex integer literals, truncating division and
+remainder, exact comparisons, `abs/min/max/if`, and integer-only syntax (no
+`^`, `&&`/`||`, `==`, floats or transcendental builtins). Division or remainder
+by zero evaluates to 0, matching the native integer parser.
+
+Evidence: 2/2 integer unit tests and `run_fparser_long_integer_check_wsl.sh`:
+**52 expressions, exact integer equality and parse-error agreement** against the
+native `FunctionParser_gmpint` oracle at x=5.
+
+## GPU host-sync extension path (ADR 0012, 2026-11-01)
+
+`Engine::enable_gpu` no longer rejects models with extensions. The E/H kernels
+stay on the device; the extension phases run on the host copy with a
+download/upload around the phase (native `Engine_GPU` host-sync behaviour).
+`--gpu` is wired through the CLI (`openems-cli --features gpu --gpu`).
+
+Evidence:
+
+| case | result |
+| --- | --- |
+| 48^3, 120 steps, `BumpExtension` (post-voltage host write) | E field diff **0.0**; CPU 4.23 s vs GPU host-sync 23.07 s (quiet run; transfers dominate on the WSL device) |
+| extension-free 48^3, 120 steps | CPU 5.00 s vs GPU 97 ms, fields identical |
+| high-level coax excitation + probes, 220 steps, `--gpu` | `u1` **0.0**, `u2` **3.55e-8** relative vs the CPU run |
+| high-level setup with a Mur extension | GPU buffers active, host-sync run completes |
+
+The host-sync path is correctness-first: it removes the CPU fallback for
+extension models but is not faster than the CPU on the current WSL adapter.
+GPU-safe extension kernels (excitation/PML) are the performance follow-up.
+
 ## fparser extended-precision backends (E-001, 2026-11-01)
 
 The parser scalar seam now has three opt-in backends beside the default `f64`:

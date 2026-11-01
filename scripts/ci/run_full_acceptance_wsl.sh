@@ -121,11 +121,14 @@ record "fparser long-double (native differential)" "$log" \
 log=$(run "fparser mpfr" bash scripts/ci/run_fparser_mpfr_check_wsl.sh)
 record "fparser MPFR/GMP (native differential)" "$log" \
     "$(grep -E 'fparser MPFR differential: (PASS|FAIL)' "$log" | tail -1)"
+log=$(run "fparser long integer" bash scripts/ci/run_fparser_long_integer_check_wsl.sh)
+record "fparser long-integer (native differential)" "$log" \
+    "$(grep -E 'fparser long-integer differential: (PASS|FAIL)' "$log" | tail -1)"
 
 # ADR 0012 stage 1: wgpu device/buffer round-trip. The test skips cleanly when
 # no adapter is available, so a CPU-only runner does not fail.
 log=$(run "gpu stage1" cargo test -p openems-core --features gpu gpu_ -- --nocapture)
-record "GPU stage 1-3 (device + kernels + engine)" "$log" "$(grep -E 'GPU engine vs CPU|GPU update vs CPU|GPU round-trip|skipping the GPU' "$log" | tail -1)"
+record "GPU (device + kernels + engine + host-sync extensions)" "$log" "$(grep -E 'GPU engine vs CPU|GPU host extension vs CPU|GPU update vs CPU|GPU round-trip|skipping the GPU' "$log" | tail -1)"
 
 echo "== HDF5 feature"
 log=$(run "hdf5 feature" cargo test -p csxcad-core -p openems-core --features hdf5)

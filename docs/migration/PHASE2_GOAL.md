@@ -34,10 +34,10 @@ already verified and are not reopened.
 
 | item | state | last evidence |
 | --- | --- | --- |
-| E-001 | float, long-double (binary128) and MPFR/GMP implemented; long integer open | native differentials: long-double 30/30 worst 0.0, MPFR 30/30 worst 1.8e-29; f64 53/53, f32 3/3 |
+| E-001 | **verified**: float, long-double (binary128), MPFR/GMP and long-integer | native differentials: long-double 30/30 worst 0.0, MPFR 30/30 worst 1.8e-29, long-integer 52/52 exact; f64 53/53, f32 3/3 |
 | E-007 | **verified**: setup integration, child-safe extensions, probes and engine | coax multigrid vs single grid: u1 1.04e-7, u2 9.3e-8, phase 1.0761 rad identical, beta error 6.2e-3, log profile 1.3e-4 |
-| GPU | stages 1-3 (device, kernels, Engine) for extension-free models | 48³/120 steps: CPU 5.00 s vs GPU 97 ms, fields identical |
-| E-010 | blocked | Actions disabled at account level |
+| GPU | stages 1-3 + host-sync extension path + `--gpu` CLI | extension-free 48³/120: CPU 5.00 s vs GPU 97 ms; host-sync 48³/120: CPU 4.23 s vs GPU 23.07 s, fields identical |
+| E-010 | out of scope | owner decision 2026-11-01; local WSL2/Windows evidence accepted |
 
 ## E-007 parity diagnosis (2026-11-01)
 
@@ -93,10 +93,10 @@ tracked as E-015 (diagnostic only).
 
 ## Order of work
 
-1. Close E-001 long-integer (the float, long-double and MPFR/GMP backends are implemented and differentially tested).
+1. E-001 is verified for all native numeric variants; the long-integer differential is part of the gate.
 2. Extend the GPU path to extension models, then close E-010 when the
    environment allows. The E-015 operator-dump diagnostic is optional.
-3. E-001: the non-`Copy` scalar refactor, long-double and MPFR/GMP are done; add the long-integer backend.
+3. GPU: extension models use the host-sync path; GPU-safe extension kernels remain a performance follow-up.
 4. GPU: extension-aware kernels or a documented host-sync path with a measured
    speed check.
 5. E-010 when the environment allows.

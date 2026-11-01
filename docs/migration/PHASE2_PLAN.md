@@ -9,7 +9,7 @@ Status values follow `STATUS_POLICY.md`; only recorded evidence moves a row to
 | --- | --- | --- | --- |
 | E-008 `CellConstantMaterial` | implemented | **Verified 2026-11-01** | closed (differential operator dump, 278 lib tests) |
 | Windows wheel version | abi3 wheel | **Verified 2026-11-01** | `cp39-abi3` wheel imports on 3.11 and 3.14; package rebuilt |
-| E-001 fparser backends | ADR 0011 | **Implemented except long integer**: f32, binary128 long-double and 256-bit MPFR/GMP, each with a native differential | long-integer backend |
+| E-001 fparser backends | ADR 0011 | **Verified**: f32, binary128 long-double, 256-bit MPFR/GMP and long-integer, each with a native differential | none |
 | E-007 cylindrical multi-grid | ADR 0013 | **Stage 2 partial**: plan + base/child `Operator` pair built and unit-tested; the native operator differential still differs (vi/ii/iv) | cylindrical coefficient parity, interface interpolation, engine |
 | GPU acceleration | ADR 0012 | **Stages 1-3 implemented** (device, kernels, Engine path; 48^3/120 steps CPU 5.00 s vs GPU 97 ms, fields identical) | extension-aware GPU kernels/probes, threaded-CPU comparison, CI adapter |
 

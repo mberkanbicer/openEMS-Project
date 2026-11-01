@@ -22,7 +22,7 @@ the default and only backend enabled by dependents unless they opt in:
 | `float` | `f32` | `float` |
 | `long-double` | IEEE binary128 (`f128`/libquadmath) | `long double` |
 | `mpfr` | `rug::Float` at 256-bit mantissa | MPFR build |
-| `long-integer` | not implemented (integer-only builtins/optimizer rules) | long integer |
+| `long-integer` | `rug::Integer`, integer-only builtins and parser mode | long integer |
 
 Rust has no stable 80-bit float, so `long-double` uses IEEE binary128 (113-bit
 mantissa) through libquadmath: it carries more precision than the native x87
