@@ -2545,6 +2545,35 @@ the peak. Record: `reference-data/convergence/analytic_sar.json`. Tolerance is
 SAR scale is the engine's DFT convention (validated pointwise), so the analytic
 claim is the spatial decay and phase, not an independent W/kg calibration.
 
+## Cylindrical multi-grid setup + coax probe gate (E-007 stage 5, 2026-11-01)
+
+`setup_fdtd` now builds the child operator, forces its outer rho face to PEC,
+builds child-safe extensions through `IsCylindricalMultiGridSave`, attaches the
+inner engine to `Engine`, and the probes/dumps sample the full base mesh. The
+`MultiGrid` setup rejection is removed.
+
+High-level coaxial gate (closed alpha, 14 rho lines 100..230 mm, 17 alpha lines,
+101 z lines, PEC walls, `1/rho` weighted voltage excitation at z=0, voltage
+probes at z=100 mm and z=600 mm, 220 steps):
+
+| check | result |
+| --- | ---: |
+| `u1` multigrid vs single grid | 1.042e-7 relative |
+| `u2` multigrid vs single grid | 9.313e-8 relative |
+| phase(u2/u1) | single 1.0761 rad, multigrid 1.0761 rad |
+| beta vs k0 (wrapped) | 6.204e-3 (0.62 %) |
+| partial/full voltage profile vs log(r) | 0.5642 vs analytic 0.5643 (1.3e-4) |
+
+This is the `coax_cylindrical.m` phase/profile oracle applied to the multigrid
+run. The physical initial-condition test above still shows the first-order
+interface drift (~30 % after 40 source-free steps); the driven probe gate is
+unaffected.
+
+Child-limitation note: UPML is not cloned to the child (native marks it
+child-unsafe), so a PML model absorbs on the base but reflects in the inner
+grid, exactly like native. TFSF and Mur on the alpha/rho-min faces are
+rejected at setup.
+
 ## Cylindrical multi-grid engine (E-007 stage 4, 2026-11-01)
 
 `MultiGridEngine` (`openEMS/rust/src/multigrid.rs`) runs the native
@@ -2571,10 +2600,10 @@ Evidence (openEMS-core lib tests, closed alpha, manufactured coaxial TEM pulse,
 | TEM peak position | multigrid z=7, reference z=7 |
 | normalized radial voltage profile | 2.8e-4 |
 
-Long-run limitation: after 40 steps the same case drifts to ~30% (a small
-`E_z` is generated at the split by the native first-order coupling). The
-`coax_cylindrical` probe/phase oracle and the setup integration are still
-required; the `MultiGrid` setup rejection stays in place.
+Long-run limitation: after 40 source-free steps the same case drifts to
+~30% (a small `E_z` is generated at the split by the native first-order
+coupling). Stage 5 adds the driven coax probe/phase gate and the setup
+integration; see the section above.
 
 ## Child-to-base field interpolation (E-007 stage 3b, 2026-11-01)
 
@@ -2619,13 +2648,12 @@ An experiment that switched the EC geometry to an unscaled (no-rho) metric made
 propagation gate (`TEM propagation, beta = k0`, max relative deviation 1.37
 against 0.01) in the Octave testsuite. The change was reverted in `4f97545`:
 the operator dump is not yet a trustworthy oracle for the cylindrical rho
-convention, and the coaxial gate is authoritative. E-007 stays open and the
-setup rejection stays in place.
+convention, and the coaxial gate is authoritative.
 
 The split operators therefore still differ from native `Operator_Cylinder` on
-this mesh; the pair is **not** validated and E-007 stays open. The next task is
-the cylindrical coefficient parity for the split/alpha mesh (likely the
-open-alpha/axis handling), then the interface interpolation and engine.
+this mesh. This stage-2 layout was later found inverted and replaced in stage 4
+(base = full mesh); the physical gates in stages 4-5 are the validation that
+matters, and the dump difference is tracked as E-015.
 
 ## Cylindrical multi-grid plan (E-007 stage 1, 2026-11-01)
 

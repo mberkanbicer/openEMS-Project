@@ -110,9 +110,10 @@ found two P0 defects the row status had missed:
   operator always used quarter-cell averaging. Fixed by rejecting the option at
   setup (E-008, RM-167, `cell_constant_material_is_rejected_at_setup`).
 - `MultiGrid` was parsed/stored/exposed but never reached the operator or
-  engine; RM-061 claimed `Verified` without a command or result. Fixed by
-  rejecting stored radii at setup while keeping the native setter contract
-  (E-007, RM-061, two regression tests).
+  engine; RM-061 claimed `Verified` without a command or result. It was first
+  made to fail loudly (E-007) and is now implemented end to end: native-layout
+  pair, interpolation, inner engine, child-safe extensions and probes, with the
+  coaxial probe/phase gate matching the single grid (E-007 closed 2026-11-01).
 
 The audit also found Python façade drift from the carried upstream tests:
 missing `dc_free`, non-native `_SetLibraryArguments` errors, `Write2XML`
