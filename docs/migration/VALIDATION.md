@@ -2545,6 +2545,17 @@ the peak. Record: `reference-data/convergence/analytic_sar.json`. Tolerance is
 SAR scale is the engine's DFT convention (validated pointwise), so the analytic
 claim is the spatial decay and phase, not an independent W/kg calibration.
 
+## Cylindrical multi-grid interpolation tables (E-007 stage 3, 2026-11-01)
+
+`AlphaInterpolation::new` ports the native `SetupInterpolation` positions and
+weights for the alpha direction (voltage and current tables, closed/open seam
+cases). Unit test: base 5 / child 10 closed lines -> voltage table index 0 wraps
+to `child_len-3 = 7`, current index 1 maps to positions 0/1, all weights finite
+and in range.
+
+The tables are not yet applied to fields; the engine and the physical
+`coax_cylindrical` probe oracle remain open.
+
 ## Cylindrical multi-grid operator pair (E-007 stage 2, 2026-11-01)
 
 `MultiGridOperatorPair::from_xml` splits the model at the validated split line

@@ -35,7 +35,7 @@ already verified and are not reopened.
 | item | state | last evidence |
 | --- | --- | --- |
 | E-001 | f32 implemented; long double/MPFR/long integer open | f64 53/53, f32 3/3 |
-| E-007 | plan + base/child pair built and unit-tested; coefficient parity open | pair `6x5`/`7x11`; native differential fails (vi 2.03, iv 4.58) |
+| E-007 | plan + base/child pair + alpha interpolation tables; coefficient parity/engine open | pair `6x5`/`7x11`; `AlphaInterpolation` positions/weights unit-tested |
 | GPU | stages 1-3 (device, kernels, Engine) for extension-free models | 48³/120 steps: CPU 5.00 s vs GPU 97 ms, fields identical |
 | E-010 | blocked | Actions disabled at account level |
 
