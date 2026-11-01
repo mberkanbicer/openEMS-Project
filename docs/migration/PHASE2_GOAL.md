@@ -46,8 +46,10 @@ already verified and are not reopened.
   operand shape of the differential; a shape-aware comparison or a padding
   decision is required.
 - Open-alpha, rho > 0 base: `vv` and `ii` match exactly; `vi` and `iv` still
-  differ (dual-mesh inductance/resistance). The remaining parity work is the
-  cylindrical dual area/length used by `GetEdgeArea(..., true)`.
+  differ. Node-level inspection confines the differences to rho index 0/1 and
+  shows a `1/rho` scale on the alpha component (native 522.08 vs Rust 25.90 at
+  rho index 1), i.e. the dual-mesh rho factor in `GetEdgeArea(..., true)` /
+  `GetEdgeLength(..., true)`, not the material data.
 - Open-alpha, rho = 0 base: `ii` also differs, so the axis (`rho = 0`) handling
   is a second discrepancy.
 
