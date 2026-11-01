@@ -2558,9 +2558,22 @@ gpu::tests::gpu_context_and_scale_round_trip ... ok
 Stage 2 adds the Yee E/H update kernels (`update_e`, `update_h`) over the same
 component-major layout, with `vv`/`vi`/`ii`/`iv` coefficients. On a 5x4x3 grid
 the GPU result matches the CPU formula: **E 5.96e-8, H 5.96e-8** max absolute
-difference. The engine still uses the CPU path; wiring the buffers into
-`Engine` (and the extension fallback) is the next stage. Both tests skip with an
-explicit message when no adapter is available.
+difference.
+
+Stage 3 wires the buffers into `Engine`: `enable_gpu()` uploads the fields and
+coefficients, every step dispatches E then H, and the fields sync once per
+`iterate_ts` batch. Models with any registered extension are refused with an
+explicit "CPU fallback" error. Measured on the local RTX 5070 (Vulkan), 48^3
+cells, 120 steps, single-thread CPU:
+
+| engine | wall time | field difference |
+| --- | ---: | ---: |
+| CPU | 5.00 s | reference |
+| GPU | 97 ms | 0.00e0 (identical) |
+
+All four GPU tests skip with an explicit message when no adapter is available.
+The CPU threaded engine is not part of this comparison; extension-aware GPU
+kernels (PML, excitation, probes) remain open.
 
 ## Cell-constant material averaging (E-008, 2026-11-01)
 

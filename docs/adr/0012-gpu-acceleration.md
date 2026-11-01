@@ -1,6 +1,6 @@
 # ADR 0012: optional GPU acceleration (supersedes ADR 0002 scope note)
 
-**Status:** Stages 1-2 implemented 2026-11-01 (`gpu` feature: wgpu device, buffer round-trip and the Yee E/H update kernels, validated against the CPU formula at 6e-8); engine integration pending
+**Status:** Stages 1-3 implemented 2026-11-01 (`gpu` feature: wgpu device, Yee E/H kernels and Engine integration). 48^3, 120 steps: CPU 5.00 s vs GPU 97 ms with identical fields; models with extensions fall back to the CPU explicitly
 **Decision owner:** Project owner
 **Related:** ADR 0002, component matrix "GPU compute"
 

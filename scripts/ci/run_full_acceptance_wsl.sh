@@ -116,7 +116,7 @@ record "fparser float (f32) backend" "$log" "$(sum_passed "$log")"
 # ADR 0012 stage 1: wgpu device/buffer round-trip. The test skips cleanly when
 # no adapter is available, so a CPU-only runner does not fail.
 log=$(run "gpu stage1" cargo test -p openems-core --features gpu gpu_ -- --nocapture)
-record "GPU stage 1-2 (device + E/H kernels)" "$log" "$(grep -E 'GPU round-trip|GPU update vs CPU|skipping the GPU' "$log" | tail -1)"
+record "GPU stage 1-3 (device + kernels + engine)" "$log" "$(grep -E 'GPU engine vs CPU|GPU update vs CPU|GPU round-trip|skipping the GPU' "$log" | tail -1)"
 
 echo "== HDF5 feature"
 log=$(run "hdf5 feature" cargo test -p csxcad-core -p openems-core --features hdf5)
