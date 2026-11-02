@@ -1085,3 +1085,19 @@ now register rows, all closed:
   extensions are TFSF, Debye/Lorentz and conducting sheets; E-016 and RM-193
   carry the evidence.
 
+
+## Session record 2026-11-02 (GPU device-side conducting sheet)
+
+- **What:** conducting sheets run on the device. The coefficients and ADE
+  state are packed as global (order, component, position) matrices with one
+  base index per cell; `sheet_pre` advances the two ADE orders and
+  `sheet_apply` subtracts the summed corrections in the voltage phase slots.
+  `Engine::setup_gpu_extensions` accepts sheet cells alongside excitation,
+  UPML, Mur and lumped RLC.
+- **Correctness:** `gpu_device_conducting_sheet_matches_the_cpu_engine` (two
+  cells, 12^3, 120 steps) reports `CPU diff 3.94e-31` and batch vs single-step
+  `0.00e0`; the workspace suite passes.
+- **Records:** `GPU_ANALYSIS.md` Â§7 documents the port; the remaining
+  host-path extensions are TFSF, Debye and Lorentz; E-016 and RM-194 carry the
+  evidence.
+

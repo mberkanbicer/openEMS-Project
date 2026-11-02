@@ -239,13 +239,26 @@ upml_pre -> E -> upml_post -> mur_post -> lumped_apply -> mur_apply -> source`.
 Validation: `gpu_device_lumped_rlc_matches_the_cpu_engine` (12³, 120 steps,
 three edges) reports `CPU diff 0.00e0` and batch vs single-step `0.00e0`.
 
+### Conducting sheet (`EngineExtConductingSheet`, RM-194)
+
+The sheet is a two-order ADE over a set of cells. The device port packs the
+per-order/component internal and external coefficients and the ADE state into
+global (order, component, position) matrices, plus one component-0 base index
+per cell; `sheet_pre` advances the ADE state and `sheet_apply` subtracts the
+sum of the two orders from the three components. They run in the
+`pre_voltage` and `apply2_voltage` slots, after the lumped phases.
+
+Validation: `gpu_device_conducting_sheet_matches_the_cpu_engine` (12³, 120
+steps, two cells, non-trivial coefficients) reports `CPU diff 3.94e-31` and
+batch vs single-step `0.00e0`.
+
 ### Remaining
 
-TFSF, Debye/Lorentz dispersive materials and conducting sheets still run on the
-host. Each follows the same pattern: upload the extension state once, add the
-phase kernels, mark `is_gpu_native`, add a CPU/GPU differential test. The
-capability flag already selects the path per model, so a model mixing a ported
-extension with an unported one keeps the host path.
+TFSF, Debye and Lorentz still run on the host. Each follows the same pattern:
+upload the extension state once, add the phase kernels, mark `is_gpu_native`,
+add a CPU/GPU differential test. The capability flag already selects the path
+per model, so a model mixing a ported extension with an unported one keeps the
+host path.
 
 ## 8. Practical guidance (current state)
 
