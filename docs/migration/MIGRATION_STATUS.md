@@ -1069,3 +1069,19 @@ now register rows, all closed:
   extensions (TFSF, lumped, Debye/Lorentz, conducting sheets); E-016 carries
   the new numbers; RM-192 records the evidence.
 
+
+## Session record 2026-11-02 (GPU device-side lumped RLC)
+
+- **What:** lumped RLC runs on the device. The nine coefficients per edge are
+  packed into one buffer, the voltage/current history and parallel inductor
+  current stay on the device, and two kernels (`lumped_pre`, `lumped_apply`)
+  run in the `pre_voltage`/`apply2_voltage` slots of the batch.
+  `Engine::setup_gpu_extensions` accepts lumped edges alongside excitation,
+  UPML and Mur.
+- **Correctness:** `gpu_device_lumped_rlc_matches_the_cpu_engine` (three edges,
+  12^3, 120 steps) reports `CPU diff 0.00e0` and batch vs single-step `0.00e0`;
+  the workspace suite passes.
+- **Records:** `GPU_ANALYSIS.md` Â§7 documents the port; the remaining host-path
+  extensions are TFSF, Debye/Lorentz and conducting sheets; E-016 and RM-193
+  carry the evidence.
+

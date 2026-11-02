@@ -226,13 +226,26 @@ overlapping faces) reports `CPU diff 6.46e-26` and batch vs single-step
 **2.30–2.77 s** on the GPU against 10.2–11.4 s on the CPU (**3.9–4.4x**), and
 its probe signals agree with the CPU run to 3.78e-7 / 2.91e-7 V/m.
 
+### Lumped RLC (`EngineExtLumpedRLC`, RM-193)
+
+Lumped elements are independent edges with three-sample voltage/current history
+and a parallel inductor current. The device port packs the nine coefficients per
+edge into one buffer and keeps the history on the device; `lumped_pre` rotates
+the voltage history and advances the inductor current, `lumped_apply` performs
+the series update and writes the edge voltage back. They run in the
+`pre_voltage` and `apply2_voltage` slots, i.e. `mur_pre -> lumped_pre ->
+upml_pre -> E -> upml_post -> mur_post -> lumped_apply -> mur_apply -> source`.
+
+Validation: `gpu_device_lumped_rlc_matches_the_cpu_engine` (12³, 120 steps,
+three edges) reports `CPU diff 0.00e0` and batch vs single-step `0.00e0`.
+
 ### Remaining
 
-TFSF, lumped RLC, Debye/Lorentz dispersive materials and conducting sheets
-still run on the host. Each follows the same pattern: upload the extension
-state once, add the phase kernels, mark `is_gpu_native`, add a CPU/GPU
-differential test. The capability flag already selects the path per model, so
-a model mixing a ported extension with an unported one keeps the host path.
+TFSF, Debye/Lorentz dispersive materials and conducting sheets still run on the
+host. Each follows the same pattern: upload the extension state once, add the
+phase kernels, mark `is_gpu_native`, add a CPU/GPU differential test. The
+capability flag already selects the path per model, so a model mixing a ported
+extension with an unported one keeps the host path.
 
 ## 8. Practical guidance (current state)
 
