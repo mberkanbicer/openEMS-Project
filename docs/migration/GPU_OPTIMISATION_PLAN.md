@@ -11,7 +11,7 @@ Only `Verified` counts as done (AGENTS.md §17).
 
 | Id | Item | Status | Evidence |
 |---|---|---|---|
-| P-1 | Merge UPML slabs per phase | **Verified** | 6 slabs: 32 -> 6 passes/step (now 4 with P-E2); 2-slab differential `0.00e0` |
+| P-1 | Merge UPML slabs per phase | **Verified** | 6 slabs: 32 -> 6 passes/step (now 2 with P-E6); 2-slab differential `0.00e0` |
 | P-2 | Colour Mur faces into conflict-free passes | **Verified** | 6 faces: 18 -> 9 passes (11 with E/H); differential `2.38e-7` |
 | P-3 | Merge Debye/Lorentz regions | **Verified** | Not applicable by construction: the operator builds exactly one region (`operator.rs:3358/3569`), so the count is already 3/4 |
 | P-4 | Device-side probe sampling | **Verified** | Point and box probes gather on the device; 6 points, batch 12 (was 1), probes match CPU to 2.3e-7 / 4.3e-7 |
@@ -64,9 +64,10 @@ buffer set with one slab table (start, extent, element offset). One dispatch
 per phase over the total element count; the kernel locates the slab from the
 index (`upml_locate`).
 
-**Result.** A 6-slab model now costs **6 passes/step** (4 PML phases + E + H)
-instead of 32. The two-slab differential is `0.00e0`; the 525k-cell PML model
-measured 2.16-2.82 s (the host was noisy; the earlier baseline was 2.55 s).
+**Result.** A 6-slab model first dropped to **6 passes/step** (4 PML phases +
+E + H); P-E6 then fused the pre phases as well, so it now costs **2 passes**
+(E and H), independent of the slab count. The two-slab differential is
+`0.00e0`, and the 525k-cell PML model runs in 1.82-1.95 s.
 
 ## P-2. Group Mur faces into conflict-free passes - Verified
 
@@ -161,7 +162,7 @@ device is unavailable rather than falling back silently.
 ## P-10. GPU performance regression gate - Verified
 
 `gpu_dispatch_budget_is_constant_in_slab_count` asserts the recorded pass count
-per model shape: six PML slabs must cost 6 passes and six Mur faces 11. A
+per model shape: six PML slabs must cost 2 passes and six Mur faces 11. A
 duplicated phase fails the test even when the fields are still correct.
 
 ## P-11. Cylindrical multi-grid on the GPU - Verified
@@ -187,7 +188,8 @@ an id before being implemented.
 | Id | Found during | Description | Status |
 |---|---|---|---|
 | P-E1 | P-1 | The per-element slab lookup is a short prefix scan; measured cost is inside the noise, so no hoisting needed | Verified |
-| P-E2 | P-1/P-10 | Fold the PML post phases into the E/H kernels. The pre phases need a global barrier, so they stay separate; a PML model now costs 4 passes/step (two pre phases + fused E + fused H) instead of 6, with the UPML differential still `0.00e0` | Verified |
+| P-E2 | P-1/P-10 | Fold the PML post phases into the E/H kernels. The pre phases need a global barrier, so they stay separate; a PML model now costs 4 passes/step (two pre phases + fused E + fused H) instead of 6, with the UPML differential still `0.00e0` (P-E6 later fuses the pre phases too: 2 passes) | Verified |
 | P-E3 | P-7/P-9 | Added the `OPENEMS_GPU_CHUNK` tuning knob and `--gpu-auto` with its printed decision | Verified |
 | P-E4 | P-2/P-5 | The engine differential tests compared zero fields because `cavity_operator` never built the EC coefficients. Building them exposed the Mur colour-range bug and an unstable Debye test, both fixed; all differentials now run on real fields | Verified |
 | P-E5 | P-4 | `ProcessIntegral` box probes are device-sampled through `IntegralCalculator::gpu_field_probe` (three components + edge-length scaling), so the CLI tutorials' probes no longer force a per-step download | Verified |
+| P-E6 | P-E2 | The E update reads only `curr` and the H update only `volt`, so the PML **pre** phases are same-cell too: fusing them into the fused E/H kernels leaves a PML model at 2 passes/step (E and H) with the UPML differential still `0.00e0`; the 525k PML model drops to 1.82-1.95 s | Verified |

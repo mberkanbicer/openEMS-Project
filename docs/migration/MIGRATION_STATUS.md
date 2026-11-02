@@ -1190,3 +1190,22 @@ now register rows, all closed:
   CPU-faster because ~0.2 ms per dispatch dominates; a single fused step kernel
   would need a device-wide barrier, which WGSL does not provide.
 
+
+## Session record 2026-11-02 (fused PML pre phases)
+
+- **What:** the PML pre phases are now fused into the E/H kernels (P-E6).
+  Because the E update reads only `curr` and the H update only `volt`, the pre
+  phase touches the same cell as the update that follows it and needs no
+  global barrier. `update_e_pml`/`update_h_pml` run `pml_pre_phase` before and
+  `pml_post_phase` after the update, with the pre coefficients bound at 16/17.
+- **Result:** a PML model costs **2 passes/step** (E and H), independent of the
+  slab count; the 525k-cell PML+source model drops to 1.82-1.95 s (was 2.05 s
+  with post-only fusion).
+- **Verification:** the two-slab UPML differential is still 0.00e0, the
+  dispatch-budget test asserts 2, all 12 engine GPU differentials pass,
+  `cargo test --release --workspace` with hdf5+gpu exits 0, and the tutorial
+  physics checks and tutorial 1 probe hash are unchanged.
+- **Remaining (recorded):** the source excitation still needs two passes
+  because its writes race with the E/H threads; small models stay CPU-faster
+  at ~0.2 ms per dispatch.
+
