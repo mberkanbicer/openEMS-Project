@@ -719,12 +719,11 @@ the SAR 1 g/10 g averaging-cube search (RM-145), the end-criteria stop time
   results on both. The full triple audit now passes on Windows/MSVC 19.44 and
   Ubuntu WSL/GCC 15.2. The separate 236,196-case 12-value triple stress audit
   passes on both systems; equivalence for every generated optimizer rule is not
-  claimed. macOS/FreeBSD runtime validation is outstanding. Optional
-  numeric variants and malformed UTF-8 byte behavior are formally out of scope
-  for `fparser-rs`: it accepts valid UTF-8 `str` and covers only the default
-  real `f64` parser; the original C++ implementation remains the compatibility
-  path for optional numeric configurations. Complete API compatibility remains
-  open.
+  claimed. The optional numeric backends of E-001 (float, long-double/binary128,
+  MPFR, long-integer) are closed with native differentials, and the remaining
+  transcendental boundary of the long-integer backend is adjudicated in RM-185;
+  what stays open is the macOS/FreeBSD runtime validation, which is
+  environment-bound (E-005/E-006 family), not missing compatibility.
   Later component-specific compatibility, binding, GUI, and dependency choices
   remain scoped to their respective migration units.
 
@@ -754,16 +753,18 @@ install-layout check, plus the Python, Octave and differential suites that CI
 does not run. The macOS, Windows and FreeBSD jobs cannot be reproduced on this
 host and stay unverified for any commit after the last green run.
 
-Follow-ups found during the last validation pass, not yet tasks:
+Follow-ups found during earlier validation passes, since resolved:
 
-- `openEMS/rust/src/openems.rs` substitutes a default excitation where native
-  `SetupFDTD` aborts with code 3 (recorded as a deviation in `VALIDATION.md`).
-- `--nativeFieldDumps` (the VTK writer's native-vector mode) has no Rust
-  equivalent yet; the CLI now exists, so this part of RM-144 is no longer
-  blocked by a missing binary, only by the VTK writer (RM-078).
-- The curve-excitation port (RM-149) and the metal-curve PEC pass (RM-150) are
-  verified; the cylindrical overrides (RM-148) are the remaining half of the
-  `SnapLine2Mesh` work tracked by RM-144.
+- `openEMS/rust/src/openems.rs` substituted a default 1 GHz Gaussian
+  excitation where native aborts; **resolved 2026-11-02 (RM-184)** — the setup
+  now fails with the native messages and exit semantics and twelve fixtures
+  declare their excitation explicitly.
+- The GPU host-sync extension model is slower than the CPU engines whenever
+  extensions dominate the run; **recorded 2026-11-02 as E-016/RM-187** with
+  fresh measurements (crossover near 451k cells), `--gpu` stays opt-in.
+- TODO/FIXME markers were once only sampled; **adjudicated 2026-11-02
+  (RM-185)** — the only 17 markers are the intentional transcendental boundary
+  of the opt-in fparser long-integer backend, unreachable on the default path.
 
 ## Session record
 
@@ -907,3 +908,37 @@ outside the tree and were unaffected.
   fork.
 - **Next:** none from this thread; remaining migration work is tracked in
   `REMEDIATION_TASKS.md` / `REMAINING_WORK.md`.
+
+## Session record 2026-11-02 (un-tasked deviations taskified and resolved)
+
+The four deviations that had been recorded as "follow-ups, not yet tasks" are
+now register rows, all closed:
+
+- **RM-184 (missing-excitation parity, code fix).** `setup_fdtd` silently
+  substituted a 1 GHz/0.5 GHz Gaussian pulse where native fails; it now
+  reproduces the native behaviour: `<FDTD>` without an `<Excitation>` child
+  fails the parse with the native message and CLI exit 1, no excitation at
+  all aborts like native `SetupFDTD` (exit 3 message), an unknown type still
+  fails at signal build. Twelve fixtures across openems-core, rust-cli and
+  rust-matlab now declare their excitation; three new tests cover the
+  behaviour; the tutorial results are byte-identical.
+- **RM-185 (TODO/FIXME adjudication, no code change).** Exactly 17
+  `unimplemented!()` markers exist, all the transcendental boundary of the
+  opt-in fparser long-integer backend, matching the native `GmpInt` template
+  that cannot instantiate those opcodes. Nothing else is marked.
+- **RM-186 (stale records corrected).** The fparser "Complete API
+  compatibility remains open" sentence predated the E-001 closure and is
+  replaced above.
+- **RM-187 / E-016 (GPU host-sync characteristic, owner-accepted).** Fresh
+  measurements: bare 10k-cell cavity 2.67 s GPU vs 1.62 s CPU, tutorial 1
+  (PML) 1.41 s vs 0.49 s, tutorial 3 13.19 s vs 3.32 s, 451k-cell bare cavity
+  10.31 s vs 11.44 s (crossover). `--gpu` stays opt-in; recorded as E-016.
+- **Validation:** `cargo test --release --workspace --features
+  "openems-core/hdf5,openems-core/gpu,openems-cli/gpu"` passes every suite
+  (openems-core 310 + 2 analytic, openems-cli 7 incl. the new exit-code
+  contract, rust-matlab 25, rust-py 22, csxcad 172, fparser 18, GUI and tool
+  crates); tutorial 1 `probe_near` SHA-256 unchanged
+  (`620f048d3a7e4dc0c43dff969f4365e12e728e0eae723cc12208bc3ef8b750bd`).
+- **Next:** full WSL acceptance rerun and a fresh Windows package for the
+  combined revision (tutorials + output-layer fixes + RM-184), as required
+  after the last code change.
