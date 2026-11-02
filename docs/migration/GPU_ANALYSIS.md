@@ -206,14 +206,33 @@ wins 4.8–5.5x at 525k cells and 9.2x on the large source model. Folding the
 PML terms into the E/H kernels (native fuses them) would remove four dispatches
 per step and is the next optimisation if small-model GPU use matters.
 
-## 7. Remaining extension work
+## 7. Device-side Mur ABC and the remaining extensions
 
-The engine keeps the host path for any extension without a device
-implementation: Mur, TFSF, lumped RLC, Debye/Lorentz dispersive materials and
-conducting sheets. The same pattern applies to each (upload its state once,
-add phase kernels, mark `is_gpu_native`), and the capability flag decides per
-model. None of those is on the hot path of the tutorials, which now cover the
-two most common cases (source and PML).
+### Mur (`EngineExtMurABC`, RM-192)
+
+Mur owns per-face coefficient and history arrays and three voltage-phase
+updates (`pre`, `post`, `apply2`). The device port uploads every face's
+`coeff_p`/`coeff_pp` and history arrays once and binds them with the global
+voltage buffer and a uniform holding the global dims, the face line/shift and
+the axis mapping (`dir`, `dir+1`, `dir+2`). Because Mur faces overlap on
+corner edges and the host applies them in registration order, the kernels run
+one pass per face in that order (pre, then post, then apply2), interleaved as
+`mur_pre -> upml_pre -> E -> upml_post -> mur_post -> mur_apply -> source ->
+upml_pre_curr -> H -> upml_post_curr -> source`.
+
+Validation: `gpu_device_mur_matches_the_cpu_engine` (12³, 120 steps, two
+overlapping faces) reports `CPU diff 6.46e-26` and batch vs single-step
+`0.00e0`; a 201×51×51 Mur model with a source (700 steps) runs in
+**2.30–2.77 s** on the GPU against 10.2–11.4 s on the CPU (**3.9–4.4x**), and
+its probe signals agree with the CPU run to 3.78e-7 / 2.91e-7 V/m.
+
+### Remaining
+
+TFSF, lumped RLC, Debye/Lorentz dispersive materials and conducting sheets
+still run on the host. Each follows the same pattern: upload the extension
+state once, add the phase kernels, mark `is_gpu_native`, add a CPU/GPU
+differential test. The capability flag already selects the path per model, so
+a model mixing a ported extension with an unported one keeps the host path.
 
 ## 8. Practical guidance (current state)
 

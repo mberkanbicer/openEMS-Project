@@ -1050,3 +1050,22 @@ now register rows, all closed:
   remaining extensions (Mur/TFSF/lumped/Debye/Lorentz/sheets), E-016 carries
   the new numbers, RM-191 records the evidence.
 
+
+## Session record 2026-11-02 (GPU device-side Mur)
+
+- **What:** Mur ABC runs on the device. Each face's coefficients and history
+  arrays are uploaded once; `mur_pre`, `mur_post` and `mur_apply` run one pass
+  per face in registration order, because faces overlap on corner edges and
+  the host applies them sequentially. The kernels are interleaved with the
+  existing device UPML/source order and `Engine::setup_gpu_extensions` accepts
+  Mur as a device-native extension.
+- **Correctness:** `gpu_device_mur_matches_the_cpu_engine` (two overlapping
+  faces) reports `CPU diff 6.46e-26` and batch vs single-step `0.00e0`; a
+  201x51x51 Mur model with a source agrees with the CPU run to 3.78e-7 /
+  2.91e-7 V/m.
+- **Performance:** that model (700 steps) runs in 2.30-2.77 s on the GPU
+  against 10.2-11.4 s on the CPU (**3.9-4.4x**).
+- **Records:** `GPU_ANALYSIS.md` Â§7 documents the port and the remaining
+  extensions (TFSF, lumped, Debye/Lorentz, conducting sheets); E-016 carries
+  the new numbers; RM-192 records the evidence.
+
