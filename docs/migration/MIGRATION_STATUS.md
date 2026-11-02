@@ -1120,3 +1120,21 @@ now register rows, all closed:
   constraint; the remaining host-path extensions are Debye and Lorentz; E-016
   and RM-195 carry the evidence.
 
+
+## Session record 2026-11-02 (GPU device-side Debye and Lorentz)
+
+- **What:** Debye and Lorentz dispersive materials now run on the device, which
+  completes the extension coverage: excitation, UPML, Mur, lumped RLC,
+  conducting sheet, TFSF, Debye and Lorentz all have device kernels.
+  Debye packs the pole coefficients/state and runs three voltage phases;
+  Lorentz uploads the four coefficient/state matrices and the per-order active
+  flags and runs four phases, preserving the host's sequential per-order
+  subtraction.
+- **Correctness:** `gpu_device_debye_matches_the_cpu_engine` reports `CPU diff
+  1.14e-13` and `gpu_device_lorentz_matches_the_cpu_engine` `5.46e-12`; both
+  are `0.00e0` for batch vs single-step, and all ten GPU differentials pass.
+  The workspace suite and the tutorial physics checks are unchanged.
+- **Records:** `GPU_ANALYSIS.md` Â§7 documents both ports and the completed
+  coverage; E-016 now states that every extension is device-native and that the
+  host path is only a fallback; RM-196/RM-197 carry the evidence.
+

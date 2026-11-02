@@ -275,11 +275,28 @@ and six PML faces (400 steps) runs in **2.46–3.16 s** on the GPU against
 10.8–10.9 s on the CPU (**3.4–4.4x**), and its probe signal agrees with the
 CPU run to 2.11e-9 V/m.
 
-### Remaining
+### Debye and Lorentz (`EngineExtDebyeMaterial`, `EngineExtLorentzMaterial`, RM-196/RM-197)
 
-Debye and Lorentz dispersive materials still run on the host. They follow the
-same pattern (upload the pole state and coefficients once, add the phase
-kernels, mark `is_gpu_native`, add a CPU/GPU differential test).
+Debye keeps a per-pole state over the dispersive cells and runs three voltage
+phases (pole update, implicit solve, correction). The device port packs the
+pole coefficients and state as (pole, component, position) and runs
+`debye_pre`, `debye_post` and `debye_apply` in the pre/post/apply2 slots.
+
+Lorentz has four phases (voltage and current ADE) and runs them as
+`lorentz_pre_volt`, `lorentz_pre_curr`, `lorentz_apply_volt` and
+`lorentz_apply_curr`, with the per-order active flags uploaded once and the
+sequential per-order subtraction preserved so the rounding matches the host.
+
+Validation: `gpu_device_debye_matches_the_cpu_engine` reports `CPU diff
+1.14e-13` and `gpu_device_lorentz_matches_the_cpu_engine` `5.46e-12`; both are
+`0.00e0` for batch vs single-step.
+
+### Coverage
+
+Every engine extension now has a device implementation: excitation, UPML, Mur,
+lumped RLC, conducting sheet, TFSF, Debye and Lorentz. A model is batched when
+all of its extensions are device-native; the host-sync path remains only as the
+fallback for any future extension without a device port.
 
 ## 8. Practical guidance (current state)
 
