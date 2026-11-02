@@ -252,13 +252,34 @@ Validation: `gpu_device_conducting_sheet_matches_the_cpu_engine` (12³, 120
 steps, two cells, non-trivial coefficients) reports `CPU diff 3.94e-31` and
 batch vs single-step `0.00e0`.
 
+### TFSF (`EngineExtTFSF`, RM-195)
+
+A plane-wave TFSF region corrects two edges per surface cell on each face, with
+a per-term amplitude, delay and interpolation factor, reading the excitation
+waveform at `ts - delay` (folded by the signal period, floored at 0). The
+device port uploads, per direction and side, the flattened
+(index, amplitude, delay, delta) tables and the waveform samples once; the
+per-step timestamp arrives in a dynamic uniform slot and `tfsf_apply`
+reproduces `update_delay_lookup` + `add_sample` exactly.
+
+Faces of one direction sit on opposite planes and never share an edge, but
+**corners are shared between directions**, and the host applies them in
+`n`-outer order. A single dispatch over all terms raced on those corner edges
+(the first differential run showed a 6.7e-4 field error), so the kernels run
+one pass per direction in that order.
+
+Validation: `gpu_device_tfsf_matches_the_cpu_engine` (16³, 120 steps, six
+active faces, synthetic delay/amplitude tables) reports `CPU diff 1.16e-10`
+and batch vs single-step `0.00e0`; a 101×61×61 model with a TFSF plane wave
+and six PML faces (400 steps) runs in **2.46–3.16 s** on the GPU against
+10.8–10.9 s on the CPU (**3.4–4.4x**), and its probe signal agrees with the
+CPU run to 2.11e-9 V/m.
+
 ### Remaining
 
-TFSF, Debye and Lorentz still run on the host. Each follows the same pattern:
-upload the extension state once, add the phase kernels, mark `is_gpu_native`,
-add a CPU/GPU differential test. The capability flag already selects the path
-per model, so a model mixing a ported extension with an unported one keeps the
-host path.
+Debye and Lorentz dispersive materials still run on the host. They follow the
+same pattern (upload the pole state and coefficients once, add the phase
+kernels, mark `is_gpu_native`, add a CPU/GPU differential test).
 
 ## 8. Practical guidance (current state)
 

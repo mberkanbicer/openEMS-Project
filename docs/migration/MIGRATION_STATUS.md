@@ -1101,3 +1101,22 @@ now register rows, all closed:
   host-path extensions are TFSF, Debye and Lorentz; E-016 and RM-194 carry the
   evidence.
 
+
+## Session record 2026-11-02 (GPU device-side TFSF)
+
+- **What:** TFSF runs on the device. The flattened delay/amplitude tables and
+  the waveform samples are uploaded once per direction and side; the per-step
+  timestamp arrives in a dynamic uniform and `tfsf_apply` reproduces the host
+  sample lookup exactly. Because corners are shared between directions, the
+  kernels run one pass per direction in the host's n-outer order; a single
+  dispatch raced and produced a 6.7e-4 field error in the first differential.
+- **Correctness:** `gpu_device_tfsf_matches_the_cpu_engine` (16^3, 120 steps,
+  six faces) reports `CPU diff 1.16e-10` and batch vs single-step `0.00e0`; a
+  101x61x61 TFSF+6 PML model agrees with the CPU run to 2.11e-9 V/m.
+- **Performance:** that model (400 steps) runs in 2.46-3.16 s on the GPU
+  against 10.8-10.9 s on the CPU (**3.4-4.4x**), and the debug summary confirms
+  the batched path with TFSF and six PML slabs.
+- **Records:** `GPU_ANALYSIS.md` Â§7 documents the port and the corner-order
+  constraint; the remaining host-path extensions are Debye and Lorentz; E-016
+  and RM-195 carry the evidence.
+
