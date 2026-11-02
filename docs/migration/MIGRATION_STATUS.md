@@ -1,32 +1,42 @@
 # Rust Migration Status
 
-**Status (2026-10-31): Complete.** The register has **183 `Verified` rows and
+**Status (2026-11-02): Complete.** The register has **187 `Verified` rows and
 no open row** (`REMEDIATION_TASKS.md`); the GUI design-parity work (`RM-152`)
-and the native icons/metrics (`RM-153`) are closed, and the `Precision
+and the native icons/metrics (`RM-153`) are closed, the `Precision
 Workbench` redesign adds RM-164..RM-166 (theme tokens, shell, viewport
-navigation). The canonical tree is
+navigation), and the 2026-11-02 session closed RM-184..RM-187 (missing-
+excitation parity with native, the TODO/FIXME adjudication, the stale
+fparser-records correction, and the GPU host-sync characteristic recorded as
+E-016). The canonical tree is
 `mberkanbicer-rust-migration-audit` in this worktree. All seven submodule ports
 are committed on their own `mberkanbicer-rust-migration-audit` branches, pushed,
 and pinned by the root repository; the archived three-crate tree is tagged
-`archive/rust-3crate-tree-2026-10`.
+`archive/rust-3crate-tree-2026-10`. The end-to-end tutorials with their
+physics checks are in `tutorials/` (see `TUTORIALS.md`).
 
-The full-stack acceptance run is **21/21 PASS** and covers the release
-workspace build, 851 crate tests, 506 HDF5 tests, 459 native Python cases (2
+The full-stack acceptance run was **24/24 PASS at `5bcfdee`** (2026-11-01,
+recorded in `ACCEPTANCE.md`) and covers the release
+workspace build, 857 crate tests, 520 HDF5 tests, 459 native Python cases (2
 GPU skips), the unmodified Octave testsuite 10/10, the f32/long-double/MPFR/long-integer parser backends with native differentials, the GPU device/kernel/engine tests and the host-sync extension path,
 the quarter and cell-centre operator dumps, the 51-case differential
 harness, the cylindrical SAR and curve-excitation gates, the analytic SAR, the
 CST comparison harness self-test and the recorded CST 2026 comparison, CTB, a
 fresh performance measurement gated at
 4.0x wall / 3.25x peak RSS, the install layout, the records check and the
-placeholder self-test. `FINAL_AUDIT.md` carries the re-audit against an earlier
+placeholder self-test. The rerun at the current revision is complete:
+**24/24 PASS at `b5b5d00`** (2026-11-02, after the tutorials, the output-layer
+fixes and RM-184; 859 crate tests, Octave 10/10, performance gate within
+limits) — every run regenerates `ACCEPTANCE.md`. `FINAL_AUDIT.md` carries the re-audit against an earlier
 revision; all thirteen criteria are met for the scope this host can execute. The
 Windows GUI session in `audits/gui-qa.md` covers
 mouse, keyboard, dialogs, the transform tools and a live-window PNG export.
-Two limitations are recorded exceptions, not open work: E-005 (the hosted
-platform matrix and nightly run are unavailable, replaced by the local job)
-and E-006 (no native Qt side-by-side and no macOS/Linux-X11 desktop session;
-the parity rows are verified by workflow and evidence).
-The full-stack acceptance run now carries the performance gate and the CST
+Recorded exceptions, not open work: E-005 (the hosted
+platform matrix and nightly run are unavailable, replaced by the local job),
+E-006 (no native Qt side-by-side and no macOS/Linux-X11 desktop session;
+the parity rows are verified by workflow and evidence), E-015 (cylindrical
+operator-dump `vi`/`iv` diagnostic difference) and E-016 (GPU host-sync
+performance characteristic; `--gpu` is opt-in).
+The full-stack acceptance run carries the performance gate and the CST
 harness self-test in addition to the listed checks; the owner accepted the
 performance threshold (4.0x wall / 3.25x peak RSS) on 2026-10-31 and the run
 measures it fresh on every invocation.
