@@ -64,10 +64,16 @@ while the kernels themselves are ~0.01–0.2 ms/step on the same grids.
    downloads only the field it produced (volt after E, curr after H), halving
    the download traffic and removing the redundant full re-upload before H.
 5. **Persistent staging/upload buffers**: no per-sync allocation.
+6. **Device-side excitation** (RM-190): the source is uploaded once and applied
+   by an `apply_source` kernel inside the batch, with per-step uniforms bound by
+   dynamic offset; the extension's host phases become no-ops when every
+   extension is device-native (`is_gpu_native`), so source-only models take the
+   batched path.
 
 Nothing in the numerical path changed: the CPU engine is untouched, and the
 tutorial CPU output is byte-identical to the recorded hashes
-(`probe_near` SHA-256 `620f048d…50bd`).
+(`probe_near` SHA-256 `620f048d…50bd`), while the device source is bit-identical
+to the host source (`0.00e0`).
 
 ## 4. Measurements (Windows, RTX 5070 Laptop, 2026-11-02)
 
@@ -113,48 +119,88 @@ The engine-level differential (`gpu_engine_matches_cpu_on_a_cavity`,
 `gpu_host_extension_path_matches_the_cpu_engine`) asserts `< 1e-5` and reports
 `0.00e0` at 120 steps.
 
-## 5. Remaining bottleneck: the host-extension path
+## 5. Device-side excitation (RM-190)
 
-Every extension phase runs on the CPU, so a PML or excitation model pays a
-device→host→device round trip per half step. The cost is dominated by the
-queue waits in `map_async` + `poll(wait)`, not by bandwidth: at 11k cells the
-transfers are ~0.8 MB/step (≪0.1 ms) yet the step costs ~1.4 ms.
+The first extension ported to the device is the excitation source, because
+every real model has one. `EngineExtExcitation` already owns per-edge
+component/position/amplitude lists and the waveform samples, so the GPU path
+uploads them once:
 
-The only structural fix is to run the extensions on the device. Concretely:
+- one storage buffer per side (flat N-I-J-K index, amplitude, delay, period,
+  signal slot, signal length);
+- one concatenated waveform buffer (one slot per distinct `Arc<Excitation>`);
+- a uniform with the per-step `ts`, bound with a dynamic offset so a whole
+  batch records one dispatch per step without rewriting it.
 
-1. **GPU-side excitation** (`EngineExtExcitation`): the extension already owns
-   the per-edge index/coefficient lists. Upload them once, upload the waveform
-   samples once, and add an `apply2` kernel that reads the per-step scalar from
-   a uniform (dynamic offsets for a batch). A model whose only extension is the
-   excitation then becomes extension-free on the host and uses the batched path
-   (tutorial 3 would drop from ~17 s to the kernel-bound ~1–2 s).
-2. **GPU-side UPML** (`EngineExtUPML`): the four phases are closed-form updates
-   over the six PML slabs with 12 coefficient arrays and 6 flux arrays. Upload
-   the coefficients/flux arrays once (they are small: slab volume × 3 × 18) and
-   add four kernels, dispatched at the same points as the host phases. That
-   removes the round trip from every PML model.
-3. **Extension capability flag**: add an optional trait method
-   (`fn gpu_supported(&self) -> bool`) so the engine keeps the fast path when
-   every extension has a device implementation, and falls back to host-sync
-   otherwise (Mur/TFSF/lumped/Debye/Lorentz remain host-side until ported).
+`apply_source` reproduces `EngineExtExcitation::sample_index` exactly, and the
+engine marks the extension `gpu_handled` so its host phases become no-ops. When
+**every** registered extension is device-native, the model takes the batched
+path; a mixed model (e.g. UPML + source) keeps the host path, because the host
+array is authoritative between host extension phases.
 
-The extension trait already separates the six phases, so each port is
-independent and testable against the existing CPU extension with the same
-`field_diff` harness (f32 CPU/GPU equality is achievable and already
-demonstrated for the kernels).
+### Measurements
 
-## 6. Practical guidance (current state)
+| Scenario | CPU | GPU (host path, before) | GPU (device source) |
+|---|---|---|---|
+| engine 24³, 120 steps, source | — | — | field diff **0.00e0**, batch vs single-step **0.00e0** |
+| large cavity 121×61×61, 2000 steps, source, no output | 20.1–20.5 s | not measured (host path) | **2.15–2.19 s (9.2x)** |
+| tutorial 3 (11k cells, 12 000 steps, per-step probes + dump) | 3.10 s | 16.97 s | **9.93 s** |
+| tutorial 3, `OverSampling=1` (probe every 13 steps) | 1.90 s | — | **2.22 s** |
+| tutorial 3, source only (no probes/dump) | 1.72 s | — | **1.96 s** |
 
-- `--gpu` is a win from roughly 50k cells upward for extension-free models
-  (7x at 450k cells measured here); below that the fixed per-batch
+Tutorial 3 probe agreement against the CPU run: max 5.15e-7 V/m
+(`probe_left`), 5.11e-7 V/m (`probe_right`).
+
+### Why the small source model is only at parity
+
+At 11k cells the kernels cost ~0.1 s for 12 000 steps while each host sync
+costs ~1 ms, and the run loop syncs once per end-criteria sample (every
+`nyquist` steps) and once per probe/dump step. The tutorial sets
+`OverSampling=16` with a 13-step Nyquist, so its probes sample **every step**
+and each step pays a full field download — that is output cost, not physics,
+and the native engine pays it too. At 451k cells the same structure gives 9.2x.
+
+The remaining extension work is UPML (see §6): a PML model keeps the host path
+until the four PML phases have device kernels.
+
+## 6. Remaining extension work: UPML and the host path
+
+A model with a non-device extension (currently UPML, Mur, TFSF, lumped,
+Debye/Lorentz, conducting sheets) still pays a device→host→device round trip
+per half step. The cost is the queue wait in `map_async` + `poll(wait)`, not
+bandwidth: at 11k cells the transfers are ~0.8 MB/step (≪0.1 ms) yet a step
+costs ~1.4 ms.
+
+The next port is **UPML** (`EngineExtUPML`): the four phases are closed-form
+updates over the six PML slabs with 12 coefficient arrays and 6 flux arrays.
+Upload coefficients and flux arrays once (slab volume × 3 × 18 floats) and add
+four kernels dispatched at the same points as the host phases (`pre_voltage`,
+`post_voltage`, `pre_current`, `post_current`). The extension trait already
+separates those phases, so the port is independent and testable against the
+existing CPU extension with the same `field_diff` harness (`f32` equality is
+already demonstrated for the E/H kernels: `0.00e0`).
+
+After UPML, the same pattern covers Mur, TFSF, lumped, Debye/Lorentz and the
+conducting sheets; the engine keeps the host path for any extension that has
+not been ported (the capability flag `is_gpu_native` decides per model).
+
+## 7. Practical guidance (current state)
+
+- `--gpu` is a win for extension-free and source-driven models from roughly
+  50k cells upward: 7.2x at 451k cells bare and **9.2x** at 451k cells with a
+  source (2.15 s vs 20.1 s). Below ~50k cells the fixed per-batch
   synchronisation dominates (1.5x at 11k cells).
-- For models with PML or a source region, the CPU engine is still faster at
-  tutorial scale; the gap shrinks as the kernel work grows relative to the
-  sync cost (the 48³ engine test is within 2x of the CPU).
+- Per-step output (probes whose `OverSampling` makes the interval round to
+  zero, dumps written every step) forces one host download per step on every
+  engine, CPU or GPU; that is output cost, not physics. Runs with sparse output
+  see the kernel speed-up.
+- Models with PML are still host-sync until the UPML kernels land; the CPU
+  engine is the better choice for those today.
 - The GPU never changes the result: the differential gates compare the fields
-  and the tutorials agree to ~1e-6 V/m.
+  (`0.00e0` on the kernel and device-source tests) and the tutorials agree to
+  ~5e-7 V/m.
 
-## 7. Reproduce
+## 8. Reproduce
 
 ```powershell
 # engine differentials

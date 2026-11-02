@@ -1004,3 +1004,25 @@ now register rows, all closed:
   model into the batched path), then UPML; each port is testable against the
   existing CPU extension with the same differential harness.
 
+
+## Session record 2026-11-02 (GPU device-side excitation)
+
+- **What:** the excitation source is now applied on the device. `GpuFields`
+  uploads the per-edge terms and waveform samples once, binds the per-step
+  timestamp with a dynamic uniform offset inside the batch, and an
+  `apply_source` kernel reproduces the host sample-index rule exactly. The
+  extension trait gained `excitation_terms`/`mark_gpu_handled`/`is_gpu_native`,
+  so a model whose every extension is device-native runs the batched path and a
+  mixed model keeps the host path.
+- **Correctness:** the new engine test reports `CPU diff 0.00e0` and batch vs
+  single-step `0.00e0`; tutorial 3 probes agree with the CPU run to
+  5.15e-7 / 5.11e-7 V/m over 12 000 steps; the CPU path is unchanged.
+- **Performance:** a 121x61x61 source cavity (2000 steps) went from 20.1-20.5 s
+  on the CPU to **2.15-2.19 s** on the GPU (**9.2x**); tutorial 3 improved
+  16.97 s -> 9.93 s and is now output-bound (its `OverSampling=16` makes the
+  probes sample every step, so every step needs a host download on any engine).
+- **Records:** `GPU_ANALYSIS.md` has the device-source section and the remaining
+  UPML port plan; E-016 carries the new numbers; RM-190 records the evidence.
+- **Next:** UPML device kernels (four phases, 12 coefficient + 6 flux arrays),
+  which removes the round trip for PML models.
+
