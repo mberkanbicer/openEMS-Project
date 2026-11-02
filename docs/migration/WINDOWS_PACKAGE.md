@@ -8,28 +8,31 @@ Rust migration, the counterpart of the native `windows-package.yml` artifact.
 
 | field | value |
 | --- | --- |
-| file | `dist/openEMS-rust_v0.37.0-128-ga7d33e4_win64.zip` |
-| size | 14 715 920 bytes |
-| SHA-256 | `438d219d1b7fcbd7018c753ee9b692ec0dc3972b7e5c01d1f4dd7a0585629f91` |
-| repository revision | `56b431b` (openEMS `v0.37.0-128-ga7d33e4`) |
+| file | `dist/openEMS-rust_v0.37.0-130-g5b64b4a_win64.zip` |
+| size | 14 715 410 bytes |
+| SHA-256 | `c35beb63ca8a899c44f10ca1c6ba2ff5f4811b143e5bcca592a185eb07a7e0e5` |
+| repository revision | `a7711c9` (openEMS `v0.37.0-130-g5b64b4a`) |
 | compiler | `rustc 1.99.1 (58cf8f9c3 2026-10-13)` |
-| Python wheel | `cp39-abi3-win_amd64` (Python 3.9-3.14, stable ABI) |
+| Python wheel | `cp39-abi3-win_amd64` (Python 3.9-3.14, stable ABI), built on CPython 3.11.16 |
 | solver features | `gpu` (the packaged `openems-cli` accepts `--gpu`) |
 
 The zip is build output and is not committed (`/dist/` is ignored); the script
 and the recorded hash make it reproducible. The hash pins this build because zip
 timestamps change between runs; a rebuild reproduces the contents, not the exact
-archive bytes.
+archive bytes. This build is the first one that carries the tutorials
+(`tutorials/`), the probe/dump output-layer fixes (`openEMS@92a406a`) and the
+RM-184 missing-excitation parity (`openEMS@5b64b4a`); it was rebuilt after the
+24/24 acceptance run at `b5b5d00`.
 
 ## Contents
 
 ```
-openEMS-rust_v0.37.0-128-ga7d33e4_win64/
+openEMS-rust_v0.37.0-130-g5b64b4a_win64/
   bin/    openems-cli.exe (GPU build), nf2ff-cli.exe, sar-cli.exe, ctb.exe,
           hyp2mat.exe, appcsxcad.exe
           hdf5.dll, zlib.dll, MSVC CRT
-  python/ csxcad-0.1.0-cp39-abi3-win_amd64.whl
-          openems-0.1.0-cp39-abi3-win_amd64.whl
+  python/ csxcad-0.1.0-cp39-abi3-win_amd64.whl (750 909 bytes)
+          openems-0.1.0-cp39-abi3-win_amd64.whl (925 211 bytes)
   README.txt, VERSION.txt
 ```
 
@@ -50,7 +53,7 @@ The recorded artifact was built against HDF5 1.10.6, so the solver path ships tw
 non-CRT DLLs. Whatever the closure is, the `smoke: DLL closure without conda on
 PATH` step proves it is complete before the zip is written.
 
-## Verification (measured 2026-11-02)
+## Verification (measured 2026-11-02, build `a7711c9` / `5b64b4a`)
 
 The script builds, smoke-tests and archives in one run:
 
@@ -63,8 +66,9 @@ The script builds, smoke-tests and archives in one run:
 [openEMS] FDTD simulation completed: 20 timesteps.
 == smoke: Python wheels
 wheel smoke ok: csxcad_py openEMS._openems 679
-package : ...\openEMS-rust_v0.37.0-128-ga7d33e4_win64.zip
-sha256  : 438d219d...
+package : ...\openEMS-rust_v0.37.0-130-g5b64b4a_win64.zip
+size    : 14715410 bytes
+sha256  : c35beb63ca8a899c44f10ca1c6ba2ff5f4811b143e5bcca592a185eb07a7e0e5
 ```
 
 The closure step copies `bin\` to a scratch directory, sets `PATH` to
@@ -73,35 +77,34 @@ script, so an incomplete runtime closure fails the build instead of the first
 run on a user machine.
 
 An independent extraction test unzipped the artifact to a scratch directory,
-restricted `PATH` the same way and ran the packaged binaries:
+restricted `PATH` the same way and ran the packaged binaries (fresh run, not the
+build's own smoke):
 
 | check | result |
 | --- | --- |
-| `openems-cli -h` | PASS (version banner, `--gpu` listed) |
-| 20-step FDTD run from the package | PASS, exit 0 |
-| 40-step run with an HDF5 `DumpBox` (writes `Et.h5`) | PASS, exit 0, valid HDF5 (`FieldData/TD` `(3,11,11,11)` float32 + `Mesh/{x,y,z}`) |
-| 48³ / 120-step model with `--gpu` | PASS, exit 0 (`FDTD simulation completed: 120 timesteps`) |
-| `appcsxcad.exe` launched from the extracted package | PASS (window process stays up, no stderr) |
-| wheel import from a clean venv | PASS (`CSXCAD`, `openEMS._openems`) |
-| wheel writes a CSXCAD XML | PASS (679 bytes) |
-| extracted package without conda on `PATH` | PASS, exit 0 |
+| SHA-256 of the zip (`certutil`) | `c35beb63ca8a899c44f10ca1c6ba2ff5f4811b143e5bcca592a185eb07a7e0e5` (matches) |
+| `openems-cli -h` | PASS (exit 0, version banner, `--gpu` listed) |
+| 20-step FDTD run from the package | PASS, exit 0, `simulation completed: 20 timesteps` |
+| 20-step run with `--gpu` | PASS, exit 0, completed |
+| 20-step run with an HDF5 `DumpBox` (writes `Et.h5`) | PASS, exit 0, 12 080 bytes, `FieldData/TD` frame `(3,3,3,3)` float32 plus `Mesh/{x,y,z}` |
+| `appcsxcad.exe` launched from the extracted package | PASS (process alive after 5 s, window title `AppCSXCAD`) |
+| wheels in a fresh `--system-site-packages` venv (`pip install --no-deps` from the package) | PASS: `CSXCAD`, `openEMS._openems`, `openEMS(NrTS=10)` + `SetCSX` + `Write2XML` produce a 682-byte XML |
+| extracted package solves without conda on `PATH` | PASS (same 20-step run, `System32` only) |
 
-GPU correctness on the same build (`cargo test -p openems-core --features "hdf5 gpu" --release`):
+GPU correctness and the host-sync trade-off are covered by the acceptance run
+and by E-016 rather than by a single benchmark line: the acceptance GPU check at
+`b5b5d00` measured `48^3`, 120 steps, `E diff 0.00e0`, CPU 3.21 s vs GPU 12.26 s
+for the **host-sync extension** path. On the CLI, `--gpu` is slower for small or
+extension-dominated models and only wins near half a million cells; the
+2026-11-02 measurements are in `EXCEPTIONS.md` E-016. `--gpu` remains opt-in and
+the default engine selection is unchanged.
 
-```
-GPU round-trip on NVIDIA GeForce RTX 5070 Laptop GPU (Vulkan)
-GPU update vs CPU ...: E 5.96e-8, H 5.96e-8
-GPU engine vs CPU: 48^3, 120 steps, E diff 0.00e0, CPU 432.13ms, GPU 27.07ms
-GPU host extension vs CPU: 48^3, 120 steps, E diff 0.00e0, CPU 441.16ms, GPU 2.50s
-```
-
-`cargo test --release -p openems-core --features "hdf5 gpu"` passes 308 tests;
-`cargo test --release -p csxcad-core` passes 209.
-
-The host-sync extension path is deliberately slower than the CPU kernel: every
-step with PML or other extensions downloads the fields, runs the CPU extension
-and uploads again. Models without extensions keep the fields resident and the
-GPU kernel wins by ~16x (27 ms vs 432 ms above). This matches ADR 0012.
+Test suites on this source tree: `cargo test --release --workspace --features
+"openems-core/hdf5,openems-core/gpu,openems-cli/gpu"` is green (openems-core
+310 + 2 analytic tests, the CLI contract suite, the MATLAB ABI and Python
+contract suites, CSXCAD and the GUI crates); `csxcad-core` alone passes 209.
+The full-stack WSL acceptance run at `b5b5d00` is 24/24 PASS (859 crate tests,
+Octave 10/10, performance gate within 4.0x wall / 3.25x RSS).
 
 ## Reproduce
 
@@ -112,6 +115,13 @@ $env:PATH = "<conda>\Library\bin;$env:PATH"
 pwsh scripts/ci/build_windows_package.ps1 -Python <conda>\python.exe
 # CPU-only solver: -Features ""
 ```
+
+Use `pwsh` (PowerShell 7), as above. Under Windows PowerShell 5.1 the same
+script aborts at the first smoke step when the caller also redirects stderr
+(`powershell -File ... 2>&1`): PS 5.1 turns the solver's
+`[openEMS] Warning: ...` stderr line into a terminating `NativeCommandError`.
+The script is unchanged by this; it is a host/redirection interaction worth
+knowing when reproducing the build from a CI wrapper.
 
 `.github/workflows/windows-rust-package.yml` runs the same script on
 `windows-latest` with miniconda (HDF5 + numpy) and uploads the zip and its

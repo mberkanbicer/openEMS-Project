@@ -949,6 +949,29 @@ now register rows, all closed:
   contract, rust-matlab 25, rust-py 22, csxcad 172, fparser 18, GUI and tool
   crates); tutorial 1 `probe_near` SHA-256 unchanged
   (`620f048d3a7e4dc0c43dff969f4365e12e728e0eae723cc12208bc3ef8b750bd`).
-- **Next:** full WSL acceptance rerun and a fresh Windows package for the
-  combined revision (tutorials + output-layer fixes + RM-184), as required
-  after the last code change.
+- **Next:** none from this thread; the full WSL acceptance rerun and the fresh
+  Windows package for the combined revision were completed on 2026-11-02
+  (session record below). Remaining migration work is tracked in
+  `REMEDIATION_TASKS.md` / `REMAINING_WORK.md`.
+
+## Session record 2026-11-02 (acceptance rerun and Windows package)
+
+- **Acceptance:** the full-stack WSL run was repeated after the last code
+  change and is **24/24 PASS at `b5b5d00`** (`ACCEPTANCE.md`): 859 crate tests,
+  the GPU host-sync check, HDF5 and Python suites, the unmodified Octave
+  testsuite 10/10, the 51-case differential harness, the CST and CTB checks and
+  the fresh performance gate inside the accepted 4.0x wall / 3.25x RSS limits.
+- **Package:** `dist/openEMS-rust_v0.37.0-130-g5b64b4a_win64.zip` (revision
+  `a7711c9`, openEMS `v0.37.0-130-g5b64b4a`), 14 715 410 bytes, SHA-256
+  `c35beb63ca8a899c44f10ca1c6ba2ff5f4811b143e5bcca592a185eb07a7e0e5`. Built and
+  smoke-tested with `pwsh scripts/ci/build_windows_package.ps1` (CLI help,
+  20-step solve, DLL closure without conda on `PATH`, wheel import) and then
+  verified independently from the extracted zip: hash match, CLI help with
+  `--gpu`, CPU and `--gpu` 20-step runs, a `DumpBox` HDF5 file
+  (`(3,3,3,3)` float32 + mesh), `appcsxcad.exe` alive, and both wheels
+  installed with `--no-deps` in a fresh venv producing a 682-byte CSXCAD XML.
+  Details in `WINDOWS_PACKAGE.md`.
+- **Note:** the first package attempt used Windows PowerShell 5.1 with an outer
+  `2>&1`; PS 5.1 converts the solver's stderr warning into a terminating
+  `NativeCommandError` and aborts the smoke step. The documented `pwsh`
+  invocation passes. The pitfall is recorded in `WINDOWS_PACKAGE.md`.
