@@ -1026,3 +1026,27 @@ now register rows, all closed:
 - **Next:** UPML device kernels (four phases, 12 coefficient + 6 flux arrays),
   which removes the round trip for PML models.
 
+
+## Session record 2026-11-02 (GPU device-side UPML)
+
+- **What:** UPML now runs on the device. The six coefficient arrays and two
+  flux arrays of each PML slab are concatenated over components and uploaded
+  once; four kernels reproduce the host phases and are interleaved in the batch
+  (`pre_volt`, E, `post_volt`, source, `pre_curr`, H, `post_curr`, source).
+  `Engine::setup_gpu_extensions` accepts any model whose extensions are all
+  excitation/UPML, and the context now requests 16 storage buffers per stage
+  (the WebGPU default of 8 cannot hold the two fields, six coefficients and two
+  flux arrays).
+- **Correctness:** the new `gpu_device_upml_matches_the_cpu_engine` test
+  reports `CPU diff 0.00e0` and batch vs single-step `0.00e0`; tutorial 1
+  probes agree with the CPU run to 2.33e-7 / 4.25e-7 V/m; the CPU path and all
+  tutorial physics checks are unchanged.
+- **Performance:** a 201x51x51 model with PML and a source (700 steps) runs in
+  2.55-2.60 s on the GPU against 12.2-14.0 s on the CPU (**4.8-5.5x**). Small
+  PML models remain CPU-faster (tutorial 1 bare: 1.02 s vs 0.31 s) because 11
+  dispatches per step hit a ~0.1 ms per-dispatch floor; folding the PML terms
+  into the E/H kernels is the recorded next optimisation.
+- **Records:** `GPU_ANALYSIS.md` Â§6 has the design and measurements, Â§7 the
+  remaining extensions (Mur/TFSF/lumped/Debye/Lorentz/sheets), E-016 carries
+  the new numbers, RM-191 records the evidence.
+

@@ -163,44 +163,71 @@ and the native engine pays it too. At 451k cells the same structure gives 9.2x.
 The remaining extension work is UPML (see §6): a PML model keeps the host path
 until the four PML phases have device kernels.
 
-## 6. Remaining extension work: UPML and the host path
+## 6. Device-side UPML (RM-191)
 
-A model with a non-device extension (currently UPML, Mur, TFSF, lumped,
-Debye/Lorentz, conducting sheets) still pays a device→host→device round trip
-per half step. The cost is the queue wait in `map_async` + `poll(wait)`, not
-bandwidth: at 11k cells the transfers are ~0.8 MB/step (≪0.1 ms) yet a step
-costs ~1.4 ms.
+The second extension ported to the device is UPML, which covers every model
+with PML boundaries. `EngineExtUPML` stores, per slab, six coefficient arrays
+(`vv`, `vvfo`, `vvfn`, `ii`, `iifo`, `iifn`) and two flux arrays; the host
+phases are four closed-form updates. The GPU path:
 
-The next port is **UPML** (`EngineExtUPML`): the four phases are closed-form
-updates over the six PML slabs with 12 coefficient arrays and 6 flux arrays.
-Upload coefficients and flux arrays once (slab volume × 3 × 18 floats) and add
-four kernels dispatched at the same points as the host phases (`pre_voltage`,
-`post_voltage`, `pre_current`, `post_current`). The extension trait already
-separates those phases, so the port is independent and testable against the
-existing CPU extension with the same `field_diff` harness (`f32` equality is
-already demonstrated for the E/H kernels: `0.00e0`).
+- concatenates the three components of each slab array and uploads the eight
+  arrays once (the flux arrays are the kernel state);
+- binds them with the two global field buffers and a uniform holding the global
+  dims, the slab origin and the slab extent;
+- dispatches four kernels (`upml_pre_volt`, `upml_post_volt`,
+  `upml_pre_curr`, `upml_post_curr`) at the same points as the host phases,
+  so a batch records `pre_volt* -> E -> post_volt* -> source -> pre_curr* -> H
+  -> post_curr* -> source` per step;
+- raises the requested `max_storage_buffers_per_shader_stage` to 16 (the
+  device default of 8 cannot hold the two fields, six coefficients and two
+  flux arrays; every desktop adapter offers more).
 
-After UPML, the same pattern covers Mur, TFSF, lumped, Debye/Lorentz and the
-conducting sheets; the engine keeps the host path for any extension that has
-not been ported (the capability flag `is_gpu_native` decides per model).
+The differential test `gpu_device_upml_matches_the_cpu_engine` (12³, 120 steps,
+two slabs, non-trivial coefficients) reports `CPU diff 0.00e0` and batch vs
+single-step `0.00e0`; tutorial 1 probes agree with the CPU run to 2.33e-7 /
+4.25e-7 V/m.
 
-## 7. Practical guidance (current state)
+### Measurements
 
-- `--gpu` is a win for extension-free and source-driven models from roughly
-  50k cells upward: 7.2x at 451k cells bare and **9.2x** at 451k cells with a
-  source (2.15 s vs 20.1 s). Below ~50k cells the fixed per-batch
-  synchronisation dominates (1.5x at 11k cells).
+| Scenario | CPU | GPU |
+|---|---|---|
+| 201×51×51 (525k cells), PML on both x faces + source, 700 steps | 12.2–14.0 s | **2.55–2.60 s (4.8–5.5x)** |
+| tutorial 1 (12k cells), per-step probes + dump | 0.38–0.61 s | 1.67–1.75 s |
+| tutorial 1, `OverSampling=1` (probe every 12 steps) | 0.35–0.38 s | 1.16–1.26 s |
+| tutorial 1, no probes/dump | 0.31–0.33 s | 1.02–1.04 s |
+
+### Why the small PML model is slower
+
+At 12k cells the four UPML kernels plus E/H/source are 11 dispatches per step,
+and each dispatch costs ~0.1 ms of driver overhead on this adapter while the
+work itself is microseconds. The CPU solves the same step in ~0.45 ms. This is
+the per-dispatch overhead floor, not a defect in the port: the same structure
+wins 4.8–5.5x at 525k cells and 9.2x on the large source model. Folding the
+PML terms into the E/H kernels (native fuses them) would remove four dispatches
+per step and is the next optimisation if small-model GPU use matters.
+
+## 7. Remaining extension work
+
+The engine keeps the host path for any extension without a device
+implementation: Mur, TFSF, lumped RLC, Debye/Lorentz dispersive materials and
+conducting sheets. The same pattern applies to each (upload its state once,
+add phase kernels, mark `is_gpu_native`), and the capability flag decides per
+model. None of those is on the hot path of the tutorials, which now cover the
+two most common cases (source and PML).
+
+## 8. Practical guidance (current state)
+
+- `--gpu` wins on models from roughly 50k cells upward: 7.2x extension-free at
+  451k cells, 9.2x source-driven at 451k cells, 4.8–5.5x with PML at 525k
+  cells. Below that the per-dispatch and per-sync overhead dominates.
 - Per-step output (probes whose `OverSampling` makes the interval round to
-  zero, dumps written every step) forces one host download per step on every
-  engine, CPU or GPU; that is output cost, not physics. Runs with sparse output
-  see the kernel speed-up.
-- Models with PML are still host-sync until the UPML kernels land; the CPU
-  engine is the better choice for those today.
+  zero, dumps written every step) forces one host download per step on any
+  engine, CPU or GPU. Runs with sparse output see the kernel speed-up.
 - The GPU never changes the result: the differential gates compare the fields
-  (`0.00e0` on the kernel and device-source tests) and the tutorials agree to
-  ~5e-7 V/m.
+  (`0.00e0` on the kernel, device-source and device-UPML tests) and the
+  tutorials agree to ~5e-7 V/m.
 
-## 8. Reproduce
+## 9. Reproduce
 
 ```powershell
 # engine differentials
