@@ -1138,3 +1138,29 @@ now register rows, all closed:
   coverage; E-016 now states that every extension is device-native and that the
   host path is only a fallback; RM-196/RM-197 carry the evidence.
 
+
+## Session record 2026-11-02 (GPU optimisation plan, first pass)
+
+- **Plan:** `docs/migration/GPU_OPTIMISATION_PLAN.md` lists the remaining
+  improvements (P-1..P-12) with acceptance criteria, status and evidence, plus
+  an emergent-work section (P-E1..P-E3).
+- **Done and verified:** P-1 UPML slab merge (6 slabs now cost 6 passes instead
+  of 32, two-slab differential 0.00e0), P-2 Mur face colouring (6 faces cost 9
+  passes instead of 18, differential 1.95e-26), P-7 chunk tuning (64/128/256
+  within noise, default 256), P-8 storage-buffer fallback (per-extension
+  requirement table + host fallback), P-9 `--gpu-auto` (CPU at 12 221 cells,
+  GPU at 451k), P-10 dispatch-budget regression test.
+- **Closed without code:** P-3, because the operator builds exactly one Debye
+  and one Lorentz region (`operator.rs:3358/3569`), so there is nothing to
+  merge and the per-step cost is already 3/4 passes.
+- **Blocked:** P-5 device energy, because an f32 GPU reduction would perturb the
+  `endCriteria` stop step; it needs a compensated reduction and stop-step
+  validation.
+- **Remaining:** P-E2 (fold PML into E/H, the next big win for small/medium PML
+  models), P-4 (device-side probe sampling), P-6 (transfer/compute overlap),
+  P-11 (cylindrical multi-grid).
+- **Evidence:** `cargo test --release --workspace` with hdf5+gpu exits 0; all 11
+  GPU differentials pass; tutorial physics unchanged (delay +0.46 %, Fresnel
+  -0.3239/+0.6707, TE101 -0.14 %, mode-profile RMS 0.0004) and tutorial 1
+  `probe_near` SHA-256 is still 620f048d3a7e4dc0c43dff969f4365e12e728e0eae723cc12208bc3ef8b750bd.
+

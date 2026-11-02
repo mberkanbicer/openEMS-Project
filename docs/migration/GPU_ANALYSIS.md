@@ -171,13 +171,15 @@ with PML boundaries. `EngineExtUPML` stores, per slab, six coefficient arrays
 phases are four closed-form updates. The GPU path:
 
 - concatenates the three components of each slab array and uploads the eight
-  arrays once (the flux arrays are the kernel state);
-- binds them with the two global field buffers and a uniform holding the global
-  dims, the slab origin and the slab extent;
+  arrays once (the flux arrays are the kernel state), and merges every slab
+  into one buffer set with a slab table (start, extent, element offset);
+- binds them with the two global field buffers, the slab table and a uniform
+  holding the global dims and the total element count;
 - dispatches four kernels (`upml_pre_volt`, `upml_post_volt`,
   `upml_pre_curr`, `upml_post_curr`) at the same points as the host phases,
-  so a batch records `pre_volt* -> E -> post_volt* -> source -> pre_curr* -> H
-  -> post_curr* -> source` per step;
+  one dispatch per phase regardless of the slab count (RM-198), so a batch
+  records `pre_volt -> E -> post_volt -> source -> pre_curr -> H ->
+  post_curr -> source` per step;
 - raises the requested `max_storage_buffers_per_shader_stage` to 16 (the
   device default of 8 cannot hold the two fields, six coefficients and two
   flux arrays; every desktop adapter offers more).
@@ -198,13 +200,14 @@ single-step `0.00e0`; tutorial 1 probes agree with the CPU run to 2.33e-7 /
 
 ### Why the small PML model is slower
 
-At 12k cells the four UPML kernels plus E/H/source are 11 dispatches per step,
-and each dispatch costs ~0.1 ms of driver overhead on this adapter while the
-work itself is microseconds. The CPU solves the same step in ~0.45 ms. This is
-the per-dispatch overhead floor, not a defect in the port: the same structure
-wins 4.8–5.5x at 525k cells and 9.2x on the large source model. Folding the
-PML terms into the E/H kernels (native fuses them) would remove four dispatches
-per step and is the next optimisation if small-model GPU use matters.
+At 12k cells the four UPML phases plus E/H/source are 12 dispatches per step in
+the old layout, and each dispatch costs ~0.1 ms of driver overhead on this
+adapter while the work itself is microseconds. The CPU solves the same step in
+~0.45 ms. This is the per-dispatch overhead floor, not a defect in the port:
+the same structure wins 4.8-5.5x at 525k cells and 9.2x on the large source
+model. RM-198 merged the slabs (a PML-only model now costs 6 passes instead of
+4 x slabs + 2), and folding the PML terms into the E/H kernels (native fuses
+them) is the recorded next step (plan item P-E2).
 
 ## 7. Device-side Mur ABC and the remaining extensions
 
@@ -213,15 +216,18 @@ per step and is the next optimisation if small-model GPU use matters.
 Mur owns per-face coefficient and history arrays and three voltage-phase
 updates (`pre`, `post`, `apply2`). The device port uploads every face's
 `coeff_p`/`coeff_pp` and history arrays once and binds them with the global
-voltage buffer and a uniform holding the global dims, the face line/shift and
-the axis mapping (`dir`, `dir+1`, `dir+2`). Because Mur faces overlap on
-corner edges and the host applies them in registration order, the kernels run
-one pass per face in that order (pre, then post, then apply2), interleaved as
+voltage buffer and a face table. Because Mur faces overlap on corner edges and
+the host applies them in registration order, RM-199 colours the faces: a face's
+colour is one more than the highest colour of an earlier face whose plane
+intersects it. Faces of one colour never overlap and run in one dispatch, and
+colours run in increasing order, so a later face still wins a shared edge
+exactly as on the host. Six faces therefore cost **3 passes per phase** (9
+total) instead of 18, interleaved as
 `mur_pre -> upml_pre -> E -> upml_post -> mur_post -> mur_apply -> source ->
 upml_pre_curr -> H -> upml_post_curr -> source`.
 
-Validation: `gpu_device_mur_matches_the_cpu_engine` (12³, 120 steps, two
-overlapping faces) reports `CPU diff 6.46e-26` and batch vs single-step
+Validation: `gpu_device_mur_matches_the_cpu_engine` (12³, 120 steps, all six
+box faces) reports `CPU diff 1.95e-26` and batch vs single-step
 `0.00e0`; a 201×51×51 Mur model with a source (700 steps) runs in
 **2.30–2.77 s** on the GPU against 10.2–11.4 s on the CPU (**3.9–4.4x**), and
 its probe signals agree with the CPU run to 3.78e-7 / 2.91e-7 V/m.
