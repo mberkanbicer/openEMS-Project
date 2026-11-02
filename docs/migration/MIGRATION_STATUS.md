@@ -975,3 +975,32 @@ now register rows, all closed:
   `2>&1`; PS 5.1 converts the solver's stderr warning into a terminating
   `NativeCommandError` and aborts the smoke step. The documented `pwsh`
   invocation passes. The pitfall is recorded in `WINDOWS_PACKAGE.md`.
+
+## Session record 2026-11-02 (GPU analysis and batching)
+
+- **Analysis:** the complete GPU read is in `docs/migration/GPU_ANALYSIS.md`:
+  both engine paths, the per-step cost model, the measured tables, the
+  correctness evidence and the remaining bottleneck.
+- **Root cause:** the run loop stepped one timestep at a time, so every
+  extension-free GPU step paid a full device-to-host download, and every
+  host-extension step paid 8 array transfers (4 up, 4 down) plus four queue
+  waits. The kernel time was never the problem: the cost per step scaled with
+  the cell count while the kernels need ~0.01-0.2 ms.
+- **Changes (RM-188):** batched command submission (`dispatch_steps`),
+  run-loop batching bounded by the next probe/dump/end-criteria event
+  (`ProcessingArray::steps_until_due`), one pair download per batch with
+  persistent staging buffers (`download_pair` + `gpu_pending`), and per-field
+  dirty tracking so the host-extension path transfers only what changed.
+- **Results:** kernel differential 16.9x (13.3 ms vs 224 ms at 48^3);
+  extension-free CLI 7.2x at 451k cells (1.63 s vs 11.7 s) and 1.55x at 11k
+  cells; host-extension path 6.4x faster than before (2470 ms -> 384 ms at
+  48^3) though still slower than the CPU at tutorial scale, which is E-016 and
+  is closed only by device-side excitation/UPML kernels (roadmap in the
+  analysis).
+- **Correctness:** GPU vs CPU engine field diff `0.00e0`; tutorial probes agree
+  to 2.5e-7-4.8e-7 V/m over 700-12 000 steps; the CPU path is unchanged
+  (tutorial 1 `probe_near` SHA-256 matches the recorded hash, byte for byte).
+- **Next:** device-side excitation kernel first (it turns every source-driven
+  model into the batched path), then UPML; each port is testable against the
+  existing CPU extension with the same differential harness.
+
