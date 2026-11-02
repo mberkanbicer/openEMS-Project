@@ -1164,3 +1164,29 @@ now register rows, all closed:
   -0.3239/+0.6707, TE101 -0.14 %, mode-profile RMS 0.0004) and tutorial 1
   `probe_near` SHA-256 is still 620f048d3a7e4dc0c43dff969f4365e12e728e0eae723cc12208bc3ef8b750bd.
 
+
+## Session record 2026-11-02 (GPU optimisation plan completed)
+
+- **Plan:** `docs/migration/GPU_OPTIMISATION_PLAN.md` now shows every item
+  Verified (P-1..P-12) plus five emergent items (P-E1..P-E5).
+- **Completed this session:** P-E2 fused PML post phases into E/H (a PML model
+  costs 4 passes/step, differential 0.00e0), P-5 device energy reduction
+  (relative diff 7.2e-9, no field download), P-4 device probe sampling for
+  point and box probes (6 points, batch 12 vs 1, probes match the CPU to
+  2.3e-7 / 4.3e-7), P-11 cylindrical multi-grid on the GPU (CPU/GPU diff
+  4.47e-8), and P-6 closed because the per-step downloads no longer exist.
+- **Critical finding (P-E4):** the engine differential tests compared zero
+  fields because `cavity_operator` never built the EC coefficients. Building
+  them exposed a real Mur colour-range bug (colours 1 and 2 wrote nothing,
+  0.274 field error) and an unstable Debye test; both are fixed, and every
+  differential now runs on non-zero fields.
+- **Verification:** 12/12 engine GPU differentials pass, the multi-grid GPU test
+  passes, `cargo test --release --workspace` with hdf5+gpu exits 0, the three
+  tutorials run and their physics checks are unchanged (delay +0.46 %, Fresnel
+  -0.3239/+0.6707, TE101 -0.14 %, mode-profile RMS 0.0004) with tutorial 1
+  `probe_near` SHA-256 still
+  620f048d3a7e4dc0c43dff969f4365e12e728e0eae723cc12208bc3ef8b750bd.
+- **Remaining (recorded, not a plan item):** models below ~50k cells are still
+  CPU-faster because ~0.2 ms per dispatch dominates; a single fused step kernel
+  would need a device-wide barrier, which WGSL does not provide.
+

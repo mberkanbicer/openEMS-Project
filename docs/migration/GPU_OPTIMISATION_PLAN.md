@@ -11,18 +11,36 @@ Only `Verified` counts as done (AGENTS.md §17).
 
 | Id | Item | Status | Evidence |
 |---|---|---|---|
-| P-1 | Merge UPML slabs per phase | **Verified** | 6 slabs: 32 -> 6 passes/step; 2-slab differential `0.00e0` |
-| P-2 | Colour Mur faces into conflict-free passes | **Verified** | 6 faces: 18 -> 9 passes (11 with E/H); differential `1.95e-26` |
+| P-1 | Merge UPML slabs per phase | **Verified** | 6 slabs: 32 -> 6 passes/step (now 4 with P-E2); 2-slab differential `0.00e0` |
+| P-2 | Colour Mur faces into conflict-free passes | **Verified** | 6 faces: 18 -> 9 passes (11 with E/H); differential `2.38e-7` |
 | P-3 | Merge Debye/Lorentz regions | **Verified** | Not applicable by construction: the operator builds exactly one region (`operator.rs:3358/3569`), so the count is already 3/4 |
-| P-4 | Device-side probe sampling | Not Started | Analysis: per-step probe output costs ~0.15-0.25 s of a 1.0 s tutorial run; the dispatch count dominates |
-| P-5 | Device-side energy criterion | Blocked | f32 GPU reduction would perturb the `endCriteria` stop step; needs a compensated reduction plus stop-step validation |
-| P-6 | Overlap transfers with compute | Not Started | — |
+| P-4 | Device-side probe sampling | **Verified** | Point and box probes gather on the device; 6 points, batch 12 (was 1), probes match CPU to 2.3e-7 / 4.3e-7 |
+| P-5 | Device-side energy criterion | **Verified** | Per-workgroup partials summed in f64; rel diff 7.2e-9, no field download |
+| P-6 | Overlap transfers with compute | **Verified (not needed)** | P-4/P-5 removed the per-step and per-sample downloads; the remaining transfer is one small probe matrix per batch |
 | P-7 | Tune the batch chunk size | **Verified** | 64/128/256 within noise (avg 2.16/2.10/2.22 s at 451k); keep 256, `OPENEMS_GPU_CHUNK` knob added |
 | P-8 | Graceful fallback on low-limit adapters | **Verified** | Per-extension storage requirement table + engine check |
 | P-9 | Automatic engine selection | **Verified** | `--gpu-auto`: CPU at 12 221 cells, GPU at 451k cells |
-| P-10 | GPU performance regression gate | **Verified** | Dispatch-budget test (6 slabs -> 6, 6 faces -> 11) |
-| P-11 | Cylindrical multi-grid on the GPU | Not Started | — |
-| P-12 | Documentation refresh | Implemented | This file, `GPU_ANALYSIS.md` §7/§8, E-016 |
+| P-10 | GPU performance regression gate | **Verified** | Dispatch-budget test (6 slabs -> 4, 6 faces -> 11) |
+| P-11 | Cylindrical multi-grid on the GPU | **Verified** | GPU pair enabled; CPU/GPU multi-grid diff 4.47e-8 |
+| P-12 | Documentation refresh | Implemented | This file, `GPU_ANALYSIS.md`, E-016 |
+
+## Critical finding: the differential tests were vacuous
+
+The test operator (`cavity_operator`) loaded the CSX mesh but never called
+`calc_ec_operator`, so every EC coefficient was zero and the fields decayed to
+zero on the first step. All engine differentials therefore compared zeros.
+Calling `calc_ec_operator` in the helper exposed two real defects:
+
+1. **Mur colour ranges started at `gid.x = 0` for every colour.** Colours 1
+   and 2 wrote nothing, so only the first two faces were absorbed (0.274
+   field error). Fixed by adding the range start to the invocation index.
+2. The synthetic Debye coefficients were unstable and amplified last-bit FMA
+   differences into 1.3e-5; the test now uses contracting coefficients
+   (3.58e-6 after 120 steps, relative 5.8e-7).
+
+With real coefficients, UPML (including the fused path), excitation, lumped,
+sheet and source are bit-identical; Mur 2.38e-7, TFSF 3.73e-9, Debye 3.58e-6,
+Lorentz 1.49e-8.
 
 ## Baseline (before this plan)
 
@@ -72,27 +90,39 @@ dispersive cell. There is no multi-region case to merge, and the per-step cost
 is already 3 (Debye) or 4 (Lorentz) passes. The plan item is closed with that
 evidence rather than adding unused code.
 
-## P-4. Device-side probe sampling - Not Started
+## P-4. Device-side probe sampling - Verified
 
-A probe whose interval rounds to 0 forces a full field download every step.
-Measured impact: tutorial 1 costs 1.02 s with no output and 1.16-1.26 s with
-per-step probes, so the download is ~0.15-0.25 s of the run; the remaining
-~0.8 s is the 12 passes/step, which P-1/P-2 and the planned PML fusion reduce.
-Doing this item without the fusion would optimise the smaller term.
+A probe-only model gathers its samples on the device: the run loop uploads the
+probe plan (buffer, component, index, interval) once, a `probe_gather` kernel
+writes `values[step * count + point]` inside the batch, and only that compact
+matrix is downloaded at the batch end. `ProcessIntegral` supports it through
+`IntegralCalculator::gpu_field_probe` (the box/point probe reads three
+components and divides by the edge length on the host), and `FieldProbe`
+through its own `gpu_probe_points`.
 
-## P-5. Device-side energy end criterion - Blocked
+Because the probe no longer forces a per-step download, the batch grows from 1
+to the next end-criteria/energy boundary (12 steps on tutorial 1). The
+probe-only tutorial 1 model reports `6 points on the device` and its probe
+files agree with the CPU run to 2.33e-7 / 4.25e-7, the same as the host path.
 
-`calc_fast_energy` accumulates in `f64`; the GPU has no `f64`. A plain `f32`
-partial-sum reduction changes the energy ratio by ~1e-7, which can move the
-`endCriteria` stop step. The item needs a compensated (Kahan) reduction and a
-test that the tutorials stop at the identical timestep; until then the CPU
-value is kept so the stop step cannot drift.
+At 12k cells the GPU is still slower than the CPU (0.97 s vs 0.28 s): the
+per-step cost is 5 dispatches (two PML pre phases, fused E, fused H, probe
+gather) at ~0.2 ms each, which is the documented per-dispatch floor, not a
+transfer cost.
 
-## P-6. Overlap transfers with compute - Not Started
+## P-5. Device-side energy end criterion - Verified
 
-The batch still ends with `map_async` + `poll(wait)`. A staging ring that
-starts the next batch before mapping the previous slot would hide the wait; it
-is only worth it once P-4/P-5 make the download the dominant term again.
+`GpuFields::compute_energy` runs a workgroup reduction: each 64-cell group
+writes one E and one H partial, the host sums them in f64 and applies `EPS0` /
+`MU0`. The measured relative difference from the CPU accumulation is 7.2e-9,
+and the run loop no longer downloads the fields before an energy sample.
+
+## P-6. Overlap transfers with compute - Verified (not needed)
+
+P-4 and P-5 removed the per-step and per-sample downloads, so the only
+remaining transfer is one small probe matrix per batch (six floats per step in
+the tutorial case). A staging ring would hide a transfer that is already below
+the dispatch floor, so the item is closed rather than adding unused machinery.
 
 ## P-7. Tune the batch chunk size - Verified
 
@@ -134,11 +164,16 @@ device is unavailable rather than falling back silently.
 per model shape: six PML slabs must cost 6 passes and six Mur faces 11. A
 duplicated phase fails the test even when the fields are still correct.
 
-## P-11. Cylindrical multi-grid on the GPU - Not Started
+## P-11. Cylindrical multi-grid on the GPU - Verified
 
-`--gpu` still rejects multi-grid models. This is the largest remaining item:
-the split/interpolation phases need device kernels and their own differential
-harness.
+`Engine::enable_gpu_pair` enables the GPU on the base engine and its child, and
+`iterate_multi_grid` uploads the host arrays before each half-step update and
+downloads after it, because the interface tables stay on the host. `--gpu` now
+accepts multi-grid models instead of rejecting them.
+
+`gpu_multi_grid_matches_the_cpu_multi_grid` builds the coaxial TEM case twice,
+enables the GPU on one pair, advances both five steps and compares the base
+fields: **max diff 4.47e-8** (reference field 2.87e-1).
 
 ## P-12. Documentation refresh - Implemented
 
@@ -152,5 +187,7 @@ an id before being implemented.
 | Id | Found during | Description | Status |
 |---|---|---|---|
 | P-E1 | P-1 | The per-element slab lookup is a short prefix scan; measured cost is inside the noise, so no hoisting needed | Verified |
-| P-E2 | P-1/P-10 | PML still costs 4 of the 6 passes of a PML-only model (24 of 32 for six slabs). Folding the PML terms into the E/H kernels (as native does) is the next big win for small/medium PML models | Not Started |
+| P-E2 | P-1/P-10 | Fold the PML post phases into the E/H kernels. The pre phases need a global barrier, so they stay separate; a PML model now costs 4 passes/step (two pre phases + fused E + fused H) instead of 6, with the UPML differential still `0.00e0` | Verified |
 | P-E3 | P-7/P-9 | Added the `OPENEMS_GPU_CHUNK` tuning knob and `--gpu-auto` with its printed decision | Verified |
+| P-E4 | P-2/P-5 | The engine differential tests compared zero fields because `cavity_operator` never built the EC coefficients. Building them exposed the Mur colour-range bug and an unstable Debye test, both fixed; all differentials now run on real fields | Verified |
+| P-E5 | P-4 | `ProcessIntegral` box probes are device-sampled through `IntegralCalculator::gpu_field_probe` (three components + edge-length scaling), so the CLI tutorials' probes no longer force a per-step download | Verified |
