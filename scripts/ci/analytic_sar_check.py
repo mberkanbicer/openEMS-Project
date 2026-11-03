@@ -18,7 +18,7 @@ the closed-form values. This is the analytic SAR case that VAL-002 recorded as
 missing; it does not rely on a native reference.
 
 Run (WSL, Rust venv):
-    PYTHONPATH=openEMS/rust-py/python:CSXCAD/rust-py/python \
+    PYTHONPATH=crates/openems-py/python:crates/csxcad-python/python \
         ~/rustpy-venv/bin/python scripts/ci/analytic_sar_check.py
 """
 

@@ -8,7 +8,7 @@ The finest mesh is the reference for the difference, so this is a
 self-convergence study, not an analytic proof.
 
 Run (WSL, Rust venv):
-    PYTHONPATH=openEMS/rust-py/python:CSXCAD/rust-py/python \
+    PYTHONPATH=crates/openems-py/python:crates/csxcad-python/python \
         ~/rustpy-venv/bin/python scripts/ci/msl_convergence.py
 """
 

@@ -175,7 +175,7 @@ record "CST comparison (recorded export)" "$log" "$(grep -E 'CST comparison:' "$
 
 echo "== CTB Octave delivery"
 log=$(run "ctb build" cargo build -p ctb-rs)
-log=$(run "ctb octave" env CTB_BIN="$REPO_ROOT/target/debug/ctb" octave --no-gui --quiet "$REPO_ROOT/CTB/rust/tests/octave/cli_exercise.m")
+log=$(run "ctb octave" env CTB_BIN="$REPO_ROOT/target/debug/ctb" octave --no-gui --quiet "$REPO_ROOT/crates/ctb/tests/octave/cli_exercise.m")
 record "CTB Octave delivery" "$log" "$(grep -E 'CTB CLI Octave exercise' "$log" | tail -1)"
 
 # E-011 / PERF-001: the owner accepted 4.0x wall and 3.25x peak RSS on

@@ -37,12 +37,12 @@ fi
 # shellcheck disable=SC1091
 source "$VENV/bin/activate"
 
-for crate in CSXCAD/rust-py openEMS/rust-py; do
+for crate in crates/csxcad-python crates/openems-py; do
   echo "building $crate"
   ( cd "$REPO_ROOT/$crate" && maturin develop "$MODE" )
 done
 
-export PYTHONPATH="$REPO_ROOT/CSXCAD/rust-py/python:$REPO_ROOT/openEMS/rust-py/python${PYTHONPATH:+:$PYTHONPATH}"
+export PYTHONPATH="$REPO_ROOT/crates/csxcad-python/python:$REPO_ROOT/crates/openems-py/python${PYTHONPATH:+:$PYTHONPATH}"
 
 # RM-013: the installed packages must be importable with the native names and
 # without PYTHONPATH, exactly like the Cython/Python originals.

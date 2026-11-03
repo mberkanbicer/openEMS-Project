@@ -8,7 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 VENV="${RUSTPY_VENV:-$HOME/rustpy-venv}"
 
-export PYTHONPATH="$REPO_ROOT/openEMS/rust-py/python:$REPO_ROOT/CSXCAD/rust-py/python${PYTHONPATH:+:$PYTHONPATH}"
+export PYTHONPATH="$REPO_ROOT/crates/openems-py/python:$REPO_ROOT/crates/csxcad-python/python${PYTHONPATH:+:$PYTHONPATH}"
 
 PYTHON="${VENV}/bin/python"
 if [ ! -x "$PYTHON" ]; then

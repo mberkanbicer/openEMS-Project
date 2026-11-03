@@ -8,7 +8,7 @@ same near-field dumps, and both solvers on the lossy guide.
 
 Usage (from the repository root, with the Rust Python packages on PYTHONPATH):
 
-    PYTHONPATH=openEMS/rust-py/python:CSXCAD/rust-py/python \
+    PYTHONPATH=crates/openems-py/python:crates/csxcad-python/python \
         python3 scripts/ci/plot_scientific_parity.py
 """
 from __future__ import annotations

@@ -1,0 +1,37 @@
+[package]
+name = "fparser-rs"
+version = "0.1.0"
+edition = "2021"
+license = "LGPL-3.0-or-later"
+description = "Rust expression parser and evaluator for openEMS"
+
+[lib]
+name = "fparser"
+path = "src/lib.rs"
+
+[features]
+# Native fparser `float` build.
+float = []
+# Native `FunctionParser_ld` build: IEEE binary128 via libquadmath.
+long-double = ["dep:f128", "dep:num-traits"]
+# Native `FunctionParser_mpfr` build: arbitrary-precision MPFR/GMP.
+mpfr = ["dep:rug"]
+# Native `FunctionParser_gmpint` build: arbitrary-precision integers.
+long-integer = ["dep:rug"]
+
+[dependencies]
+f128 = { version = "0.2.9", optional = true }
+num-traits = { version = "0.2", optional = true }
+rug = { version = "1", optional = true, default-features = false, features = ["float", "integer"] }
+
+[[example]]
+name = "long_double_probe"
+required-features = ["long-double"]
+
+[[example]]
+name = "mpfr_probe"
+required-features = ["mpfr"]
+
+[[example]]
+name = "long_integer_probe"
+required-features = ["long-integer"]

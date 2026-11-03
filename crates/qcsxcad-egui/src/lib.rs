@@ -1,0 +1,18 @@
+//! egui + wgpu GUI implementation for QCSXCAD.
+//!
+//! Provides concrete implementations of the `qcsxcad-core` widget and
+//! rendering traits using egui for the UI and wgpu for 3D rendering.
+
+pub mod app;
+#[cfg(feature = "docking")]
+pub mod docking;
+pub mod renderer;
+pub mod theme;
+pub mod widgets;
+
+pub use app::{trace_input, EguiApp};
+pub use qcsxcad_core::widgets::TransformMode;
+pub use renderer::WgpuRenderer;
+pub use widgets::{
+    EguiGridEditor, EguiPrimitiveEditor, EguiPropertyEditor, EguiTreeWidget,
+};

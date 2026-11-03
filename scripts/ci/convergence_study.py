@@ -8,7 +8,7 @@ a table and writes a JSON record.
 
 Usage (WSL, inside the Rust venv):
 
-    PYTHONPATH=openEMS/rust-py/python:CSXCAD/rust-py/python \
+    PYTHONPATH=crates/openems-py/python:crates/csxcad-python/python \
         ~/rustpy-venv/bin/python scripts/ci/convergence_study.py
 """
 

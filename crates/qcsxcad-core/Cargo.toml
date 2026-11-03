@@ -1,0 +1,27 @@
+[package]
+name = "qcsxcad-core"
+version = "0.1.0"
+edition = "2021"
+license = "LGPL-3.0-or-later"
+description = "Rust foundations for QCSXCAD GUI"
+build = "build.rs"
+
+[features]
+default = []
+# discrete-material rendering needs the HDF5 reader
+hdf5 = ["csxcad-core/hdf5"]
+
+[dependencies]
+csxcad-core = { package = "csxcad-core", path = "../csxcad-core" }
+fparser = { package = "fparser-rs", path = "../fparser" }
+thiserror = "2.0"
+
+# GUI framework: egui (immediate-mode UI) + wgpu (cross-platform 3D rendering)
+egui = "0.37"
+egui-winit = "0.37"
+egui-wgpu = "0.37"
+wgpu = "30"
+winit = "0.30"
+bytemuck = { version = "1.14", features = ["derive"] }
+
+[build-dependencies]

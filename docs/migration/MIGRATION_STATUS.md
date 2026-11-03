@@ -1276,6 +1276,31 @@ now register rows, all closed:
   upstream mirror and is intentionally untouched (its local tracking was
   severed this session; on-demand sync keeps working via an explicit
   `git fetch upstream master:refs/remotes/upstream/master`).
+
+## Session record 2026-11-03 (standalone Rust workspace — fully Rust layout)
+
+- **What:** the fifteen crates moved out of the C++ submodule trees into a
+  root-level `crates/` workspace (ADR 0014), so `cargo build` and
+  `cargo test` need no submodules at all. Two hidden compile-time couplings
+  surfaced in the wiring audit and were fixed by moving assets into their
+  owning crates: the 7 AppCSXCAD toolbar icons (`appcsxcad/images`) and the
+  discrete-material HDF5 fixture (two `include_bytes!` call sites in
+  `qcsxcad-core`). `scripts/ci/*` and `.github/workflows/rust.yml` were
+  repointed to `crates/*`; `crates/PROVENANCE.md` records the per-crate
+  source paths and commits.
+- **Verification (exit-code-checked, submodules UNINITIALIZED in the work
+  tree):** plain `cargo build --release` exit 0; plain workspace tests
+  exit 0 (**915 passed / 0 failed**); gpu-feature tests exit 0 (**933 / 0**);
+  `openems-cli --gpu` solves the 10-step smoke model on the RTX 5070.
+- **Wiring audit (same session):** placeholder gate re-run — the only
+  `unimplemented!()` hits are the deliberate long-integer-backend rejections
+  in `fparser/src/scalar.rs` (documented runtime error paths, ADR 0006), no
+  silent stubs; all six binaries (`openems-cli`, `nf2ff-cli`, `sar-cli`,
+  `hyp2mat`, `ctb`, `appcsxcad`) answer `--help`/`--version`; the GPU/CPU
+  comparison of `dipole_pml.xml` (531k cells) agreed to max 3.8e-11 with a
+  19.2x solver-only speed-up on the GPU.
+- **Follow-ups:** a WSL full-acceptance re-run at the new layout; the
+  E-005 hosted platform matrix stays the recorded environment limit.
 - **Correction + regression fixed:** the record above initially reported the
   plain `cargo build --release` as green from a tail-only read without
   checking the exit code; the build had actually failed. The default

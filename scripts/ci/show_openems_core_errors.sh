@@ -7,5 +7,5 @@ export PATH="$HOME/.cargo/bin:$PATH"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
-cd "$REPO_ROOT/openEMS/rust"
+cd "$REPO_ROOT/crates/openems-core"
 cargo test --no-run --message-format short 2>&1 | grep -E "error" | head -20

@@ -7,16 +7,16 @@ export PATH="$HOME/.cargo/bin:$PATH"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
-cd "$REPO_ROOT/CSXCAD/rust"
+cd "$REPO_ROOT/crates/csxcad-core"
 cargo test
 # the HDF5 backed readers (discrete materials, mode files) need the feature
 cargo test --features hdf5
 
-cd "$REPO_ROOT/openEMS/rust"
+cd "$REPO_ROOT/crates/openems-core"
 cargo test
 
-cd "$REPO_ROOT/fparser/rust"
+cd "$REPO_ROOT/crates/fparser"
 cargo test
 
-cd "$REPO_ROOT/hyp2mat/rust"
+cd "$REPO_ROOT/crates/hyp2mat"
 cargo test

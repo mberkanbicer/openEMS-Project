@@ -14,6 +14,6 @@ if [ ! -x "$PYTHON" ]; then
   PYTHON=python3
 fi
 
-export PYTHONPATH="$REPO_ROOT/openEMS/rust-py/python:$REPO_ROOT/CSXCAD/rust-py/python${PYTHONPATH:+:$PYTHONPATH}"
+export PYTHONPATH="$REPO_ROOT/crates/openems-py/python:$REPO_ROOT/crates/csxcad-python/python${PYTHONPATH:+:$PYTHONPATH}"
 cd "$REPO_ROOT"
 "$PYTHON" scripts/ci/msl_convergence.py "$@"

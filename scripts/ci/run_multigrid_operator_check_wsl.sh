@@ -7,14 +7,14 @@
 # and Rust `--debug-operator` dumps node by node, which isolates the coefficient
 # normalization problem from the multi-grid engine. The native-layout operator
 # pair (base = full mesh, child = inner rho + every second alpha line) and the
-# engine are constructed and tested in openEMS/rust/src/multigrid.rs.
+# engine are constructed and tested in crates/openems-core/src/multigrid.rs.
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 NATIVE_BIN="${NATIVE_BIN:-$HOME/opt/openEMS/bin/openEMS}"
 RUST_BIN="${RUST_BIN:-$REPO_ROOT/target/release/openems-cli}"
-FIXTURES="$REPO_ROOT/openEMS/rust/tests/fixtures/multigrid"
+FIXTURES="$REPO_ROOT/crates/openems-core/tests/fixtures/multigrid"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 

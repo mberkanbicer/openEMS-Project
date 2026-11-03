@@ -561,7 +561,7 @@ def write_markdown(path: str, context: dict, summary: dict, rows: list) -> None:
     )
     lines.append(
         "- The native solver prints its engine, grid and timestep; the Rust CLI does not, so "
-        "the Rust engine label comes from `openEMS/rust-cli/src/main.rs` (engine name → "
+        "the Rust engine label comes from `crates/openems-cli/src/main.rs` (engine name → "
         "thread count mapping) and is corroborated by the measured CPU utilisation in the CSV."
     )
     lines.append("")

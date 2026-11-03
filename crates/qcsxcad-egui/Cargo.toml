@@ -1,0 +1,27 @@
+[package]
+name = "qcsxcad-egui"
+version = "0.1.0"
+edition = "2021"
+license = "LGPL-3.0-or-later"
+description = "egui + wgpu GUI implementation for QCSXCAD"
+
+[features]
+docking = ["dep:egui_tiles", "dep:serde", "dep:serde_json"]
+
+[dependencies]
+qcsxcad-core = { package = "qcsxcad-core", path = "../qcsxcad-core", features = ["hdf5"] }
+csxcad-core = { package = "csxcad-core", path = "../csxcad-core" }
+egui = { version = "0.37", features = ["default_fonts"] }
+egui-winit = "0.37"
+egui-wgpu = "0.37"
+wgpu = "30"
+winit = "0.30"
+bytemuck = { version = "1.14", features = ["derive"] }
+png = "0.17"
+thiserror = "2.0"
+egui_tiles = { version = "0.18", features = ["serde"], optional = true }
+serde = { version = "1", features = ["derive"], optional = true }
+serde_json = { version = "1", optional = true }
+
+[dev-dependencies]
+pollster = "0.3"

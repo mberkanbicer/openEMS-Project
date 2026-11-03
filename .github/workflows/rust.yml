@@ -137,9 +137,9 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
         with:
-          workspaces: fparser/rust
+          workspaces: crates/fparser
       - name: Differential suite against the pinned C++ parser
-        run: python3 fparser/rust/tests/run_differential.py
+        run: python3 crates/fparser/tests/run_differential.py
 
   freebsd:
     name: FreeBSD (check)
@@ -158,4 +158,4 @@ jobs:
           # differential suite, is checked here.
           run: |
             env HDF5_LIB_DIR=/usr/local/lib cargo check --workspace --exclude hyp2mat-rs
-            python3 fparser/rust/tests/run_differential.py
+            python3 crates/fparser/tests/run_differential.py
