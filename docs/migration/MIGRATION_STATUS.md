@@ -1253,6 +1253,29 @@ now register rows, all closed:
 - **Remaining:** R-2 (device-resident multi-grid interface tables), R-3 (CI
   GPU runner), RM-121 (native performance baseline), RM-106 (interactive GUI
   QA sign-off items).
+
+## Session record 2026-11-03 (merged into modernization/integration)
+
+- **What:** `mberkanbicer-rust-migration-audit` (333 commits, v0.37.0..cf43c01)
+  was merged into the fork's integration line with a `--no-ff` merge
+  (`0e31f9c`). Conflict resolutions: `docs/migration/*` keeps the
+  rust-branch records as canonical; `AGENTS.md` keeps the full 735-line
+  governance document (the 162-line condensed variant is not adopted);
+  submodule pins take the rust branches (AppCSXCAD `e05821b`, CSXCAD
+  `43f9e80`, QCSXCAD `e832b4f`, fparser `c9431813`, openEMS `272f1a6`),
+  each verified reachable from its submodule origin before the commit —
+  the fparser pin surfaced a missing local tracking ref, resolved by
+  fetching it (`ls-remote` confirmed the commit was already on GitHub).
+- **Verification at the merged HEAD (all exit-code-checked):** plain
+  `cargo build --release` exit 0; gpu-feature workspace test run exits 0
+  with **933 passed / 0 failed**; `openems-cli gpu_engine.xml --gpu`
+  completes 10 timesteps on the RTX 5070. Pushed as
+  `f0c7952..0e31f9c` to `origin/modernization/integration`.
+- **Scope note:** the merge does not mark the migration complete; RM-121,
+  RM-106, R-2 and R-3 stay open as recorded. `master` remains the
+  upstream mirror and is intentionally untouched (its local tracking was
+  severed this session; on-demand sync keeps working via an explicit
+  `git fetch upstream master:refs/remotes/upstream/master`).
 - **Correction + regression fixed:** the record above initially reported the
   plain `cargo build --release` as green from a tail-only read without
   checking the exit code; the build had actually failed. The default
