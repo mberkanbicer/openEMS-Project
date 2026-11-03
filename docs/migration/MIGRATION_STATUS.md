@@ -1209,3 +1209,23 @@ now register rows, all closed:
   because its writes race with the E/H threads; small models stay CPU-faster
   at ~0.2 ms per dispatch.
 
+
+## Session record 2026-11-03 (fused excitation, adaptive auto threshold)
+
+- **What:** the excitation is now applied by the fused E/H kernels through a
+  per-cell CSR (P-E7). Each thread applies its own cell's terms after the
+  update, in term order, so a PML+source model costs **2 passes/step** and is
+  bit-identical to the CPU (`0.00e0`). `--gpu-auto` scales its crossover with
+  the estimated pass count (50k/75k/150k cells), and
+  `scripts/bench/gpu_bench.ps1` is the committed benchmark harness.
+- **Results:** the probe-only tutorial drops from 0.97 s to 0.74 s (CPU
+  0.27 s); the 525k PML+source model stays at 1.82-1.95 s.
+- **Verification:** 13/13 engine GPU differentials pass (the new fused
+  PML+source test is `0.00e0` and asserts 2 passes), the dispatch-budget test
+  passes, `cargo test --release --workspace` with hdf5+gpu exits 0, and the
+  tutorial physics checks and tutorial 1 probe hash are unchanged.
+- **Remaining (recorded in the plan as R-1..R-4):** the Debye chain is not
+  bit-identical (`5.8e-7` relative, FMA contraction), multi-grid keeps its
+  interface tables on the host, CI has no GPU runner, and small models stay
+  CPU-faster at the ~0.2 ms per-dispatch floor.
+

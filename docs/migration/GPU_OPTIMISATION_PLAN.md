@@ -193,3 +193,13 @@ an id before being implemented.
 | P-E4 | P-2/P-5 | The engine differential tests compared zero fields because `cavity_operator` never built the EC coefficients. Building them exposed the Mur colour-range bug and an unstable Debye test, both fixed; all differentials now run on real fields | Verified |
 | P-E5 | P-4 | `ProcessIntegral` box probes are device-sampled through `IntegralCalculator::gpu_field_probe` (three components + edge-length scaling), so the CLI tutorials' probes no longer force a per-step download | Verified |
 | P-E6 | P-E2 | The E update reads only `curr` and the H update only `volt`, so the PML **pre** phases are same-cell too: fusing them into the fused E/H kernels leaves a PML model at 2 passes/step (E and H) with the UPML differential still `0.00e0`; the 525k PML model drops to 1.82-1.95 s | Verified |
+| P-E7 | P-E6 | Fuse the excitation into the same kernels with a per-cell CSR (each thread applies its own cell's terms after the update, in term order). A PML+source model now costs 2 passes/step and is bit-identical to the CPU (`0.00e0`); the probe-only tutorial drops from 0.97 s to 0.74 s. `--gpu-auto` scales its crossover with the estimated pass count, and `scripts/bench/gpu_bench.ps1` is the committed benchmark harness | Verified |
+
+## Remaining (not plan items)
+
+| Id | Item | Status | Why it is not closed |
+|---|---|---|---|
+| R-1 | Debye dispersion is not bit-identical (`3.58e-6` absolute, `5.8e-7` relative) | Accepted | The pole-state recurrence is sensitive to FMA contraction; WGSL has no `precise` qualifier and the error is two orders below the gate. The tutorials and all other paths are `0.00e0` |
+| R-2 | Multi-grid keeps its interface tables on the host | Open | Correct (4.47e-8) but each half step uploads/downloads; moving the split/interpolation tables to the device is a larger port |
+| R-3 | GPU tests need a local adapter and CI has no GPU runner | Open | The differentials are verified on the RTX 5070 Laptop only; CI cannot reproduce them without hardware |
+| R-4 | Models below ~50k cells stay CPU-faster | Accepted | Two passes at ~0.2 ms each is the driver floor; a single fused step kernel needs a device-wide barrier, which WGSL does not provide |

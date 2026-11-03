@@ -200,14 +200,15 @@ single-step `0.00e0`; tutorial 1 probes agree with the CPU run to 2.33e-7 /
 
 ### Why the small PML model is slower
 
-At 12k cells the four UPML phases plus E/H/source are 12 dispatches per step in
-the old layout, and each dispatch costs ~0.1 ms of driver overhead on this
-adapter while the work itself is microseconds. The CPU solves the same step in
-~0.45 ms. This is the per-dispatch overhead floor, not a defect in the port:
-the same structure wins 4.8-5.5x at 525k cells and 9.2x on the large source
-model. RM-198 merged the slabs (a PML-only model now costs 6 passes instead of
-4 x slabs + 2), and folding the PML terms into the E/H kernels (native fuses
-them) is the recorded next step (plan item P-E2).
+At 12k cells the fused E/H kernels cost two dispatches per step (the PML pre
+and post phases run inside them), and each dispatch costs ~0.2 ms of driver
+overhead on this adapter while the work itself is microseconds. The CPU solves
+the same step in ~0.4 ms. This is the per-dispatch overhead floor, not a defect
+in the port: the same structure wins 4.8-5.5x at 525k cells and 9.2x on the
+large source model. RM-198 merged the slabs (32 -> 6 passes for six slabs),
+P-E2 fused the post phases (6 -> 4), and P-E6 fused the pre phases (4 -> 2);
+P-E7 fuses the source through a per-cell CSR, so a PML+source model also runs
+two passes plus the probe gather.
 
 ## 7. Device-side Mur ABC and the remaining extensions
 
@@ -308,13 +309,18 @@ fallback for any future extension without a device port.
 
 - `--gpu` wins on models from roughly 50k cells upward: 7.2x extension-free at
   451k cells, 9.2x source-driven at 451k cells, 4.8–5.5x with PML at 525k
-  cells. Below that the per-dispatch and per-sync overhead dominates.
-- Per-step output (probes whose `OverSampling` makes the interval round to
-  zero, dumps written every step) forces one host download per step on any
-  engine, CPU or GPU. Runs with sparse output see the kernel speed-up.
+  cells (1.82-1.95 s). `--gpu-auto` scales the crossover with the estimated
+  pass count: 50k cells for two passes, 75k for three to five, 150k above.
+- Device probe sampling means per-step probe output no longer forces a field
+  download: only a compact per-step matrix crosses the bus at the batch end.
+  Dumps written every step still need the host arrays, so those runs stay
+  output-bound on either engine.
 - The GPU never changes the result: the differential gates compare the fields
-  (`0.00e0` on the kernel, device-source and device-UPML tests) and the
-  tutorials agree to ~5e-7 V/m.
+  on non-zero coefficients (`0.00e0` for the kernel, PML, source and the fused
+  PML+source; up to 3.58e-6 for the dispersive Debye chain, relative 5.8e-7)
+  and the tutorials agree to ~5e-7 V/m.
+- Benchmark with `scripts/bench/gpu_bench.ps1 -Models ... -Repeat N [-Gpu]`,
+  which prints the best and average wall time per model.
 
 ## 9. Reproduce
 
