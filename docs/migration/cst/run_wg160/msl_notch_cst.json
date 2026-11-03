@@ -1,0 +1,21 @@
+{
+  "project": "C:\\Users\\mberkanbicer\\Projects\\openEMS-Project-rust\\docs\\migration\\cst\\run_wg160\\msl_notch.cst",
+  "touchstone": "C:\\Users\\mberkanbicer\\Projects\\openEMS-Project-rust\\docs\\migration\\cst\\run_wg160\\msl_notch.s2p",
+  "samples": 1201,
+  "frequency_hz": [
+    1000000000.0,
+    7000000000.0
+  ],
+  "cst_notch_hz": 3642545406.9002542,
+  "cst_s11_at_notch": 0.998077911199085,
+  "cst_s21_at_notch_db": -29.76242087735661,
+  "reference_notch_hz": 3670049589.871748,
+  "notch_relative_difference": 0.007494226521460946,
+  "gates": {
+    "notch_frequency": true,
+    "reflection_at_notch": true,
+    "rejection_at_notch": true,
+    "shape_rms": true
+  },
+  "passed": true
+}

@@ -23,3 +23,25 @@ CLAUDE.md
 .cursor*
 .windsurf*
 .copilot*
+
+# Python bytecode from the CI helper scripts
+__pycache__/
+*.pyc
+
+# Rust workspace build output and local scratch files
+/target/
+**/target/
+diff.txt
+build-*/
+build-wheels/
+build-venv/
+
+# Auxiliary Rust tools linked as native binaries
+/bin/
+
+
+# native excitation sample dumps written next to the solver output
+/et
+/ht
+# Rust packaging output (scripts/ci/build_windows_package.ps1)
+/dist/

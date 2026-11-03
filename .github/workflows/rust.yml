@@ -1,0 +1,161 @@
+name: Rust
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+      - "mberkanbicer-**"
+    paths:
+      - "**/*.rs"
+      - "**/Cargo.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "**/build.rs"
+      - ".github/workflows/rust.yml"
+      - "scripts/ci/**"
+  pull_request:
+    paths:
+      - "**/*.rs"
+      - "**/Cargo.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "**/build.rs"
+      - ".github/workflows/rust.yml"
+      - "scripts/ci/**"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  linux:
+    name: Linux (build, tests, policy gates)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      # RM-030: the workspace unifies the `hdf5` feature, so the default check
+      # needs the HDF5 development files as well.
+      - name: Install HDF5 development files
+        run: sudo apt-get update && sudo apt-get install -y libhdf5-dev pkg-config
+      - name: Check the whole workspace
+        run: cargo check --workspace
+      - name: Numerical core tests
+        run: cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs
+      - name: Placeholder policy
+        run: |
+          python3 scripts/ci/check_placeholders.py --self-test
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="origin/${{ github.base_ref }}"
+          else
+            BASE="${{ github.event.before }}"
+          fi
+          if git rev-parse --verify "$BASE" > /dev/null 2>&1; then
+            python3 scripts/ci/check_placeholders.py --changed --base "$BASE"
+          else
+            python3 scripts/ci/check_placeholders.py --changed
+          fi
+      - name: Migration records
+        run: python3 scripts/ci/check_migration_docs.py
+      - name: Installed layout
+        run: bash scripts/ci/check_cmake_install.sh
+
+  hdf5:
+    name: Linux (HDF5 feature)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Install HDF5 development files
+        run: sudo apt-get update && sudo apt-get install -y libhdf5-dev pkg-config
+      - name: Build and test with the hdf5 feature
+        run: cargo test -p csxcad-core -p openems-core --features hdf5
+      - name: HDF5 reader and discrete-material tests
+        run: cargo test -p csxcad-core --features hdf5 hdf5
+
+  windows:
+    name: Windows (build, tests)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      # RM-030: HDF5 comes from the runner's vcpkg, which the workspace check
+      # needs because the feature is unified across the workspace.
+      - name: Install HDF5 (vcpkg)
+        run: vcpkg install hdf5:x64-windows
+        shell: pwsh
+      - name: Check the whole workspace
+        env:
+          HDF5_LIB_DIR: C:\vcpkg\installed\x64-windows\lib
+        run: cargo check --workspace
+      - name: Add the HDF5 DLLs to PATH
+        run: echo "C:\vcpkg\installed\x64-windows\bin" >> $env:GITHUB_PATH
+        shell: pwsh
+      - name: Numerical core tests
+        env:
+          HDF5_LIB_DIR: C:\vcpkg\installed\x64-windows\lib
+        run: cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs
+      - name: Placeholder policy self-test
+        run: python scripts/ci/check_placeholders.py --self-test
+
+  macos:
+    name: macOS (build)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Install HDF5
+        run: brew install hdf5
+      - name: Check the whole workspace
+        run: HDF5_LIB_DIR="$(brew --prefix)/opt/hdf5/lib" cargo check --workspace
+      - name: Numerical core tests
+        run: HDF5_LIB_DIR="$(brew --prefix)/opt/hdf5/lib" cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs
+
+  fparser-differential:
+    # RM-026: the fparser differential suite against the pinned C++ parser on
+    # macOS (Linux runs it in the main job, Windows is covered by the Rust
+    # integration tests).
+    name: fparser differential (macOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: fparser/rust
+      - name: Differential suite against the pinned C++ parser
+        run: python3 fparser/rust/tests/run_differential.py
+
+  freebsd:
+    name: FreeBSD (check)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: cargo check in a FreeBSD VM
+        uses: vmactions/freebsd-vm@v1
+        with:
+          usesh: true
+          prepare: pkg install -y rust hdf5 cmake python3
+          # hyp2mat is excluded: its clipper2c-sys build script has no FreeBSD
+          # target (exception E-004). Everything else, including the fparser
+          # differential suite, is checked here.
+          run: |
+            env HDF5_LIB_DIR=/usr/local/lib cargo check --workspace --exclude hyp2mat-rs
+            python3 fparser/rust/tests/run_differential.py

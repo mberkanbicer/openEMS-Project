@@ -1,0 +1,118 @@
+# Final readiness
+
+Decision: **CONDITIONAL_RESEARCH_RELEASE**
+
+The default CPU solver path is evidence-backed against the pinned native
+implementation and two analytic wave-speed cases. `CellConstantMaterial` is now
+implemented and differentially verified; cylindrical multi-grid is still
+rejected explicitly. Convergence is measured for the cavity (mesh and time
+step), the dielectric speed and the MSL notch, and SAR is validated against the
+exact lossy-medium solution. An independent CST 2026 comparison now validates
+the MSL notch (0.749 % on the resonance). The port is not a complete equivalent
+of every upstream feature, so it must not be described as a complete or
+production-ready replacement.
+
+## 1. What is proven
+
+- Workspace builds and the crate/Python/Octave tests run on this host:
+  **acceptance 21/21 PASS** on a clean worktree; `docs/migration/ACCEPTANCE.md`
+  pins the tested SHA and counts (851 crate tests, 506 HDF5, 459 Python with 2
+  GPU skips, Octave 10/10, 51 differential cases, the f32 parser feature build, the GPU stage 1-3 device, kernel and engine tests,
+  quarter and cell-centre operator dumps, fresh performance gate at
+  4.0x wall / 3.25x RSS, CST harness self-test and the recorded CST 2026
+  comparison; Windows workspace separately 897 tests / 33 binaries).
+- 51-case native differential harness, operator dump, UPML reflection, SAR and
+  curve-excitation gates.
+- Analytic vacuum and dielectric propagation speed (2 % discrete bound).
+- 459 native Python tests (2 GPU tests skipped), Octave 10/10, install layout.
+- GUI editor workflow with real-click tree → inspector → status evidence;
+  arrow-key tree navigation with focus rings and a Ctrl+K command palette.
+- P0 guards: cylindrical `MultiGrid` is implemented end to end and matches the
+  single-grid coax probe/phase gate (E-007 closed); `CellConstantMaterial` is
+  implemented and differentially verified against native (E-008 closed).
+
+## 2. What is not proven
+
+| Item | Status |
+|---|---|
+| Mesh/time convergence | **measured**: cavity TE101 2.05/2.03; dt 2.32 vs the fixed-mesh limit; dielectric monotone 0.90/0.31; MSL notch 3.6700 GHz with 3.0e-4 mesh spread (`numerics/CONVERGENCE.md`) |
+| CST MWS comparison | **PASS** (CST-001/E-009): CST 2026, 160 steps/wavelength, notch 3.6425 vs 3.6700 GHz (0.749 %), \|S11\| 0.9981, \|S21\| -29.8 dB, RMS 1.42 dB (`cst/PREPARATION.md`) |
+| GPU compute | **implemented** (ADR 0012): wgpu E/H kernels, host-sync extension path, `--gpu` CLI; extension-free 48^3 speedup and host-sync field parity recorded |
+| macOS/FreeBSD/Windows run at this HEAD | local WSL2 + Windows evidence accepted; hosted CI is out of scope (E-010, owner decision 2026-11-01) |
+| Windows installer | **DONE** 2026-10-31: Rust-native package built and smoke-tested (`WINDOWS_PACKAGE.md`, 15.4 MB, sha256 `614f5d0b…`); native C++ workflow remains reference-only |
+| GUI drag-docking | **PASS** (ADR 0010): tabs/splits/drag grips, persisted; tab/split workflow accepted, floating panes out of scope (E-013 closed) |
+| Performance threshold | **PASS, accepted 2026-10-31** (PERF-001): 4.0x wall / 3.25x RSS measured fresh in acceptance; worst 2.90x/3.08x |
+| Analytic SAR | **PASS** (`VAL-002`): lossy line alpha 9.3513 vs 9.3601 Np/m, beta 84.3651 vs 84.3547 rad/m, SAR slope rel 9.4e-4 |
+| MATLAB (as opposed to Octave) | smoke PASS (R2025b: XML write, setup, 50-step run) |
+| Fuzzing/Miri/sanitizers | **Miri PASS** (21 parser + 3 operator), **cargo-fuzz PASS** (126 963 runs/121 s, 0 crashes) and **ASan PASS** (53 parser + 58 operator, no report); TSan not claimed |
+
+## 3. Checklist (protocol §13)
+
+| Criterion | Verdict |
+|---|---|
+| Seven-component matrix with traceability | Met (`component_matrix.csv`) |
+| Existing port audited before changes | Met (`00_inventory.md`, dashboard) |
+| No verified module rewritten without cause | Met; changes are guards + bindings |
+| Missing/partial high-priority paths completed | Partly: Python façade and P0 guards fixed; multi-grid/GPU remain out of scope |
+| No unreported C++ runtime | Met (`legacy_dependency_register.md`) |
+| CPU reference passes analytic/regression | Met for the recorded corpus |
+| Mesh/time convergence | **Met for the recorded studies**: cavity mesh/time, dielectric speed, MSL notch (openEMS) and CST notch 80->160 steps; no SAR-averaging convergence claim |
+| Physical conventions validated | Met for wave speed, ports, and SAR (analytic lossy line); absolute SAR scale follows the validated DFT convention |
+| Immutable reference provenance | Met (`GOLD_REGISTRY.json`), no self-generation |
+| SIMD/thread backends compared | Not met (no SIMD variant) |
+| GPU parity | CPU/GPU fields identical for extension-free models; host-sync extension path diff 0.0; high-level excitation probes 0.0/3.55e-8 |
+| CST comparison | **Met** (CST 2026, notch 0.749 %) |
+| Python/MATLAB/Octave compatibility | Python/Octave met; MATLAB smoke PASS (R2025b) |
+| GUI edit/validate/export | Met; dock layout (tabs/splits) is draggable and persisted; no solver run by design |
+| Security/unsafe/fuzz review | Met for the recorded surface: source review + Miri + fuzz + ASan; TSan not claimed |
+| Cross-platform builds | **Blocked at HEAD** |
+| Final report links evidence | Met (this tree) |
+
+## 3a. Accepted exceptions (release note)
+
+These items are consciously not closed in this tree. Each is recorded in
+`docs/migration/EXCEPTIONS.md` with its decision record, impact and the exact
+action that removes it; none is silently treated as verified.
+
+- **E-009 (closed 2026-10-31)** - CST Studio Suite 2026 reproduced the MSL
+  notch within 0.749 % (3.6425 vs 3.6700 GHz); see `cst/PREPARATION.md`.
+- **E-010 / E-005 / CI-001** - hosted CI is out of scope by owner decision
+  (2026-11-01); the accepted evidence is the local WSL2 acceptance gate and the
+  Windows build/package checks.
+- **E-011 (closed 2026-10-31)** - the owner accepted the 4.0x wall / 3.25x RSS
+  gate; `run_full_acceptance_wsl.sh` now measures it fresh and fails outside the
+  limits (recorded worst: 2.90x wall, 3.08x RSS).
+- **E-012 (closed 2026-10-31)** - the Rust-native Windows package is built and
+  smoke-tested (`WINDOWS_PACKAGE.md`); the native C++ packaging workflow is
+  untouched and remains a reference path.
+- **E-013 (closed 2026-10-31)** - the owner accepted the tab/split dock
+  workflow (ADR 0010); `egui_tiles` has no floating panes, so Qt-style floating
+  panels stay out of scope rather than being tracked as missing work.
+- **E-014 (closed 2026-10-31)** - ASan now passes 53 parser + 58 operator
+  tests; TSan is not claimed for the single-threaded selection.
+
+## 4. Conditions to move to READY_FOR_RELEASE
+
+1. ~~A clean 13/13 acceptance run at the release commit.~~ Met at `cf3d226`;
+   re-run at the final tagged commit.
+2. ~~A converged MSL notch model.~~ Met (RM-179): notch 3.6700 GHz, 3.0e-4 mesh spread.
+3. Hosted or local macOS/FreeBSD/Windows runs at the release commit.
+4. ~~Owner approval of the proposed performance gate.~~ Met 2026-10-31: 4.0x wall / 3.25x RSS accepted and measured fresh in acceptance.
+5. ~~The sRGB material-colour fix.~~ Met (RM-171).
+6. ~~A decision on multi-grid and cell-constant materials.~~ Cell-constant
+   averaging implemented 2026-11-01 (E-008); multi-grid remains an explicit
+   rejection (E-007).
+7. ~~A MATLAB run if MATLAB support is advertised.~~ Smoke met (full suite still open).
+
+## 5. Honest limitations for the release note
+
+- GPU host-sync extension models are correctness-first and currently slower
+  than the CPU on the WSL adapter (48^3/120: 23.07 s vs 4.23 s); GPU-safe
+  extension kernels remain a performance follow-up.
+- No cylindrical multi-grid; models that request it stop at setup.
+- CST validates the MSL notch (0.749 %); it is a single fixture, not a
+  CST validation of every solver feature. Convergence is measured for the
+  cavity (mesh/time), the dielectric speed and the MSL notch, and SAR is
+  validated on a lossy line; no SAR-averaging convergence claim.
+- macOS/FreeBSD/Windows verification predates this HEAD.
+- Performance is 2-4x native on the recorded cases, not faster.

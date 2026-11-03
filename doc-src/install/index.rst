@@ -19,4 +19,5 @@ Windows and FreeBSD as a quicker start.
    package
    python
    octave
+   rust
    check

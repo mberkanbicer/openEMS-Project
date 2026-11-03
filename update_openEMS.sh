@@ -32,6 +32,7 @@ function help_msg {
   echo "                                enabled by default on macOS as TinyXML is desupported"
   echo "                                (need network access to SourceForge & GitHub)"
   echo "	--python		build python extensions"
+  echo "	--with-rust		build Rust extensions (all submodule Rust ports: fparser-rs, csxcad-core, csxcad-py, csxcad-matlab, openems-core, openems-py, openems-matlab, openems-cli, qcsxcad-core, qcsxcad-egui, appcsxcad, hyp2mat-rs, ctb-rs)"
   echo ""
   ./scripts/build_python.sh --help-python
 }
@@ -214,6 +215,10 @@ function parse_args {
         echo "enabling Python Extension build"
         BUILD_PY_EXT=1
 	;;
+      --with-rust)
+        echo "enabling Rust Extension build"
+        BUILD_RUST=1
+	;;
       --)
         shift
         break
@@ -267,6 +272,7 @@ function dependency_check {
   if [ "$BUILD_GUI" = "NO" ]; then dep_args+=("--disable-gui"); fi
   if [ "$BUILD_PY_EXT" -eq 1 ]; then dep_args+=("--python"); fi
   if [ "$BUILD_CTB" -eq 1 ]; then dep_args+=("--with-ctb"); fi
+  if [ "$BUILD_RUST" -eq 1 ]; then dep_args+=("--with-rust"); fi
 
   if ./scripts/install_deps.sh --check ${dep_args[@]+"${dep_args[@]}"}; then
     return 0
@@ -307,6 +313,7 @@ function show_postinstall_help {
   local build_hyp2mat="$2"
   local build_ctb="$3"
   local python_help="$4"
+  local build_rust="$5"
 
   echo " -------- "
   echo "openEMS and all modules have been updated successfully..."
@@ -317,7 +324,8 @@ function show_postinstall_help {
 
   if [ "$build_hyp2mat" -eq 1 ] ||
      [ "$build_ctb" -eq 1 ] ||
-     [ -n "$python_help" ];
+     [ -n "$python_help" ] ||
+     [ "$build_rust" -eq 1 ];
   then
     echo ""
     echo "% optional additional packages:"
@@ -329,6 +337,22 @@ function show_postinstall_help {
     fi
     if [ -n "$python_help" ]; then
       echo "$python_help"
+    fi
+    if [ "$build_rust" -eq 1 ]; then
+      echo "Rust crates built: fparser-rs, csxcad-core, csxcad-py, csxcad-matlab, openems-core, openems-py, openems-matlab, openems-cli, qcsxcad-core, qcsxcad-egui, appcsxcad, hyp2mat-rs, ctb-rs"
+      echo "  fparser-rs:     $install_path/bin/fparser-rs (cargo build)"
+      echo "  csxcad-core:    $install_path/lib/csxcad_core (cargo build)"
+      echo "  csxcad-py:      $install_path/lib/python (maturin build)"
+      echo "  csxcad-matlab:  $install_path/lib/csxcad_matlab (cargo build, cdylib)"
+      echo "  openems-core:   $install_path/lib/openems_core (cargo build)"
+      echo "  openems-py:     $install_path/lib/python (maturin build)"
+      echo "  openems-matlab: $install_path/lib/openems_matlab (cargo build, cdylib)"
+      echo "  openems-cli:    $install_path/bin/openems-cli (cargo build)"
+      echo "  qcsxcad-core:   $install_path/lib/qcsxcad_core (cargo build)"
+      echo "  qcsxcad-egui:   $install_path/bin/qcsxcad-egui (cargo build)"
+      echo "  appcsxcad:      $install_path/bin/appcsxcad (cargo build)"
+      echo "  hyp2mat-rs:     $install_path/bin/hyp2mat-rs (cargo build)"
+      echo "  ctb-rs:         $install_path/bin/ctb-rs (cargo build)"
     fi
   fi
   echo ""
@@ -343,6 +367,7 @@ BUILD_HYP2MAT=0
 BUILD_CTB=0
 BUILD_GUI="YES"
 BUILD_PY_EXT=0
+BUILD_RUST=0
 BUILD_TINYXML=0
 SKIP_DEP_CHECK=0
 INSTALL_PATH=
@@ -384,8 +409,14 @@ if [ "$BUILD_TINYXML" -eq 1 ]; then
 fi
 
 # build openEMS Project
+RUST_CMAKE=NO
+if [ "$BUILD_RUST" -eq 1 ]; then RUST_CMAKE=YES; fi
+RUST_PY_CMAKE=NO
+if [ "$BUILD_RUST" -eq 1 ] && [ "$BUILD_PY_EXT" -eq 1 ]; then RUST_PY_CMAKE=YES; fi
 build "$BASEDIR" "$TMPDIR" "$NJOBS" "$LOG_FILE" "$STDOUT" \
       "-DBUILD_APPCSXCAD=$BUILD_GUI" \
+      "-DBUILD_RUST=$RUST_CMAKE" \
+      "-DBUILD_RUST_PYTHON=$RUST_PY_CMAKE" \
       "-DCMAKE_INSTALL_PREFIX=$INSTALL_PATH"
 
 ##### additional packages #####
@@ -417,10 +448,79 @@ if [ "$BUILD_PY_EXT" -eq 1 ]; then
   fi
   PYTHON_HELP=$(./scripts/build_python.sh --cpp-install-dir "$INSTALL_PATH" ${PYTHON_ARGS[@]+"${PYTHON_ARGS[@]}"} --help-postinst)
 fi
-cd "$BASEDIR" || die
 
+#### rust extension build ####
+# The subproject loop above installs the C++ binaries under the native names.
+# The Rust install rules live in the root CMake project, which chains the
+# subprojects with ExternalProject_Add, so build only its `rust-workspace`
+# target and install from that build tree: the root install rules then put the
+# Rust binaries, C-ABI libraries and M-files into the prefix, replacing the C++
+# binaries with the port.
+if [ "$BUILD_RUST" -eq 1 ]; then
+  echo "Building and installing the Rust extensions ... please wait"
+  RUST_BUILD_DIR="$TMPDIR/rust-root"
+  RUST_CMAKE_ARGS=(-DBUILD_RUST=YES -DCMAKE_INSTALL_PREFIX="$INSTALL_PATH")
+  if [ "$BUILD_PY_EXT" -eq 1 ]; then
+    RUST_CMAKE_ARGS+=(-DBUILD_RUST_PYTHON=YES)
+  fi
+  if ! cmake -S "$BASEDIR" -B "$RUST_BUILD_DIR" "${RUST_CMAKE_ARGS[@]}" \
+       2>&1 | tee -a "$LOG_FILE" >> "$STDOUT";
+  then
+    echo "cmake for the Rust workspace failed, please see logfile for more details... $LOG_FILE"
+    exit 1
+  fi
+  if ! cmake --build "$RUST_BUILD_DIR" --target rust-workspace -j "$NJOBS" \
+       2>&1 | tee -a "$LOG_FILE" >> "$STDOUT";
+  then
+    echo "Rust workspace build failed, please see logfile for more details... $LOG_FILE"
+    exit 1
+  fi
+  if ! cmake --install "$RUST_BUILD_DIR" \
+       2>&1 | tee -a "$LOG_FILE" >> "$STDOUT";
+  then
+    echo "Rust install failed, please see logfile for more details... $LOG_FILE"
+    exit 1
+  fi
+
+  echo "Verifying the Rust installation in $INSTALL_PATH ..."
+  RUST_MISSING=0
+  for f in bin/openEMS bin/AppCSXCAD bin/hyp2mat bin/nf2ff bin/sar_calc bin/ctb; do
+    if [ ! -x "$INSTALL_PATH/$f" ]; then
+      echo "missing: $f"
+      RUST_MISSING=1
+    fi
+  done
+  if [ "$RUST_MISSING" -eq 0 ]; then
+    # `--version` is not a supported flag and exits non-zero, which would trip
+    # `pipefail`; read `--help` instead and match the banner text.
+    RUST_BANNER=$("$INSTALL_PATH/bin/openEMS" --help 2>&1 || true)
+    case "$RUST_BANNER" in
+      *Rust*) ;;
+      *)
+        echo "bin/openEMS is not the Rust build"
+        RUST_MISSING=1
+        ;;
+    esac
+  fi
+  for f in lib/libcsxcad_matlab.so lib/libopenems_matlab.so; do
+    if [ ! -f "$INSTALL_PATH/$f" ]; then
+      echo "missing: $f"
+      RUST_MISSING=1
+    fi
+  done
+  for d in share/openEMS/matlab share/CSXCAD/matlab; do
+    if [ ! -d "$INSTALL_PATH/$d" ]; then
+      echo "missing: $d"
+      RUST_MISSING=1
+    fi
+  done
+  if [ "$RUST_MISSING" -ne 0 ]; then
+    echo "Rust installation is incomplete, please see logfile for more details... $LOG_FILE"
+    exit 1
+  fi
+fi
 echo "build successful, cleaning up tmp dir ..."
 rm -rf "$TMPDIR"
 
 #####
-show_postinstall_help "$INSTALL_PATH" "$BUILD_HYP2MAT" "$BUILD_CTB" "$PYTHON_HELP"
+show_postinstall_help "$INSTALL_PATH" "$BUILD_HYP2MAT" "$BUILD_CTB" "$PYTHON_HELP" "$BUILD_RUST"

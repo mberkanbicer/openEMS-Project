@@ -114,3 +114,27 @@ controls, VTK-backed exports, view-only mode, and the Qt/VTK platform matrix.
 The two confirmed source defects and the open compatibility questions above
 must be resolved against a reference build before they become normative Rust
 behavior.
+
+## Migration decisions (2026-10-27)
+
+- **Save keeps the openEMS wrapper.** Native `QCSXCAD::Write2XML` delegates to
+  `ContinuousStructure::Write2XML`, so saving an opened solver project writes
+  only the geometry and silently drops `<FDTD>`, `<BoundaryCond>` and the
+  excitation settings. `qcsxcad_core::ProjectFile` remembers the loaded
+  document and replaces only its `<ContinuousStructure>` element. This is a
+  deliberate deviation, chosen because the native behavior is data loss.
+- **Save As adopts the new path.** Native `ExportGeometry` (the Save-As action)
+  writes the chosen file but leaves `AppCSXCAD::m_filename` unchanged. The port
+  updates the path so a following Save targets the file the user just chose.
+- **No random fill colors.** Native assigns `rand()%256` colors in the
+  `CSProperties` constructor. The port leaves the color unset until the user
+  picks one, keeping documents and exports reproducible.
+- **Property file names are sanitized.** Native names each exported file after
+  the property; an empty or unsafe name now falls back to `property_<index>`
+  and replaces path separators.
+- **In-app path dialogs.** `QFileDialog` is replaced by a path window (the
+  dialog is the OS integration, not the file operation); the operations
+  themselves are covered by unit tests.
+- **`--RenderDiscMaterial` no longer toggles edit mode.** The confirmed native
+  defect is not reproduced: the render flag and the edit flag stay separate.
+  Discrete-material rendering is not ported yet and is tracked as RM-147.

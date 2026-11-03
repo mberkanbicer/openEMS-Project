@@ -1,0 +1,1285 @@
+
+=== coax ===
+================================================
+  openEMS - Finite-Difference Time-Domain Solver
+  Rust port (openems-py)
+================================================
+Exact-endcriteria: evaluating the end criteria every 283 timestep(s) (this excitation's Nyquist rate)
+[openEMS] Timestep: 100
+[openEMS] Timestep: 200
+[openEMS] Timestep: 300
+[openEMS] Timestep: 400
+[openEMS] Timestep: 500
+[openEMS] Timestep: 600
+[openEMS] Timestep: 700
+[openEMS] Timestep: 800
+[openEMS] Timestep: 900
+[openEMS] Timestep: 1000
+[openEMS] Timestep: 1100
+[openEMS] Timestep: 1200
+[openEMS] Timestep: 1300
+[openEMS] Timestep: 1400
+[openEMS] Timestep: 1500
+[openEMS] Timestep: 1600
+[openEMS] Timestep: 1700
+[openEMS] Timestep: 1800
+[openEMS] Timestep: 1900
+[openEMS] Timestep: 2000
+[openEMS] Timestep: 2100
+[openEMS] Timestep: 2200
+[openEMS] End-criteria of 51.3 dB reached after 2264 timesteps.
+[openEMS] FDTD simulation completed: 2264 timesteps.
+max(dB(S11)) = -50.8 dB
+min(dB(S21)) = -0.0 dB,  max(dB(S21)) = 0.00 dB
+PASS
+  [PASS] Z_ref (real): max rel. difference 7.471e-05
+  [PASS] S21: max |delta| 1.933e-04 dB
+  [PASS] S11 worst return loss: -50.83 dB vs -50.88 dB (delta 0.05 dB)
+  ==> coax: PASS
+
+=== conducting-sheet ===
+================================================
+  openEMS - Finite-Difference Time-Domain Solver
+  Rust port (openems-py)
+================================================
+Exact-endcriteria: evaluating the end criteria every 73 timestep(s) (this excitation's Nyquist rate)
+[openEMS] Timestep: 100
+[openEMS] Timestep: 200
+[openEMS] Timestep: 300
+[openEMS] Timestep: 400
+[openEMS] Timestep: 500
+[openEMS] Timestep: 600
+[openEMS] Timestep: 700
+[openEMS] Timestep: 800
+[openEMS] Timestep: 900
+[openEMS] Timestep: 1000
+[openEMS] Timestep: 1100
+[openEMS] Timestep: 1200
+[openEMS] Timestep: 1300
+[openEMS] Timestep: 1400
+[openEMS] Timestep: 1500
+[openEMS] Timestep: 1600
+[openEMS] Timestep: 1700
+[openEMS] Timestep: 1800
+[openEMS] Timestep: 1900
+[openEMS] Timestep: 2000
+[openEMS] Timestep: 2100
+[openEMS] Timestep: 2200
+[openEMS] Timestep: 2300
+[openEMS] Timestep: 2400
+[openEMS] Timestep: 2500
+[openEMS] Timestep: 2600
+[openEMS] Timestep: 2700
+[openEMS] Timestep: 2800
+[openEMS] Timestep: 2900
+[openEMS] Timestep: 3000
+[openEMS] Timestep: 3100
+[openEMS] Timestep: 3200
+[openEMS] Timestep: 3300
+[openEMS] Timestep: 3400
+[openEMS] Timestep: 3500
+[openEMS] Timestep: 3600
+[openEMS] Timestep: 3700
+[openEMS] Timestep: 3800
+[openEMS] Timestep: 3900
+[openEMS] Timestep: 4000
+[openEMS] Timestep: 4100
+[openEMS] Timestep: 4200
+[openEMS] Timestep: 4300
+[openEMS] Timestep: 4400
+[openEMS] Timestep: 4500
+[openEMS] Timestep: 4600
+[openEMS] Timestep: 4700
+[openEMS] Timestep: 4800
+[openEMS] Timestep: 4900
+[openEMS] Timestep: 5000
+[openEMS] Timestep: 5100
+[openEMS] Timestep: 5200
+[openEMS] Timestep: 5300
+[openEMS] Timestep: 5400
+[openEMS] Timestep: 5500
+[openEMS] Timestep: 5600
+[openEMS] Timestep: 5700
+[openEMS] Timestep: 5800
+[openEMS] Timestep: 5900
+[openEMS] Timestep: 6000
+[openEMS] Timestep: 6100
+[openEMS] Timestep: 6200
+[openEMS] Timestep: 6300
+[openEMS] Timestep: 6400
+[openEMS] Timestep: 6500
+[openEMS] Timestep: 6600
+[openEMS] Timestep: 6700
+[openEMS] Timestep: 6800
+[openEMS] Timestep: 6900
+[openEMS] Timestep: 7000
+[openEMS] Timestep: 7100
+[openEMS] Timestep: 7200
+[openEMS] Timestep: 7300
+[openEMS] Timestep: 7400
+[openEMS] Timestep: 7500
+[openEMS] Timestep: 7600
+[openEMS] Timestep: 7700
+[openEMS] Timestep: 7800
+[openEMS] Timestep: 7900
+[openEMS] Timestep: 8000
+[openEMS] Timestep: 8100
+[openEMS] Timestep: 8200
+[openEMS] Timestep: 8300
+[openEMS] Timestep: 8400
+[openEMS] Timestep: 8500
+[openEMS] Timestep: 8600
+[openEMS] Timestep: 8700
+[openEMS] Timestep: 8800
+[openEMS] Timestep: 8900
+[openEMS] Timestep: 9000
+[openEMS] Timestep: 9100
+[openEMS] Timestep: 9200
+[openEMS] Timestep: 9300
+[openEMS] Timestep: 9400
+[openEMS] Timestep: 9500
+[openEMS] Timestep: 9600
+[openEMS] Timestep: 9700
+[openEMS] Timestep: 9800
+[openEMS] Timestep: 9900
+[openEMS] Timestep: 10000
+[openEMS] Timestep: 10100
+[openEMS] Timestep: 10200
+[openEMS] Timestep: 10300
+[openEMS] Timestep: 10400
+[openEMS] Timestep: 10500
+[openEMS] Timestep: 10600
+[openEMS] Timestep: 10700
+[openEMS] Timestep: 10800
+[openEMS] Timestep: 10900
+[openEMS] Timestep: 11000
+[openEMS] Timestep: 11100
+[openEMS] Timestep: 11200
+[openEMS] Timestep: 11300
+[openEMS] Timestep: 11400
+[openEMS] Timestep: 11500
+[openEMS] Timestep: 11600
+[openEMS] Timestep: 11700
+[openEMS] Timestep: 11800
+[openEMS] Timestep: 11900
+[openEMS] Timestep: 12000
+[openEMS] Timestep: 12100
+[openEMS] Timestep: 12200
+[openEMS] Timestep: 12300
+[openEMS] Timestep: 12400
+[openEMS] Timestep: 12500
+[openEMS] Timestep: 12600
+[openEMS] Timestep: 12700
+[openEMS] Timestep: 12800
+[openEMS] Timestep: 12900
+[openEMS] Timestep: 13000
+[openEMS] Timestep: 13100
+[openEMS] Timestep: 13200
+[openEMS] Timestep: 13300
+[openEMS] Timestep: 13400
+[openEMS] Timestep: 13500
+[openEMS] Timestep: 13600
+[openEMS] Timestep: 13700
+[openEMS] Timestep: 13800
+[openEMS] Timestep: 13900
+[openEMS] Timestep: 14000
+[openEMS] Timestep: 14100
+[openEMS] Timestep: 14200
+[openEMS] Timestep: 14300
+[openEMS] Timestep: 14400
+[openEMS] Timestep: 14500
+[openEMS] Timestep: 14600
+[openEMS] Timestep: 14700
+[openEMS] Timestep: 14800
+[openEMS] Timestep: 14900
+[openEMS] Timestep: 15000
+[openEMS] Timestep: 15100
+[openEMS] Timestep: 15200
+[openEMS] Timestep: 15300
+[openEMS] Timestep: 15400
+[openEMS] Timestep: 15500
+[openEMS] Timestep: 15600
+[openEMS] Timestep: 15700
+[openEMS] Timestep: 15800
+[openEMS] Timestep: 15900
+[openEMS] Timestep: 16000
+[openEMS] Timestep: 16100
+[openEMS] Timestep: 16200
+[openEMS] Timestep: 16300
+[openEMS] Timestep: 16400
+[openEMS] Timestep: 16500
+[openEMS] Timestep: 16600
+[openEMS] Timestep: 16700
+[openEMS] Timestep: 16800
+[openEMS] Timestep: 16900
+[openEMS] Timestep: 17000
+[openEMS] Timestep: 17100
+[openEMS] Timestep: 17200
+[openEMS] Timestep: 17300
+[openEMS] Timestep: 17400
+[openEMS] Timestep: 17500
+[openEMS] Timestep: 17600
+[openEMS] Timestep: 17700
+[openEMS] Timestep: 17800
+[openEMS] Timestep: 17900
+[openEMS] Timestep: 18000
+[openEMS] Timestep: 18100
+[openEMS] Timestep: 18200
+[openEMS] Timestep: 18300
+[openEMS] Timestep: 18400
+[openEMS] Timestep: 18500
+[openEMS] Timestep: 18600
+[openEMS] Timestep: 18700
+[openEMS] Timestep: 18800
+[openEMS] Timestep: 18900
+[openEMS] Timestep: 19000
+[openEMS] Timestep: 19100
+[openEMS] Timestep: 19200
+[openEMS] Timestep: 19300
+[openEMS] Timestep: 19400
+[openEMS] Timestep: 19500
+[openEMS] Timestep: 19600
+[openEMS] Timestep: 19700
+[openEMS] Timestep: 19800
+[openEMS] Timestep: 19900
+[openEMS] Timestep: 20000
+[openEMS] Warning: Max. number of timesteps reached before end-criteria of 50.0 dB.
+[openEMS] FDTD simulation completed: 20000 timesteps.
+================================================
+  openEMS - Finite-Difference Time-Domain Solver
+  Rust port (openems-py)
+================================================
+Exact-endcriteria: evaluating the end criteria every 73 timestep(s) (this excitation's Nyquist rate)
+[openEMS] Timestep: 100
+[openEMS] Timestep: 200
+[openEMS] Timestep: 300
+[openEMS] Timestep: 400
+[openEMS] Timestep: 500
+[openEMS] Timestep: 600
+[openEMS] Timestep: 700
+[openEMS] Timestep: 800
+[openEMS] Timestep: 900
+[openEMS] Timestep: 1000
+[openEMS] Timestep: 1100
+[openEMS] Timestep: 1200
+[openEMS] Timestep: 1300
+[openEMS] Timestep: 1400
+[openEMS] Timestep: 1500
+[openEMS] Timestep: 1600
+[openEMS] Timestep: 1700
+[openEMS] Timestep: 1800
+[openEMS] Timestep: 1900
+[openEMS] Timestep: 2000
+[openEMS] Timestep: 2100
+[openEMS] Timestep: 2200
+[openEMS] Timestep: 2300
+[openEMS] Timestep: 2400
+[openEMS] Timestep: 2500
+[openEMS] Timestep: 2600
+[openEMS] Timestep: 2700
+[openEMS] Timestep: 2800
+[openEMS] Timestep: 2900
+[openEMS] Timestep: 3000
+[openEMS] Timestep: 3100
+[openEMS] Timestep: 3200
+[openEMS] Timestep: 3300
+[openEMS] Timestep: 3400
+[openEMS] Timestep: 3500
+[openEMS] Timestep: 3600
+[openEMS] Timestep: 3700
+[openEMS] Timestep: 3800
+[openEMS] Timestep: 3900
+[openEMS] Timestep: 4000
+[openEMS] Timestep: 4100
+[openEMS] Timestep: 4200
+[openEMS] Timestep: 4300
+[openEMS] Timestep: 4400
+[openEMS] Timestep: 4500
+[openEMS] Timestep: 4600
+[openEMS] Timestep: 4700
+[openEMS] Timestep: 4800
+[openEMS] Timestep: 4900
+[openEMS] Timestep: 5000
+[openEMS] Timestep: 5100
+[openEMS] Timestep: 5200
+[openEMS] Timestep: 5300
+[openEMS] Timestep: 5400
+[openEMS] Timestep: 5500
+[openEMS] Timestep: 5600
+[openEMS] Timestep: 5700
+[openEMS] Timestep: 5800
+[openEMS] Timestep: 5900
+[openEMS] Timestep: 6000
+[openEMS] Timestep: 6100
+[openEMS] Timestep: 6200
+[openEMS] Timestep: 6300
+[openEMS] Timestep: 6400
+[openEMS] Timestep: 6500
+[openEMS] Timestep: 6600
+[openEMS] Timestep: 6700
+[openEMS] Timestep: 6800
+[openEMS] Timestep: 6900
+[openEMS] Timestep: 7000
+[openEMS] Timestep: 7100
+[openEMS] Timestep: 7200
+[openEMS] Timestep: 7300
+[openEMS] Timestep: 7400
+[openEMS] Timestep: 7500
+[openEMS] Timestep: 7600
+[openEMS] Timestep: 7700
+[openEMS] Timestep: 7800
+[openEMS] Timestep: 7900
+[openEMS] Timestep: 8000
+[openEMS] Timestep: 8100
+[openEMS] Timestep: 8200
+[openEMS] Timestep: 8300
+[openEMS] Timestep: 8400
+[openEMS] Timestep: 8500
+[openEMS] Timestep: 8600
+[openEMS] Timestep: 8700
+[openEMS] Timestep: 8800
+[openEMS] Timestep: 8900
+[openEMS] Timestep: 9000
+[openEMS] Timestep: 9100
+[openEMS] Timestep: 9200
+[openEMS] Timestep: 9300
+[openEMS] Timestep: 9400
+[openEMS] Timestep: 9500
+[openEMS] Timestep: 9600
+[openEMS] Timestep: 9700
+[openEMS] Timestep: 9800
+[openEMS] Timestep: 9900
+[openEMS] Timestep: 10000
+[openEMS] Timestep: 10100
+[openEMS] Timestep: 10200
+[openEMS] Timestep: 10300
+[openEMS] Timestep: 10400
+[openEMS] Timestep: 10500
+[openEMS] Timestep: 10600
+[openEMS] Timestep: 10700
+[openEMS] Timestep: 10800
+[openEMS] Timestep: 10900
+[openEMS] Timestep: 11000
+[openEMS] Timestep: 11100
+[openEMS] Timestep: 11200
+[openEMS] Timestep: 11300
+[openEMS] Timestep: 11400
+[openEMS] Timestep: 11500
+[openEMS] Timestep: 11600
+[openEMS] Timestep: 11700
+[openEMS] Timestep: 11800
+[openEMS] Timestep: 11900
+[openEMS] Timestep: 12000
+[openEMS] Timestep: 12100
+[openEMS] Timestep: 12200
+[openEMS] Timestep: 12300
+[openEMS] Timestep: 12400
+[openEMS] Timestep: 12500
+[openEMS] Timestep: 12600
+[openEMS] Timestep: 12700
+[openEMS] Timestep: 12800
+[openEMS] Timestep: 12900
+[openEMS] Timestep: 13000
+[openEMS] Timestep: 13100
+[openEMS] Timestep: 13200
+[openEMS] Timestep: 13300
+[openEMS] Timestep: 13400
+[openEMS] Timestep: 13500
+[openEMS] Timestep: 13600
+[openEMS] Timestep: 13700
+[openEMS] Timestep: 13800
+[openEMS] Timestep: 13900
+[openEMS] Timestep: 14000
+[openEMS] Timestep: 14100
+[openEMS] Timestep: 14200
+[openEMS] Timestep: 14300
+[openEMS] Timestep: 14400
+[openEMS] Timestep: 14500
+[openEMS] Timestep: 14600
+[openEMS] Timestep: 14700
+[openEMS] Timestep: 14800
+[openEMS] Timestep: 14900
+[openEMS] Timestep: 15000
+[openEMS] Timestep: 15100
+[openEMS] Timestep: 15200
+[openEMS] Timestep: 15300
+[openEMS] Timestep: 15400
+[openEMS] Timestep: 15500
+[openEMS] Timestep: 15600
+[openEMS] Timestep: 15700
+[openEMS] Timestep: 15800
+[openEMS] Timestep: 15900
+[openEMS] Timestep: 16000
+[openEMS] Timestep: 16100
+[openEMS] Timestep: 16200
+[openEMS] Timestep: 16300
+[openEMS] Timestep: 16400
+[openEMS] Timestep: 16500
+[openEMS] Timestep: 16600
+[openEMS] Timestep: 16700
+[openEMS] Timestep: 16800
+[openEMS] Timestep: 16900
+[openEMS] Timestep: 17000
+[openEMS] Timestep: 17100
+[openEMS] Timestep: 17200
+[openEMS] Timestep: 17300
+[openEMS] Timestep: 17400
+[openEMS] Timestep: 17500
+[openEMS] Timestep: 17600
+[openEMS] Timestep: 17700
+[openEMS] Timestep: 17800
+[openEMS] Timestep: 17900
+[openEMS] Timestep: 18000
+[openEMS] Timestep: 18100
+[openEMS] Timestep: 18200
+[openEMS] Timestep: 18300
+[openEMS] Timestep: 18400
+[openEMS] Timestep: 18500
+[openEMS] Timestep: 18600
+[openEMS] Timestep: 18700
+[openEMS] Timestep: 18800
+[openEMS] Timestep: 18900
+[openEMS] Timestep: 19000
+[openEMS] Timestep: 19100
+[openEMS] Timestep: 19200
+[openEMS] Timestep: 19300
+[openEMS] Timestep: 19400
+[openEMS] Timestep: 19500
+[openEMS] Timestep: 19600
+[openEMS] Timestep: 19700
+[openEMS] Timestep: 19800
+[openEMS] Timestep: 19900
+[openEMS] Timestep: 20000
+[openEMS] Warning: Max. number of timesteps reached before end-criteria of 50.0 dB.
+[openEMS] FDTD simulation completed: 20000 timesteps.
+================================================
+  openEMS - Finite-Difference Time-Domain Solver
+  Rust port (openems-py)
+================================================
+Exact-endcriteria: evaluating the end criteria every 73 timestep(s) (this excitation's Nyquist rate)
+[openEMS] Timestep: 100
+[openEMS] Timestep: 200
+[openEMS] Timestep: 300
+[openEMS] Timestep: 400
+[openEMS] Timestep: 500
+[openEMS] Timestep: 600
+[openEMS] Timestep: 700
+[openEMS] Timestep: 800
+[openEMS] Timestep: 900
+[openEMS] Timestep: 1000
+[openEMS] Timestep: 1100
+[openEMS] Timestep: 1200
+[openEMS] Timestep: 1300
+[openEMS] Timestep: 1400
+[openEMS] Timestep: 1500
+[openEMS] Timestep: 1600
+[openEMS] Timestep: 1700
+[openEMS] Timestep: 1800
+[openEMS] Timestep: 1900
+[openEMS] Timestep: 2000
+[openEMS] Timestep: 2100
+[openEMS] Timestep: 2200
+[openEMS] Timestep: 2300
+[openEMS] Timestep: 2400
+[openEMS] Timestep: 2500
+[openEMS] Timestep: 2600
+[openEMS] Timestep: 2700
+[openEMS] Timestep: 2800
+[openEMS] Timestep: 2900
+[openEMS] Timestep: 3000
+[openEMS] Timestep: 3100
+[openEMS] Timestep: 3200
+[openEMS] Timestep: 3300
+[openEMS] Timestep: 3400
+[openEMS] Timestep: 3500
+[openEMS] Timestep: 3600
+[openEMS] Timestep: 3700
+[openEMS] Timestep: 3800
+[openEMS] Timestep: 3900
+[openEMS] Timestep: 4000
+[openEMS] Timestep: 4100
+[openEMS] Timestep: 4200
+[openEMS] Timestep: 4300
+[openEMS] Timestep: 4400
+[openEMS] Timestep: 4500
+[openEMS] Timestep: 4600
+[openEMS] Timestep: 4700
+[openEMS] Timestep: 4800
+[openEMS] Timestep: 4900
+[openEMS] Timestep: 5000
+[openEMS] Timestep: 5100
+[openEMS] Timestep: 5200
+[openEMS] Timestep: 5300
+[openEMS] Timestep: 5400
+[openEMS] Timestep: 5500
+[openEMS] Timestep: 5600
+[openEMS] Timestep: 5700
+[openEMS] Timestep: 5800
+[openEMS] Timestep: 5900
+[openEMS] Timestep: 6000
+[openEMS] Timestep: 6100
+[openEMS] Timestep: 6200
+[openEMS] Timestep: 6300
+[openEMS] Timestep: 6400
+[openEMS] Timestep: 6500
+[openEMS] Timestep: 6600
+[openEMS] Timestep: 6700
+[openEMS] Timestep: 6800
+[openEMS] Timestep: 6900
+[openEMS] Timestep: 7000
+[openEMS] Timestep: 7100
+[openEMS] Timestep: 7200
+[openEMS] Timestep: 7300
+[openEMS] Timestep: 7400
+[openEMS] Timestep: 7500
+[openEMS] Timestep: 7600
+[openEMS] Timestep: 7700
+[openEMS] Timestep: 7800
+[openEMS] Timestep: 7900
+[openEMS] Timestep: 8000
+[openEMS] Timestep: 8100
+[openEMS] Timestep: 8200
+[openEMS] Timestep: 8300
+[openEMS] Timestep: 8400
+[openEMS] Timestep: 8500
+[openEMS] Timestep: 8600
+[openEMS] Timestep: 8700
+[openEMS] Timestep: 8800
+[openEMS] Timestep: 8900
+[openEMS] Timestep: 9000
+[openEMS] Timestep: 9100
+[openEMS] Timestep: 9200
+[openEMS] Timestep: 9300
+[openEMS] Timestep: 9400
+[openEMS] Timestep: 9500
+[openEMS] Timestep: 9600
+[openEMS] Timestep: 9700
+[openEMS] Timestep: 9800
+[openEMS] Timestep: 9900
+[openEMS] Timestep: 10000
+[openEMS] Timestep: 10100
+[openEMS] Timestep: 10200
+[openEMS] Timestep: 10300
+[openEMS] Timestep: 10400
+[openEMS] Timestep: 10500
+[openEMS] Timestep: 10600
+[openEMS] Timestep: 10700
+[openEMS] Timestep: 10800
+[openEMS] Timestep: 10900
+[openEMS] Timestep: 11000
+[openEMS] Timestep: 11100
+[openEMS] Timestep: 11200
+[openEMS] Timestep: 11300
+[openEMS] Timestep: 11400
+[openEMS] Timestep: 11500
+[openEMS] Timestep: 11600
+[openEMS] Timestep: 11700
+[openEMS] Timestep: 11800
+[openEMS] Timestep: 11900
+[openEMS] Timestep: 12000
+[openEMS] Timestep: 12100
+[openEMS] Timestep: 12200
+[openEMS] Timestep: 12300
+[openEMS] Timestep: 12400
+[openEMS] Timestep: 12500
+[openEMS] Timestep: 12600
+[openEMS] Timestep: 12700
+[openEMS] Timestep: 12800
+[openEMS] Timestep: 12900
+[openEMS] Timestep: 13000
+[openEMS] Timestep: 13100
+[openEMS] Timestep: 13200
+[openEMS] Timestep: 13300
+[openEMS] Timestep: 13400
+[openEMS] Timestep: 13500
+[openEMS] Timestep: 13600
+[openEMS] Timestep: 13700
+[openEMS] Timestep: 13800
+[openEMS] Timestep: 13900
+[openEMS] Timestep: 14000
+[openEMS] Timestep: 14100
+[openEMS] Timestep: 14200
+[openEMS] Timestep: 14300
+[openEMS] Timestep: 14400
+[openEMS] Timestep: 14500
+[openEMS] Timestep: 14600
+[openEMS] Timestep: 14700
+[openEMS] Timestep: 14800
+[openEMS] Timestep: 14900
+[openEMS] Timestep: 15000
+[openEMS] Timestep: 15100
+[openEMS] Timestep: 15200
+[openEMS] Timestep: 15300
+[openEMS] Timestep: 15400
+[openEMS] Timestep: 15500
+[openEMS] Timestep: 15600
+[openEMS] Timestep: 15700
+[openEMS] Timestep: 15800
+[openEMS] Timestep: 15900
+[openEMS] Timestep: 16000
+[openEMS] Timestep: 16100
+[openEMS] Timestep: 16200
+[openEMS] Timestep: 16300
+[openEMS] Timestep: 16400
+[openEMS] Timestep: 16500
+[openEMS] Timestep: 16600
+[openEMS] Timestep: 16700
+[openEMS] Timestep: 16800
+[openEMS] Timestep: 16900
+[openEMS] Timestep: 17000
+[openEMS] Timestep: 17100
+[openEMS] Timestep: 17200
+[openEMS] Timestep: 17300
+[openEMS] Timestep: 17400
+[openEMS] Timestep: 17500
+[openEMS] Timestep: 17600
+[openEMS] Timestep: 17700
+[openEMS] Timestep: 17800
+[openEMS] Timestep: 17900
+[openEMS] Timestep: 18000
+[openEMS] Timestep: 18100
+[openEMS] Timestep: 18200
+[openEMS] Timestep: 18300
+[openEMS] Timestep: 18400
+[openEMS] Timestep: 18500
+[openEMS] Timestep: 18600
+[openEMS] Timestep: 18700
+[openEMS] Timestep: 18800
+[openEMS] Timestep: 18900
+[openEMS] Timestep: 19000
+[openEMS] Timestep: 19100
+[openEMS] Timestep: 19200
+[openEMS] Timestep: 19300
+[openEMS] Timestep: 19400
+[openEMS] Timestep: 19500
+[openEMS] Timestep: 19600
+[openEMS] Timestep: 19700
+[openEMS] Timestep: 19800
+[openEMS] Timestep: 19900
+[openEMS] Timestep: 20000
+[openEMS] Warning: Max. number of timesteps reached before end-criteria of 50.0 dB.
+[openEMS] FDTD simulation completed: 20000 timesteps.
+================================================
+  openEMS - Finite-Difference Time-Domain Solver
+  Rust port (openems-py)
+================================================
+Exact-endcriteria: evaluating the end criteria every 73 timestep(s) (this excitation's Nyquist rate)
+[openEMS] Timestep: 100
+[openEMS] Timestep: 200
+[openEMS] Timestep: 300
+[openEMS] Timestep: 400
+[openEMS] Timestep: 500
+[openEMS] Timestep: 600
+[openEMS] Timestep: 700
+[openEMS] Timestep: 800
+[openEMS] Timestep: 900
+[openEMS] Timestep: 1000
+[openEMS] Timestep: 1100
+[openEMS] Timestep: 1200
+[openEMS] Timestep: 1300
+[openEMS] Timestep: 1400
+[openEMS] Timestep: 1500
+[openEMS] Timestep: 1600
+[openEMS] Timestep: 1700
+[openEMS] Timestep: 1800
+[openEMS] Timestep: 1900
+[openEMS] Timestep: 2000
+[openEMS] Timestep: 2100
+[openEMS] Timestep: 2200
+[openEMS] Timestep: 2300
+[openEMS] Timestep: 2400
+[openEMS] Timestep: 2500
+[openEMS] Timestep: 2600
+[openEMS] Timestep: 2700
+[openEMS] Timestep: 2800
+[openEMS] Timestep: 2900
+[openEMS] Timestep: 3000
+[openEMS] Timestep: 3100
+[openEMS] Timestep: 3200
+[openEMS] Timestep: 3300
+[openEMS] Timestep: 3400
+[openEMS] Timestep: 3500
+[openEMS] Timestep: 3600
+[openEMS] Timestep: 3700
+[openEMS] Timestep: 3800
+[openEMS] Timestep: 3900
+[openEMS] Timestep: 4000
+[openEMS] Timestep: 4100
+[openEMS] Timestep: 4200
+[openEMS] Timestep: 4300
+[openEMS] Timestep: 4400
+[openEMS] Timestep: 4500
+[openEMS] Timestep: 4600
+[openEMS] Timestep: 4700
+[openEMS] Timestep: 4800
+[openEMS] Timestep: 4900
+[openEMS] Timestep: 5000
+[openEMS] Timestep: 5100
+[openEMS] Timestep: 5200
+[openEMS] Timestep: 5300
+[openEMS] Timestep: 5400
+[openEMS] Timestep: 5500
+[openEMS] Timestep: 5600
+[openEMS] Timestep: 5700
+[openEMS] Timestep: 5800
+[openEMS] Timestep: 5900
+[openEMS] Timestep: 6000
+[openEMS] Timestep: 6100
+[openEMS] Timestep: 6200
+[openEMS] Timestep: 6300
+[openEMS] Timestep: 6400
+[openEMS] Timestep: 6500
+[openEMS] Timestep: 6600
+[openEMS] Timestep: 6700
+[openEMS] Timestep: 6800
+[openEMS] Timestep: 6900
+[openEMS] Timestep: 7000
+[openEMS] Timestep: 7100
+[openEMS] Timestep: 7200
+[openEMS] Timestep: 7300
+[openEMS] Timestep: 7400
+[openEMS] Timestep: 7500
+[openEMS] Timestep: 7600
+[openEMS] Timestep: 7700
+[openEMS] Timestep: 7800
+[openEMS] Timestep: 7900
+[openEMS] Timestep: 8000
+[openEMS] Timestep: 8100
+[openEMS] Timestep: 8200
+[openEMS] Timestep: 8300
+[openEMS] Timestep: 8400
+[openEMS] Timestep: 8500
+[openEMS] Timestep: 8600
+[openEMS] Timestep: 8700
+[openEMS] Timestep: 8800
+[openEMS] Timestep: 8900
+[openEMS] Timestep: 9000
+[openEMS] Timestep: 9100
+[openEMS] Timestep: 9200
+[openEMS] Timestep: 9300
+[openEMS] Timestep: 9400
+[openEMS] Timestep: 9500
+[openEMS] Timestep: 9600
+[openEMS] Timestep: 9700
+[openEMS] Timestep: 9800
+[openEMS] Timestep: 9900
+[openEMS] Timestep: 10000
+[openEMS] Timestep: 10100
+[openEMS] Timestep: 10200
+[openEMS] Timestep: 10300
+[openEMS] Timestep: 10400
+[openEMS] Timestep: 10500
+[openEMS] Timestep: 10600
+[openEMS] Timestep: 10700
+[openEMS] Timestep: 10800
+[openEMS] Timestep: 10900
+[openEMS] Timestep: 11000
+[openEMS] Timestep: 11100
+[openEMS] Timestep: 11200
+[openEMS] Timestep: 11300
+[openEMS] Timestep: 11400
+[openEMS] Timestep: 11500
+[openEMS] Timestep: 11600
+[openEMS] Timestep: 11700
+[openEMS] Timestep: 11800
+[openEMS] Timestep: 11900
+[openEMS] Timestep: 12000
+[openEMS] Timestep: 12100
+[openEMS] Timestep: 12200
+[openEMS] Timestep: 12300
+[openEMS] Timestep: 12400
+[openEMS] Timestep: 12500
+[openEMS] Timestep: 12600
+[openEMS] Timestep: 12700
+[openEMS] Timestep: 12800
+[openEMS] Timestep: 12900
+[openEMS] Timestep: 13000
+[openEMS] Timestep: 13100
+[openEMS] Timestep: 13200
+[openEMS] Timestep: 13300
+[openEMS] Timestep: 13400
+[openEMS] Timestep: 13500
+[openEMS] Timestep: 13600
+[openEMS] Timestep: 13700
+[openEMS] Timestep: 13800
+[openEMS] Timestep: 13900
+[openEMS] Timestep: 14000
+[openEMS] Timestep: 14100
+[openEMS] Timestep: 14200
+[openEMS] Timestep: 14300
+[openEMS] Timestep: 14400
+[openEMS] Timestep: 14500
+[openEMS] Timestep: 14600
+[openEMS] Timestep: 14700
+[openEMS] Timestep: 14800
+[openEMS] Timestep: 14900
+[openEMS] Timestep: 15000
+[openEMS] Timestep: 15100
+[openEMS] Timestep: 15200
+[openEMS] Timestep: 15300
+[openEMS] Timestep: 15400
+[openEMS] Timestep: 15500
+[openEMS] Timestep: 15600
+[openEMS] Timestep: 15700
+[openEMS] Timestep: 15800
+[openEMS] Timestep: 15900
+[openEMS] Timestep: 16000
+[openEMS] Timestep: 16100
+[openEMS] Timestep: 16200
+[openEMS] Timestep: 16300
+[openEMS] Timestep: 16400
+[openEMS] Timestep: 16500
+[openEMS] Timestep: 16600
+[openEMS] Timestep: 16700
+[openEMS] Timestep: 16800
+[openEMS] Timestep: 16900
+[openEMS] Timestep: 17000
+[openEMS] Timestep: 17100
+[openEMS] Timestep: 17200
+[openEMS] Timestep: 17300
+[openEMS] Timestep: 17400
+[openEMS] Timestep: 17500
+[openEMS] Timestep: 17600
+[openEMS] Timestep: 17700
+[openEMS] Timestep: 17800
+[openEMS] Timestep: 17900
+[openEMS] Timestep: 18000
+[openEMS] Timestep: 18100
+[openEMS] Timestep: 18200
+[openEMS] Timestep: 18300
+[openEMS] Timestep: 18400
+[openEMS] Timestep: 18500
+[openEMS] Timestep: 18600
+[openEMS] Timestep: 18700
+[openEMS] Timestep: 18800
+[openEMS] Timestep: 18900
+[openEMS] Timestep: 19000
+[openEMS] Timestep: 19100
+[openEMS] Timestep: 19200
+[openEMS] Timestep: 19300
+[openEMS] Timestep: 19400
+[openEMS] Timestep: 19500
+[openEMS] Timestep: 19600
+[openEMS] Timestep: 19700
+[openEMS] Timestep: 19800
+[openEMS] Timestep: 19900
+[openEMS] Timestep: 20000
+[openEMS] Warning: Max. number of timesteps reached before end-criteria of 50.0 dB.
+[openEMS] FDTD simulation completed: 20000 timesteps.
+Running reference (no sheet)...
+Running Resistive film (sigma = 100000 S/m, t = 10 um)...
+  |T| = -45.5 .. -45.5 dB  (analytic -45.5 .. -45.5 dB)
+  max |dB error| = 0.028 dB,  max |phase error| = 6.62 deg
+PASS [Resistive film]
+Running Thin copper (sigma = 5.8e+07 S/m, t = 1 um)...
+  |T| = -80.7 .. -80.1 dB  (analytic -80.8 .. -80.0 dB)
+  max |dB error| = 0.105 dB,  max |phase error| = 3.92 deg
+PASS [Thin copper]
+Running Thick copper (sigma = 5.8e+07 S/m, t = 18 um)...
+  |T| = -90.9 .. -82.2 dB  (analytic -90.2 .. -80.2 dB)
+  max |dB error| = 1.990 dB,  max |phase error| = 18.36 deg
+PASS [Thick copper]
+Thick copper |T| slope: 8.7 dB/decade (skin effect: 10 dB/decade)
+PASS
+  [PASS] Resistive film: max |dB| difference 0.036 dB
+  [PASS] Resistive film: max phase difference 0.178 deg
+  [PASS] Thin copper: max |dB| difference 0.036 dB
+  [PASS] Thin copper: max phase difference 0.188 deg
+  [PASS] Thick copper: max |dB| difference 0.073 dB
+  [PASS] Thick copper: max phase difference 0.199 deg
+  ==> conducting-sheet: PASS
+
+=== fieldprobes ===
+================================================
+  openEMS - Finite-Difference Time-Domain Solver
+  Rust port (openems-py)
+================================================
+Exact-endcriteria: evaluating the end criteria every 86 timestep(s) (this excitation's Nyquist rate)
+[openEMS] Timestep: 100
+[openEMS] Timestep: 200
+[openEMS] Timestep: 300
+[openEMS] Timestep: 400
+[openEMS] Timestep: 500
+[openEMS] Timestep: 600
+[openEMS] Timestep: 700
+[openEMS] Timestep: 800
+[openEMS] Timestep: 900
+[openEMS] Timestep: 1000
+[openEMS] Timestep: 1100
+[openEMS] Timestep: 1200
+[openEMS] Timestep: 1300
+[openEMS] Timestep: 1400
+[openEMS] Timestep: 1500
+[openEMS] Timestep: 1600
+[openEMS] Timestep: 1700
+[openEMS] Timestep: 1800
+[openEMS] Timestep: 1900
+[openEMS] Timestep: 2000
+[openEMS] Timestep: 2100
+[openEMS] Timestep: 2200
+[openEMS] Timestep: 2300
+[openEMS] Timestep: 2400
+[openEMS] Timestep: 2500
+[openEMS] Timestep: 2600
+[openEMS] Timestep: 2700
+[openEMS] Timestep: 2800
+[openEMS] Timestep: 2900
+[openEMS] Timestep: 3000
+[openEMS] Timestep: 3100
+[openEMS] Timestep: 3200
+[openEMS] Timestep: 3300
+[openEMS] Timestep: 3400
+[openEMS] Timestep: 3500
+[openEMS] Timestep: 3600
+[openEMS] Timestep: 3700
+[openEMS] Timestep: 3800
+[openEMS] Timestep: 3900
+[openEMS] Timestep: 4000
+[openEMS] Timestep: 4100
+[openEMS] Timestep: 4200
+[openEMS] Timestep: 4300
+[openEMS] Timestep: 4400
+[openEMS] Timestep: 4500
+[openEMS] Timestep: 4600
+[openEMS] Timestep: 4700
+[openEMS] Timestep: 4800
+[openEMS] Timestep: 4900
+[openEMS] Timestep: 5000
+[openEMS] Timestep: 5100
+[openEMS] Timestep: 5200
+[openEMS] Timestep: 5300
+[openEMS] Timestep: 5400
+[openEMS] Timestep: 5500
+[openEMS] Timestep: 5600
+[openEMS] Timestep: 5700
+[openEMS] Timestep: 5800
+[openEMS] Timestep: 5900
+[openEMS] Timestep: 6000
+[openEMS] Timestep: 6100
+[openEMS] Timestep: 6200
+[openEMS] Timestep: 6300
+[openEMS] Timestep: 6400
+[openEMS] Timestep: 6500
+[openEMS] Timestep: 6600
+[openEMS] Timestep: 6700
+[openEMS] Timestep: 6800
+[openEMS] Timestep: 6900
+[openEMS] Timestep: 7000
+[openEMS] Timestep: 7100
+[openEMS] Timestep: 7200
+[openEMS] Timestep: 7300
+[openEMS] Timestep: 7400
+[openEMS] Timestep: 7500
+[openEMS] Timestep: 7600
+[openEMS] Timestep: 7700
+[openEMS] Timestep: 7800
+[openEMS] Timestep: 7900
+[openEMS] Timestep: 8000
+[openEMS] Timestep: 8100
+[openEMS] Timestep: 8200
+[openEMS] Timestep: 8300
+[openEMS] Timestep: 8400
+[openEMS] Timestep: 8500
+[openEMS] Timestep: 8600
+[openEMS] Timestep: 8700
+[openEMS] Timestep: 8800
+[openEMS] Timestep: 8900
+[openEMS] Timestep: 9000
+[openEMS] Timestep: 9100
+[openEMS] Timestep: 9200
+[openEMS] Timestep: 9300
+[openEMS] Timestep: 9400
+[openEMS] Timestep: 9500
+[openEMS] Timestep: 9600
+[openEMS] Timestep: 9700
+[openEMS] Timestep: 9800
+[openEMS] Timestep: 9900
+[openEMS] Timestep: 10000
+[openEMS] Warning: Max. number of timesteps reached before end-criteria of 60.0 dB.
+[openEMS] FDTD simulation completed: 10000 timesteps.
+/mnt/d/openEMS-Project-rust/scripts/ci/reference_harness.py:142: ComplexWarning: Casting complex values to real discards the imaginary part
+  left = np.asarray(node[()], dtype=np.float64)
+/mnt/d/openEMS-Project-rust/scripts/ci/reference_harness.py:143: ComplexWarning: Casting complex values to real discards the imaginary part
+  right = np.asarray(reference, dtype=np.float64)
+TD probes match TD dumps
+max rel. diff. D - eps0 E = 2.52e-08,  B - mue0 H = 6.39e-08
+max rel. diff. B - mue0 H (no interpolation) = 4.32e-08
+FD probes match TD probes and FD dump
+Ez is rotationally symmetric
+Ez(r2)/Ez(r1) = 0.2452  (analytic 0.2397),  error 5.07 %
+Hy(r2)/Hy(r1) = 0.4191  (analytic 0.4332),  error 4.18 %
+23 VTK files written
+PASS
+  [PASS] Ef.h5: worst dataset FieldData/FD/f0 1.480e-13
+  [PASS] Et.h5: worst dataset FieldData/TD/00010000 4.522e-07
+  [PASS] Hf.h5: worst dataset Mesh/x 1.850e-16
+  [PASS] Ht.h5: worst dataset FieldData/TD/00005680 1.887e-07
+  [PASS] ef_p1: max rel. difference 2.270e-06
+  [PASS] ef_p1_FD: max rel. difference 1.640e-25
+  [PASS] ef_p2: max rel. difference 2.859e-06
+  [PASS] ef_p2_FD: max rel. difference 1.875e-25
+  [PASS] ef_p3: max rel. difference 2.774e-06
+  [PASS] ef_p3_FD: max rel. difference 8.730e-26
+  [PASS] ef_p4: max rel. difference 3.333e-06
+  [PASS] ef_p4_FD: max rel. difference 1.832e-25
+  [PASS] ef_p5: max rel. difference 4.328e-06
+  [PASS] ef_p5_FD: max rel. difference 1.403e-25
+  [PASS] et: max rel. difference 8.800e-07
+  [PASS] et_p1: max rel. difference 2.270e-06
+  [PASS] et_p2: max rel. difference 2.859e-06
+  [PASS] et_p3: max rel. difference 2.774e-06
+  [PASS] et_p4: max rel. difference 3.333e-06
+  [PASS] et_p5: max rel. difference 4.328e-06
+  [PASS] ht: max rel. difference 8.400e-07
+  [PASS] ht_p1: max rel. difference 1.482e-05
+  [PASS] ht_p2: max rel. difference 8.741e-06
+  [PASS] ht_p3: max rel. difference 1.191e-05
+  [PASS] ht_p4: max rel. difference 1.132e-05
+  [PASS] ht_p5: max rel. difference 1.316e-05
+  ==> fieldprobes: PASS
+
+=== msl-notchfilter ===
+================================================
+  openEMS - Finite-Difference Time-Domain Solver
+  Rust port (openems-py)
+================================================
+[openEMS] Timestep: 100
+[openEMS] Timestep: 200
+[openEMS] Timestep: 300
+[openEMS] Timestep: 400
+[openEMS] Timestep: 500
+[openEMS] Timestep: 600
+[openEMS] Timestep: 700
+[openEMS] Timestep: 800
+[openEMS] Timestep: 900
+[openEMS] Timestep: 1000
+[openEMS] Warning: Max. number of timesteps reached before end-criteria of 60.0 dB.
+[openEMS] FDTD simulation completed: 1000 timesteps.
+/mnt/d/openEMS-Project-rust/openEMS/rust-py/python/openEMS/ports.py:442: RuntimeWarning: invalid value encountered in divide
+  beta = np.sqrt( - dEt * dHt / (Ht * Et) )
+/mnt/d/openEMS-Project-rust/openEMS/rust-py/python/openEMS/ports.py:447: RuntimeWarning: invalid value encountered in divide
+  self.Z_ref = np.sqrt(Et * dEt / (Ht * dHt))
+  [PASS] et: max rel. difference 2.052e-06
+  [PASS] ht: max rel. difference 2.052e-06
+  [PASS] port_it_1A: max rel. difference 1.516e-06
+  [PASS] port_it_1B: max rel. difference 1.891e-06
+  [PASS] port_it_2A: max rel. difference 1.366e-08
+  [PASS] port_it_2B: max rel. difference 1.366e-08
+  [PASS] port_ut_1A: max rel. difference 3.916e-06
+  [PASS] port_ut_1B: max rel. difference 3.118e-06
+  [PASS] port_ut_1C: max rel. difference 6.024e-06
+  [PASS] port_ut_2A: max rel. difference 1.366e-08
+  [PASS] port_ut_2B: max rel. difference 1.366e-08
+  [PASS] port_ut_2C: max rel. difference 1.366e-08
+  ==> msl-notchfilter: PASS
+
+{
+  "coax": {
+    "ok": true,
+    "checks": [
+      {
+        "ok": true,
+        "detail": "Z_ref (real): max rel. difference 7.471e-05"
+      },
+      {
+        "ok": true,
+        "detail": "S21: max |delta| 1.933e-04 dB"
+      },
+      {
+        "ok": true,
+        "detail": "S11 worst return loss: -50.83 dB vs -50.88 dB (delta 0.05 dB)"
+      }
+    ]
+  },
+  "conducting-sheet": {
+    "ok": true,
+    "checks": [
+      {
+        "ok": true,
+        "detail": "Resistive film: max |dB| difference 0.036 dB"
+      },
+      {
+        "ok": true,
+        "detail": "Resistive film: max phase difference 0.178 deg"
+      },
+      {
+        "ok": true,
+        "detail": "Thin copper: max |dB| difference 0.036 dB"
+      },
+      {
+        "ok": true,
+        "detail": "Thin copper: max phase difference 0.188 deg"
+      },
+      {
+        "ok": true,
+        "detail": "Thick copper: max |dB| difference 0.073 dB"
+      },
+      {
+        "ok": true,
+        "detail": "Thick copper: max phase difference 0.199 deg"
+      }
+    ]
+  },
+  "fieldprobes": {
+    "ok": true,
+    "checks": [
+      {
+        "ok": true,
+        "detail": "Ef.h5: worst dataset FieldData/FD/f0 1.480e-13"
+      },
+      {
+        "ok": true,
+        "detail": "Et.h5: worst dataset FieldData/TD/00010000 4.522e-07"
+      },
+      {
+        "ok": true,
+        "detail": "Hf.h5: worst dataset Mesh/x 1.850e-16"
+      },
+      {
+        "ok": true,
+        "detail": "Ht.h5: worst dataset FieldData/TD/00005680 1.887e-07"
+      },
+      {
+        "ok": true,
+        "detail": "ef_p1: max rel. difference 2.270e-06"
+      },
+      {
+        "ok": true,
+        "detail": "ef_p1_FD: max rel. difference 1.640e-25"
+      },
+      {
+        "ok": true,
+        "detail": "ef_p2: max rel. difference 2.859e-06"
+      },
+      {
+        "ok": true,
+        "detail": "ef_p2_FD: max rel. difference 1.875e-25"
+      },
+      {
+        "ok": true,
+        "detail": "ef_p3: max rel. difference 2.774e-06"
+      },
+      {
+        "ok": true,
+        "detail": "ef_p3_FD: max rel. difference 8.730e-26"
+      },
+      {
+        "ok": true,
+        "detail": "ef_p4: max rel. difference 3.333e-06"
+      },
+      {
+        "ok": true,
+        "detail": "ef_p4_FD: max rel. difference 1.832e-25"
+      },
+      {
+        "ok": true,
+        "detail": "ef_p5: max rel. difference 4.328e-06"
+      },
+      {
+        "ok": true,
+        "detail": "ef_p5_FD: max rel. difference 1.403e-25"
+      },
+      {
+        "ok": true,
+        "detail": "et: max rel. difference 8.800e-07"
+      },
+      {
+        "ok": true,
+        "detail": "et_p1: max rel. difference 2.270e-06"
+      },
+      {
+        "ok": true,
+        "detail": "et_p2: max rel. difference 2.859e-06"
+      },
+      {
+        "ok": true,
+        "detail": "et_p3: max rel. difference 2.774e-06"
+      },
+      {
+        "ok": true,
+        "detail": "et_p4: max rel. difference 3.333e-06"
+      },
+      {
+        "ok": true,
+        "detail": "et_p5: max rel. difference 4.328e-06"
+      },
+      {
+        "ok": true,
+        "detail": "ht: max rel. difference 8.400e-07"
+      },
+      {
+        "ok": true,
+        "detail": "ht_p1: max rel. difference 1.482e-05"
+      },
+      {
+        "ok": true,
+        "detail": "ht_p2: max rel. difference 8.741e-06"
+      },
+      {
+        "ok": true,
+        "detail": "ht_p3: max rel. difference 1.191e-05"
+      },
+      {
+        "ok": true,
+        "detail": "ht_p4: max rel. difference 1.132e-05"
+      },
+      {
+        "ok": true,
+        "detail": "ht_p5: max rel. difference 1.316e-05"
+      }
+    ]
+  },
+  "msl-notchfilter": {
+    "ok": true,
+    "checks": [
+      {
+        "ok": true,
+        "detail": "et: max rel. difference 2.052e-06"
+      },
+      {
+        "ok": true,
+        "detail": "ht: max rel. difference 2.052e-06"
+      },
+      {
+        "ok": true,
+        "detail": "port_it_1A: max rel. difference 1.516e-06"
+      },
+      {
+        "ok": true,
+        "detail": "port_it_1B: max rel. difference 1.891e-06"
+      },
+      {
+        "ok": true,
+        "detail": "port_it_2A: max rel. difference 1.366e-08"
+      },
+      {
+        "ok": true,
+        "detail": "port_it_2B: max rel. difference 1.366e-08"
+      },
+      {
+        "ok": true,
+        "detail": "port_ut_1A: max rel. difference 3.916e-06"
+      },
+      {
+        "ok": true,
+        "detail": "port_ut_1B: max rel. difference 3.118e-06"
+      },
+      {
+        "ok": true,
+        "detail": "port_ut_1C: max rel. difference 6.024e-06"
+      },
+      {
+        "ok": true,
+        "detail": "port_ut_2A: max rel. difference 1.366e-08"
+      },
+      {
+        "ok": true,
+        "detail": "port_ut_2B: max rel. difference 1.366e-08"
+      },
+      {
+        "ok": true,
+        "detail": "port_ut_2C: max rel. difference 1.366e-08"
+      }
+    ]
+  }
+}

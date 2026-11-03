@@ -1,0 +1,21 @@
+[package]
+name = "fparser-fuzz"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+fparser-rs = { path = "../../fparser/rust" }
+
+[[bin]]
+name = "parse_expression"
+path = "fuzz_targets/parse_expression.rs"
+test = false
+doc = false
+bench = false
+
+[workspace]

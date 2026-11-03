@@ -9,6 +9,36 @@ audit, baseline, or coverage records.
 
 ---
 
+## 0. Status and evidence policy (RM-006)
+
+Only these status values are used, here and in the task list, the coverage
+matrix and the status document:
+
+| Status | Meaning |
+| --- | --- |
+| `Not Started` | No work begun |
+| `Analyzed` | Source behavior understood and recorded, no implementation |
+| `Implemented` | Code exists and is reachable from a real entry point |
+| `Integrated` | Wired into the product path (CLI, library, GUI, binding) |
+| `Verified` | Executed comparison against a reference/analytic result, with an approved tolerance |
+| `Blocked` | Cannot progress; the blocker is recorded with a reason |
+
+Rules:
+
+1. A task may only move forward with evidence in its `Evidence` column. The
+   evidence names a test or a command and its result.
+2. Compilation is not verification. A numerical component reaches `Verified`
+   only through an executed comparison recorded in `VALIDATION.md`.
+3. A tolerance is only changed with a recorded justification; reference data is
+   never edited to make output match (ADR 0007).
+4. Accepted scope reductions live in `docs/migration/EXCEPTIONS.md`, never only
+   in a conversation or a commit message.
+5. Where this plan, the task list and `MIGRATION_STATUS.md` disagree, the task
+   list is authoritative and the others are corrected in the same change.
+
+---
+
+
 ## 1. Why a remediation plan is needed
 
 A read-only audit of both Rust trees found that the migration is not complete
@@ -85,6 +115,7 @@ documentation integrity.
 | D-05 | MATLAB strategy | Make the Rust CLI binary-compatible with the native `openEMS` executable first, so the unchanged M-file suite drives it; keep a C ABI only for CSXCAD structure access. | RM-091..RM-093 |
 | D-06 | fparser optional numeric backends | Formally accept `f64`-only as documented, or implement `long double`/MPFR/GMP. Default: accept as a recorded exception. | RM-024 |
 | D-07 | Numerical tolerances | Approve per-case tolerances derived from `VALIDATION.md` repeatability before any differential test is declared passing. | RM-119 |
+| D-08 | C++ API/FFI surface | The Rust crates are canonical; no C++ source/binary-compatible wrapper. Compatibility surfaces are the CLI binaries, the Python packages, the MATLAB/Octave CLI plus a narrow reviewed C ABI, and the CSXCAD XML format (`ADR 0008`). | RM-025 |
 
 **Stop condition:** if D-01 is not resolved, do not start WS1-WS9 work; any new
 code would deepen the fork.
@@ -509,3 +540,13 @@ blockers, next task. Do not rewrite history.
 | 2026-10-24 | RM-076, RM-077 | Implemented | Real system-HDF5 writer/reader (`hdf5` feature, `build.rs`) with the native `/Mesh` + `/FieldData/{TD,FD}` layout, `d_order`, `time` and `frequency` attributes; reads the recorded C++ dump `Et_ref.h5` and round-trips its layout. 158 openEMS-core tests pass with `--features hdf5` |
 | 2026-10-24 | RM-053 | Implemented | CSXCAD infers anisotropy from per-direction property vectors (`Epsilon="2,4,6"`) and the EC coefficients follow each edge direction (vi_x:vi_y:vi_z = 1/2:1/4:1/6) |
 | 2026-10-24 | RM-065 (partial) | Not Started | New analytic integration suite: vacuum pulse speed 2.9404e8 m/s (1.9% vs c) and dielectric speed c/2 (1.0%); full case set still open |
+| 2026-10-25 | Wave A (RM-002..022, RM-126..133) | Verified/Implemented | Wave A completed and pushed: archive tag `archive/rust-3crate-tree-2026-10`; all seven submodules on pushed `mberkanbicer-rust-migration-audit` branches; root pointers bumped; one CMake `rust-workspace` build replaces 13 per-crate ExternalProjects and installs the native layout on Windows and WSL; PyO3 0.30 wheels build and import on CPython 3.14; placeholder and migration-record CI gates pass locally and are wired into `.github/workflows/rust.yml`; ADRs 0001-0007, exception register, corrected task statuses and rebuilt validation counts. RM-125 and RM-127 remain `Blocked` on the acceptance suites |
+| 2026-10-25 | RM-060 | Implemented | Steady-state extension wired with the native energy + period metric and probe layout; periodic excitations now repeat every period (bug fix); `run_fdtd` uses the extension metric or the `currE/maxE` fallback, which also removes the no-limit infinite loop. A 1 GHz sinus in a UPML box stops at 240 of 4000 steps with `end_crit=0.5` |
+| 2026-10-27 | Waves B/C/D (CI matrix, hyp2mat, fparser, Python/MATLAB surfaces, C-ABI) | Verified | `VALIDATION.md` sections for RM-107..RM-111, RM-023..RM-025, RM-031..RM-033, RM-094, RM-026/RM-030/RM-120; CI run 40580893146 covers Linux/macOS/Windows/FreeBSD |
+| 2026-10-27 | RM-149, RM-150 | Verified | `Curve` excitation via `Operator::FindPath` (peaks 4.8e-5/9.2e-6/2.9e-5 vs native, bit-identical with a pinned timestep) and the metal-curve PEC pass; `openems-core` 245 + 2 tests; `scripts/ci/run_curve_excitation_check_wsl.sh` |
+| 2026-10-27 | RM-121, RM-122 | Verified | `docs/migration/reference-data/perf/performance-baseline.md`: basic engine 1.81x/2.63x/2.03x native, default 3.78x/2.14x/2.92x; peak RSS 0.32-0.39x small cases, 2.96x on the 2.1M-cell Coax case |
+| 2026-10-27 | Native Octave testsuite | green | 10/10 PASS in 2305.7 s (including `nf2ff_dipole` after linking the CLI); `VALIDATION.md` |
+| 2026-10-28 | RM-148 | Verified | Cylindrical `FindPath`/`SnapLine2Mesh` overrides; five hand-derived edge-list tests; native `-vvv` prints the same seam internals and `Voltage excitations: 4 (3, 1, 0)`; probes agree to 4.7e-7/2.1e-7/2.2e-7 |
+| 2026-10-28 | RM-007, RM-008 | Verified | `check_placeholders.py --self-test` and the CI changed-file gate; `check_migration_docs.py` passes and Section 12 logs every session |
+| 2026-10-28 | RM-125 | Verified | `scripts/ci/run_full_acceptance_wsl.sh` at `e71b743`: 13/13 PASS (759 crate tests, 469 HDF5, 448 Python cases, Octave 10/10, 51 differential cases, SAR and curve gates, CTB, install layout, records); report in `ACCEPTANCE.md` |
+| 2026-10-28 | RM-127 | Verified | `FINAL_AUDIT.md`: 13 Section-21 criteria, 4 met / 5 partly / 3 not met; all 96 `Verified` rows carry a command, result and artefact; migration not complete -- 53 `Implemented` rows and RM-144 remain |

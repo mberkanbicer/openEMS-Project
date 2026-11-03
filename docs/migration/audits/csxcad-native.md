@@ -117,6 +117,25 @@ No defect is classified from this initial pass alone. The above are
 source-supported compatibility questions; tests and broader source tracing
 remain necessary.
 
+## Native error-ordering facts (recorded for Rust parity)
+
+These facts were verified against the native CSXCAD C++ source and are
+required for Rust `parameter_update_errors()` parity:
+
+- **PSErrorCode2Msg:** Codes -1, 0, 1-5, 100-110 have messages; every other
+  code maps to an empty string (no `default:` case in the native switch).
+- **Setter behavior:** Every native setter uses `Eval=true` and discards the
+  returned error code; errors are consumed at set time, not deferred.
+- **bModified:** Stays `true` from construction; no native code calls
+  `SetModified(false)`.
+- **MultiBox coordinate order:** Native evaluates per-axis across all boxes:
+  for each axis (x, y, z), evaluate `start` then `stop` for all boxes —
+  i.e., `box1.start.x, box1.stop.x, box1.start.y, box1.stop.y, box1.start.z,
+  box1.stop.z`, then `box2.start.x, box2.stop.x`, etc. All coordinates are
+  evaluated and all errors collected; no short-circuit.
+- **Cylinder:** Native evaluates all coordinates (axis, radius, optional
+  shell_width) and collects all errors; no short-circuit when axis fails.
+
 ## Remaining audit work
 
 - Trace concrete subclass copy/assignment and ownership behavior in more

@@ -1,26 +1,45 @@
 # Rust Migration Status
 
-> **Superseded 2026-10-30.** The canonical migration records live in the
-> `openEMS-Project-rust` worktree (`mberkanbicer-rust-migration-audit`):
-> `REMEDIATION_TASKS.md` there has 162 `Verified` rows and no open row, and
-> `audits/upstream-sync-2026-10-30.md` / `audits/upstream-branches-2026-10-30.md`
-> record the upstream sync and the branch ports. This file remains the
-> historical status of the archived three-crate tree and its 133-row register.
-
-**Status (2026-10-25):** The canonical tree is
+**Status (2026-11-02): Complete.** The register has **187 `Verified` rows and
+no open row** (`REMEDIATION_TASKS.md`); the GUI design-parity work (`RM-152`)
+and the native icons/metrics (`RM-153`) are closed, the `Precision
+Workbench` redesign adds RM-164..RM-166 (theme tokens, shell, viewport
+navigation), and the 2026-11-02 session closed RM-184..RM-187 (missing-
+excitation parity with native, the TODO/FIXME adjudication, the stale
+fparser-records correction, and the GPU host-sync characteristic recorded as
+E-016). The canonical tree is
 `mberkanbicer-rust-migration-audit` in this worktree. All seven submodule ports
 are committed on their own `mberkanbicer-rust-migration-audit` branches, pushed,
 and pinned by the root repository; the archived three-crate tree is tagged
-`archive/rust-3crate-tree-2026-10`. The numerical core builds and its 375 tests
-pass, including analytic propagation, UPML absorption, CFL, quarter-cell
-material averaging and native-HDF5 dump reading.
+`archive/rust-3crate-tree-2026-10`. The end-to-end tutorials with their
+physics checks are in `tutorials/` (see `TUTORIALS.md`).
 
-Remaining work is tracked per task in `docs/migration/REMEDIATION_TASKS.md`
-(1 `Verified`, 30 `Implemented`, 104 `Not Started` at the last update; see the
-snapshot there for the live count). The largest open areas are the extension
-framework and remaining physics extensions, NF2FF/SAR, the native CLI and
-scripting interfaces, the GUI feature surface, and the differential harness over
-`reference-data/`.
+The full-stack acceptance run was **24/24 PASS at `5bcfdee`** (2026-11-01,
+recorded in `ACCEPTANCE.md`) and covers the release
+workspace build, 857 crate tests, 520 HDF5 tests, 459 native Python cases (2
+GPU skips), the unmodified Octave testsuite 10/10, the f32/long-double/MPFR/long-integer parser backends with native differentials, the GPU device/kernel/engine tests and the host-sync extension path,
+the quarter and cell-centre operator dumps, the 51-case differential
+harness, the cylindrical SAR and curve-excitation gates, the analytic SAR, the
+CST comparison harness self-test and the recorded CST 2026 comparison, CTB, a
+fresh performance measurement gated at
+4.0x wall / 3.25x peak RSS, the install layout, the records check and the
+placeholder self-test. The rerun at the current revision is complete:
+**24/24 PASS at `b5b5d00`** (2026-11-02, after the tutorials, the output-layer
+fixes and RM-184; 859 crate tests, Octave 10/10, performance gate within
+limits) — every run regenerates `ACCEPTANCE.md`. `FINAL_AUDIT.md` carries the re-audit against an earlier
+revision; all thirteen criteria are met for the scope this host can execute. The
+Windows GUI session in `audits/gui-qa.md` covers
+mouse, keyboard, dialogs, the transform tools and a live-window PNG export.
+Recorded exceptions, not open work: E-005 (the hosted
+platform matrix and nightly run are unavailable, replaced by the local job),
+E-006 (no native Qt side-by-side and no macOS/Linux-X11 desktop session;
+the parity rows are verified by workflow and evidence), E-015 (cylindrical
+operator-dump `vi`/`iv` diagnostic difference) and E-016 (GPU host-sync
+performance characteristic; `--gpu` is opt-in).
+The full-stack acceptance run carries the performance gate and the CST
+harness self-test in addition to the listed checks; the owner accepted the
+performance threshold (4.0x wall / 3.25x peak RSS) on 2026-10-31 and the run
+measures it fresh on every invocation.
 
 ### Status and evidence policy
 
@@ -30,6 +49,93 @@ scripting interfaces, the GUI feature surface, and the differential harness over
 authoritative counts and evidence are in `REMEDIATION_TASKS.md`. See Section 0 of
 `REMEDIATION_PLAN.md` and `EXCEPTIONS.md`.
 
+
+## Upstream sync 2026-10-30
+
+The fork was rebased onto `thliebig/openEMS-Project` master
+(`38da98d`, 2026-10-24): CSXCAD `626b99f` (8 commits), openEMS `d686f1d`
+(38), QCSXCAD `6a22e41` (2) and AppCSXCAD `bcbc0ad` (3). The Rust audit
+branches merged the same commits without conflicts outside the changelogs.
+
+Ported to Rust in this pass: the DC-free Gaussian pulse (`DCFree`) end to
+end, the `INT_MAX` timestep clamp, the unknown-engine error, double precision
+polyhedron vertices, the drawing tolerance (every primitive's containment, the
+robust polyhedron inside test and the operator tolerance from the mesh), the
+nested `ContinuousStructure` lookup, the black default edge, the disc-material
+polydata surface, `--debug-memory`, the first-minute end-criteria cadence and
+the denormal flush, the PEC-edge `.vtp` dump and the FDTD-child scoping fix.
+The register grows to 163 `Verified` rows (RM-154..RM-163); the new APIs are
+wired into the GUI renderer and the Python bindings, and the full workspace
+suite is 865 passed / 0 failed. The GUI redesign adds RM-164..RM-166 and the
+audit adds RM-167/RM-168, the parser hardening adds RM-169, the cavity convergence study adds RM-170, the viewport colour fix adds RM-171, the `TimeStepFactor` fix adds RM-172, dock persistence adds RM-173, the dielectric study adds RM-174, and the MATLAB smoke adds RM-175, and the keyboard/palette work adds RM-176, and the time-step study adds RM-177, and the analytic SAR validation adds RM-178, and the corrected MSL notch study
+adds RM-179, the Miri pass adds RM-180, and drag-docking adds RM-181, and the fuzz pass adds RM-182, and the ASan pass adds RM-183, for 183 `Verified`
+rows in total.
+Everything else is classified as already present, not applicable (upstream HIP/Metal GPU backends;
+packaging, CI) or deferred with a reason in
+`audits/upstream-sync-2026-10-30.md`.
+
+A scan of every upstream branch (2026-10-30) found that only
+`CSXCAD/WIP`, `openEMS/WIP` and `openEMS/memory-stats` carry work beyond
+`master`; `audits/upstream-branches-2026-10-30.md` classifies all of it. The
+portable parts are now in Rust: the nested `ContinuousStructure` lookup, the
+black default edge colour and `--debug-memory`; the Python viewer/`Results`
+work is not applicable to the Rust product.
+
+The worktree moved from `D:\openEMS-Project-rust` to
+`C:\Users\mberkanbicer\Projects\openEMS-Project-rust`; the historical
+path in `REMEDIATION_PLAN.md` is the old location of the same tree.
+
+## GUI modernization (Precision Workbench), 2026-10-30
+
+`docs/migration/audits/gui-modernization-audit.md` is the Phase 0 audit: stack,
+architecture, command inventory, ranked findings and the phase plan.
+Phase 1 is implemented and verified in this tree:
+
+- `QCSXCAD/rust-egui/src/theme.rs` defines the dark (default), light and
+  high-contrast palettes from DESIGN.md §3.1 plus the spacing/type tokens. The
+  viewport clear is linearised for the sRGB surface; contrast is asserted by
+  tests.
+- The shell has `File`/`Edit`/`View`/`Info`, a grouped command strip that wraps
+  whole groups at 1280 px, panel toggles (Ctrl+B / Ctrl+I), theme persistence in
+  `settings.json`, and a status bar with coordinates + unit, tool, selection,
+  projection, counts and an unsaved marker.
+- Viewport navigation is confined to the viewport, `Fit All` / `Fit Selection`
+  are wired, and the axis triad follows the theme.
+- The tree -> inspector -> status path is verified with a real click
+  (`audits/gui-selection-1440.png`).
+
+Tests: 52 `qcsxcad-core`, 24 `qcsxcad-egui`, 13 `appcsxcad`. Screenshots:
+`audits/gui-dark-1280.png`, `gui-dark-1440.png`, `gui-dark-1920.png`,
+`gui-light-1440.png`, `gui-high-contrast-1440.png`,
+`gui-selection-1440.png`. `audits/gui-parity.md` carries the parity update and
+the two recorded findings (sRGB vertex colours, Qt collapse/expand icons).
+
+## Completion audit (2026-10-30)
+
+`audit/` implements the audit/completion protocol against the existing port.
+The audit re-read the implementation instead of trusting the register, and
+found two P0 defects the row status had missed:
+
+- `CellConstantMaterial` was parsed, stored and exposed but never applied; the
+  operator always used quarter-cell averaging. Fixed by rejecting the option at
+  setup (E-008, RM-167, `cell_constant_material_is_rejected_at_setup`).
+- `MultiGrid` was parsed/stored/exposed but never reached the operator or
+  engine; RM-061 claimed `Verified` without a command or result. It was first
+  made to fail loudly (E-007) and is now implemented end to end: native-layout
+  pair, interpolation, inner engine, child-safe extensions and probes, with the
+  coaxial probe/phase gate matching the single grid (E-007 closed 2026-11-01).
+
+The audit also found Python façade drift from the carried upstream tests:
+missing `dc_free`, non-native `_SetLibraryArguments` errors, `Write2XML`
+writing an incomplete setup, and `GetPolyDataModel` missing/without NumPy
+shapes and a live transform. Fixed under RM-168; the native Python suites now
+pass (405 tests, 2 GPU tests reported `SKIPPED`).
+
+Records corrected: E-005 (the nightly task was deleted), the stale
+`FINAL_AUDIT.md` headline, and `RM-061`'s evidence. The register is now
+**183 `Verified`, 0 open**. The remaining gaps are validation strength
+(convergence, CST) and the platform matrix, not porting work; see
+`audit/releases/FINAL_READINESS.md` for the conditional release verdict.
 
 ## Baseline
 
@@ -71,24 +177,87 @@ A converged 3D coaxial-line reference now adds analytic port and impedance
 checks on a 715,084-cell mesh; two runs matched all saved numeric port arrays
 bitwise. Its solver timings are characterization only.
 
+## Wave C status (2026-10-26)
+
+The scripting wave is verified for the Python **and** the Octave/MATLAB
+interfaces.
+
+Python: the unmodified native CSXCAD suite (150 tests) and the unmodified native
+openEMS Python suite (298 tests) pass against the Rust core
+(`scripts/ci/run_rust_python_tests_wsl.sh`), including the controller, every port
+class, XML round-trips, NF2FF results, SAR and the HDF5 readers.
+
+Octave/MATLAB: the unmodified native testsuite runs through the Rust binaries
+(`scripts/ci/run_octave_testsuite_wsl.sh`):
+
+```
+PASS unittests/port_setup, unittests/transforms, probes/fieldprobes,
+     combinedtests/Coax, combinedtests/cavity, combinedtests/msl_port,
+     combinedtests/nf2ff_dipole, combinedtests/rect_waveguide,
+     enginetests/engine_compare
+PASS combinedtests/coax_cylindrical    (RM-134, cylindrical operator)
+10 passed, 0 failed, 0 errors in 334 s
+```
+
+`combinedtests/Coax` now reports Z = 50.09..51.12 Ohm against the native
+reference 50.49..51.10 Ohm and the analytic 49.94 Ohm. The MSL smoke tests
+(`.github/smoketests/{octave,python}/MSL_NotchFilter`) complete unchanged.
+
+What made the interface work, in order of impact:
+
+1. `setup_fdtd` now applies the `<Excitation>` and `<BoundaryCond>` children of
+   `<FDTD>`; previously only the Python controller supplied them, so a plain
+   `openEMS file.xml` run excited a default 1 GHz/500 MHz pulse and had no PML
+   (the domain rang as a lossless cavity).
+2. The default timestep method is the native Rennings_2 (3), restoring the
+   native 9.629 ps step on the Coax mesh.
+3. The excitation weight function is evaluated at the Yee vertex in metres
+   (`GetWeightedExcitation`), fixing the TEM port amplitude.
+4. Probe and dump snapping use the native `SnapToMeshLine` floor rule, field
+   probes return physical E/H (`GetRawField`), and processed samples are written
+   with the native `setprecision(12)` general format (the previous fixed-point
+   time column quantised 1.44e-10 s to 1 ps and corrupted the Octave FFT).
+5. CSX `DumpBox` properties drive real time-domain dumps (cropped, physical
+   units, native `DumpMode` 0/1/2 interpolation, dual mesh/time for H/B,
+   `NXYZ` or legacy `NZYX` layout), which is what `probes/fieldprobes` and the
+   NF2FF box faces need.
+6. New Rust binaries `nf2ff` (native `<nf2ff>` XML contract) and `sar_calc`
+   (native option set) are linked under the native names.
+
+The cylindrical operator closed the last deferred case (RM-134): the native
+`(rho, alpha, z)` metric, the closed-azimuth seam and the `1/rho` excitation
+weight are ported, and `combinedtests/coax_cylindrical` passes (beta = k0
+within 0.20 %, radial profile within 0.013 %, symmetry 7.6e-17).
+
+Direct SAR result dumps (`DumpType` 20..22) are verified as well (RM-136):
+the in-solver `SAR_Calculation` writes local and 1 g results, and the test
+script compares them against the raw dump + `sar_calc` path (peak 6.5e-9
+relative, homogeneous interior bit-identical).
+
+Known gaps tracked separately: cylindrical multi-grid
+(`Engine_Ext_CylinderMultiGrid`, radii stored but the hierarchy is not ported),
+the SAR 1 g/10 g averaging-cube search (RM-145), the end-criteria stop time
+(RM-146) and cylindrical port/line snapping plus `--nativeFieldDumps`
+(RM-144, blocked on the wire-excitation and CLI waves).
+
 ## Verified progress
 
 - All seven submodule Rust ports are committed and building cleanly:
 
   | Crate | Path | Type | Status |
   |-------|------|------|--------|
-  | fparser-rs | fparser/rust | lib | 52 tests pass, clippy clean, fmt clean |
-  | csxcad-core | CSXCAD/rust | lib | 145 tests pass (148 with HDF5), clippy clean, fmt clean |
-  | csxcad-python | CSXCAD/rust-py | lib | Builds cleanly, tests pass |
-  | csxcad-matlab | CSXCAD/rust-matlab | cdylib | Compiles cleanly (18 FFI functions) |
-  | openems-core | openEMS/rust | lib | 90 tests pass, clippy clean, fmt clean |
+  | fparser-rs | fparser/rust | lib | 53 f64 tests, 3 f32, 3 long-double, 3 MPFR, 2 long-integer; native differentials pass |
+  | csxcad-core | CSXCAD/rust | lib | 194 tests pass (200 with HDF5), including the native XML corpus, differential model harness and mesh fixtures; clippy and fmt clean |
+  | csxcad-python | CSXCAD/rust-py | lib+package | 2 Rust tests plus 36 Python surface/contract tests; the native Python suite (150 tests) passes against it; installs as the native `CSXCAD` package |
+  | csxcad-matlab | CSXCAD/rust-matlab | cdylib | 18 FFI functions with 7 contract tests; the Octave M-file surface test checks all 58 public + 12 private native M-files |
+  | openems-core | openEMS/rust | lib | 245 + 2 tests pass, clippy clean, fmt clean |
   | openems-processing | openEMS/rust | lib | 10 tests pass, clippy clean, fmt clean |
-  | openems-matlab | openEMS/rust-matlab | cdylib | Compiles cleanly (29 FFI functions) |
+  | openems-matlab | openEMS/rust-matlab | cdylib | 34 C-ABI entry points with 25 contract tests and 54 Octave checks |
   | openems-cli | openEMS/rust-cli | bin | Compiles cleanly |
   | qcsxcad-egui | QCSXCAD/rust-egui | lib | Compiles cleanly |
   | appcsxcad | AppCSXCAD/rust | bin | Compiles cleanly |
-  | hyp2mat-rs | hyp2mat/rust | lib+bin | 14 tests pass, clippy clean, end-to-end tested |
-  | ctb-rs | CTB/rust | lib | Compiles cleanly, MATLAB R2025b probes passed |
+  | hyp2mat-rs | hyp2mat/rust | lib+bin | 114 tests pass (77 lib + 23 CLI + 14 fixture corpus); native differential model dump and `-v` summary byte-identical for all 9 fixtures |
+  | ctb-rs | CTB/rust | lib+bin | 65 lib + 8 differential + 4 CLI + 1 doc tests; the `ctb` CLI plus Octave M-file wrappers are exercised in Octave 11.1.0 |
 
 - Root Cargo workspace builds all 13 crates with proper dependency ordering
   (fparser → CSXCAD → openEMS → QCSXCAD → AppCSXCAD, hyp2mat after CSXCAD,
@@ -560,29 +729,68 @@ bitwise. Its solver timings are characterization only.
   results on both. The full triple audit now passes on Windows/MSVC 19.44 and
   Ubuntu WSL/GCC 15.2. The separate 236,196-case 12-value triple stress audit
   passes on both systems; equivalence for every generated optimizer rule is not
-  claimed. macOS/FreeBSD runtime validation is outstanding. Optional
-  numeric variants and malformed UTF-8 byte behavior are formally out of scope
-  for `fparser-rs`: it accepts valid UTF-8 `str` and covers only the default
-  real `f64` parser; the original C++ implementation remains the compatibility
-  path for optional numeric configurations. Complete API compatibility remains
-  open.
+  claimed. The optional numeric backends of E-001 (float, long-double/binary128,
+  MPFR, long-integer) are closed with native differentials, and the remaining
+  transcendental boundary of the long-integer backend is adjudicated in RM-185;
+  what stays open is the macOS/FreeBSD runtime validation, which is
+  environment-bound (E-005/E-006 family), not missing compatibility.
   Later component-specific compatibility, binding, GUI, and dependency choices
   remain scoped to their respective migration units.
 
 ## Next task
 
-Wave B is closed. The next dependency-ready work is Wave C:
+Waves A, C, D and E (CLI, Python, Octave/MATLAB, dumps, SAR, NF2FF,
+QCSXCAD/AppCSXCAD, hyp2mat, CTB), the CSXCAD depth wave (RM-027/028/029/
+034/035/036), the CSXCAD interface contracts (RM-031/032/033), the fparser
+decisions (RM-023/024/025), the MATLAB C-ABI contracts (RM-094), the CI
+matrix (RM-026/030/120), the curve and metal-curve work (RM-149/RM-150) and
+the performance and memory baseline (RM-121/RM-122) are verified.
 
-1. **RM-083/RM-084** - make the Rust CLI accept the native
-   `openEMS <xml> [options]` contract, options, exit codes and log files.
-2. **RM-085..RM-090** - build the native Python package layout and raise the
-   Controller/CSXCAD classes to the native surface.
-3. **RM-091..RM-096** - run the native MATLAB/Octave suite through the CLI.
-4. **RM-065/RM-081** - finish the deferred analytic cases (Fresnel slab,
-   anisotropic guide, graded-mesh dispersion) and the byte-level native dump
-   comparison; the pinned WSL toolchain is available for reference runs.
+| Task | Work | State |
+| --- | --- | --- |
+| RM-144 | Cylindrical port/line snapping and `--nativeFieldDumps` | Depends on RM-148 and the VTK native-vector mode (RM-078) |
+| RM-124 | Nightly reference run | The schedule and dispatch are in place, but GitHub Actions is disabled for the repository, so no scheduled run is created |
+
+**CI is unavailable (2026-10-28).** `gh workflow run rust.yml` returns
+`HTTP 422: Actions has been disabled for this repository`, and no run has
+been created for any push after `f69ed4d` (the last one, 40602679364/40602679322,
+is green). GitHub does not expose the reason through the API used here; the
+repository setting reports Actions as enabled, so this is an account-side
+restriction, not a workflow change. Until it is lifted, the local acceptance
+run (`scripts/ci/run_full_acceptance_wsl.sh`) is the substitute for the Linux
+job: it performs the same workspace build, crate/HDF5 tests, policy gates and
+install-layout check, plus the Python, Octave and differential suites that CI
+does not run. The macOS, Windows and FreeBSD jobs cannot be reproduced on this
+host and stay unverified for any commit after the last green run.
+
+Follow-ups found during earlier validation passes, since resolved:
+
+- `openEMS/rust/src/openems.rs` substituted a default 1 GHz Gaussian
+  excitation where native aborts; **resolved 2026-11-02 (RM-184)** — the setup
+  now fails with the native messages and exit semantics and twelve fixtures
+  declare their excitation explicitly.
+- The GPU host-sync extension model is slower than the CPU engines whenever
+  extensions dominate the run; **recorded 2026-11-02 as E-016/RM-187** with
+  fresh measurements (crossover near 451k cells), `--gpu` stays opt-in.
+- TODO/FIXME markers were once only sampled; **adjudicated 2026-11-02
+  (RM-185)** — the only 17 markers are the intentional transcendental boundary
+  of the opt-in fparser long-integer backend, unreachable on the default path.
 
 ## Session record
+
+### Canonical tree moved (2026-10-27)
+
+The validation host deleted the `mberkanbicer-potential-garbanzo` worktree under
+`.copilot/repos/copilot-worktrees` while the session was running. The tree was
+re-cloned from GitHub to `D:\openEMS-Project-rust` on branch
+`mberkanbicer-rust-migration-audit` (submodules at the recorded commits, full
+history, not shallow). Every committed change survived; the only lost work was
+an uncommitted `openEMS/rust/src/operator.rs` curve-excitation port, which was
+restarted from the committed source. The WSL helpers no longer hard-code the old
+path (they derive the repository root); the pinned native binaries
+(`~/opt/openEMS`, `~/openems-exact`) and the `~/rustpy-venv` environment live
+outside the tree and were unaffected.
+
 
 - **Completed:** All seven submodule Rust ports committed and building cleanly
   (fparser-rs, csxcad-core, csxcad-python, csxcad-matlab, openems-core,
@@ -603,6 +811,46 @@ Wave B is closed. The next dependency-ready work is Wave C:
 - **Unresolved:** Optional fparser backends and broader optimizer validation,
   cross-platform and interactive GUI testing, further reference diversity,
   final Rust tolerances, and component-specific compatibility decisions.
+
+## Session record 2026-10-26 (differential reference harness)
+
+- **Completed:** RM-117. `scripts/ci/reference_harness.py` runs the unmodified
+  pinned Python sources against the Rust core, keeps the solver output and the
+  exact `input.xml`, and compares the derived quantities with the native
+  captures. `REFERENCE_TOLERANCES.md` records the proposed bounds and the
+  measured values (RM-119, pending approval).
+- **Found and fixed:** the D and B dumps were missing the absolute
+  `EPS0`/`MU0` factor (native `m_epsR`/`m_mueR` store absolute values); the
+  `et`/`ht` excitation waveforms were never written. Both are fixed in the
+  submodule and covered by the source test / the MSL reference.
+- **Found and tracked (not hidden):** conducting-sheet transmission is
+  3.07 dB (RM-139), the FD dump disagrees with the FD probe by ~1.0 relative
+  (RM-140), and the Python `AddMSLPort` excited-port current probes are all
+  zero (RM-141). RM-135 returns to `Implemented` until RM-140 is fixed.
+- **Validation:** Rust 229 openEMS (hdf5) + 2 CLI, Python 298 + 150, and the
+  unmodified Octave suite 10/10 (459 s) pass after the changes.
+- **Harness results:** coax PASS (`Z_ref` 7.5e-5, `S21` 1.9e-4 dB, `S11`
+  0.05 dB); msl-notchfilter 8/10 checks pass (1.4e-8..6.0e-6); conducting
+  sheet and fieldprobes FAIL on the tracked defects.
+- **Next:** RM-140 (FD dump/probe), RM-139 (conducting sheet), RM-141
+  (excited-port current), then RM-118/RM-119 and the rest of the list.
+
+## Session record 2026-10-26 (Wave C closure, cylindrical operator)
+
+- **Completed:** RM-134. The cylindrical `(rho, alpha, z)` operator reproduces
+  the native `GetEdgeLength`/`GetNodeArea`/`GetEdgeArea`/`GetCellVolume`
+  overrides, `load_csx` accepts `CoordSystem=1`, pins and pads a full `2*pi`
+  azimuth, rejects negative rho, and `EngineExtCylinder` closes the seam after
+  every voltage/current update. The `1/rho` excitation weight is evaluated in
+  cylindrical coordinates and the UPML grading uses the cylindrical metric.
+- **Validation:** `combinedtests/coax_cylindrical` PASS (beta 0.20 %, profile
+  0.013 %, symmetry 7.6e-17). The unmodified native suite is now **10 passed,
+  0 failed, 0 errors in 333.8 s**. Rust: 228 openEMS tests (hdf5 feature) plus
+  the cylindrical metric/snap unit tests.
+- **Records:** RM-134 Verified; RM-137 (`rho = 0` axis) and RM-138
+  (cylindrical dumps) added as open tasks; ADR 0002 updated.
+- **Next:** RM-137/RM-138 (cylindrical completeness), then the verification
+  infrastructure (RM-117..RM-119) and the GUI/CTB waves.
 
 ## Session record 2026-10-25 (Wave B)
 
@@ -638,3 +886,384 @@ Wave B is closed. The next dependency-ready work is Wave C:
   The native Python package is ~6k lines of Cython plus ~2.3k lines of
   pure-Python modules; porting the class surface to PyO3 is the next block of
   work and was not started in this session.
+
+## Session record 2026-11-02 (tutorials, dump-writer performance, --disable-dumps)
+
+- **Completed:** three self-contained tutorial projects in `tutorials/` (root
+  repository, outside the submodules): free-space pulse vs `100 mm / c`,
+  dielectric half-space vs Fresnel, PEC cavity vs analytic TE modes. Each opens
+  in the Rust `appcsxcad`, runs with `openems-cli` and is plotted by
+  `tutorials/plot_tutorials.py`; `tutorials/run_tutorial.ps1` wraps the whole
+  workflow. All evidence is in `docs/migration/TUTORIALS.md`.
+- **Solver fixes:** (1) `ProcessIntegral` keeps the TD probe stream open,
+  (2) `HDF5FileWriter`/`ProcessFieldsTD` keep the dump file open, both matching
+  the native lifetime and removing a per-timestep open/close that dominated the
+  runtime (tutorial 1: 61 s -> 0.34 s; `Et.h5` 9.68 MB -> 0.79 MB, same
+  content). (3) `--disable-dumps` now disables the field dumps as native does
+  (`ProcField->SetEnable(Enable_Dumps)`) and writes `et`/`ht` unconditionally;
+  previously every `DumpBox` still ran and `et`/`ht` were wrongly suppressed.
+- **Validation:** tutorial checks re-measured with the final binaries (delay
+  +0.46 %; Gamma -0.3239 vs -1/3, T +0.6707 vs 2/3; TE101 5.209 GHz -0.14 %,
+  TE301 6.715 GHz -0.10 %, mode profile RMS deviation 0.0004). Neutrality of
+  the writer changes: probe/`et`/`ht` files byte-identical (SHA-256) with dumps
+  on vs `--disable-dumps`. FD dump verified separately (`FieldData/FD/f0` at
+  5 GHz). `cargo test --release -p openems-core --features "hdf5 gpu"`:
+  308 + 2 analytic tests pass. GUI: all three projects load in `appcsxcad`
+  (window title carries the project path, process alive).
+- **Records:** `docs/migration/TUTORIALS.md` added; this file updated. No
+  coverage-matrix row changed status (the fixes fall under the existing
+  `openems-core` processing rows).
+- **Commits:** solver fixes in the `openEMS` submodule, tutorials + docs in the
+  root repository, both on `mberkanbicer-rust-migration-audit`, pushed to the
+  fork.
+- **Next:** none from this thread; remaining migration work is tracked in
+  `REMEDIATION_TASKS.md` / `REMAINING_WORK.md`.
+
+## Session record 2026-11-02 (un-tasked deviations taskified and resolved)
+
+The four deviations that had been recorded as "follow-ups, not yet tasks" are
+now register rows, all closed:
+
+- **RM-184 (missing-excitation parity, code fix).** `setup_fdtd` silently
+  substituted a 1 GHz/0.5 GHz Gaussian pulse where native fails; it now
+  reproduces the native behaviour: `<FDTD>` without an `<Excitation>` child
+  fails the parse with the native message and CLI exit 1, no excitation at
+  all aborts like native `SetupFDTD` (exit 3 message), an unknown type still
+  fails at signal build. Twelve fixtures across openems-core, rust-cli and
+  rust-matlab now declare their excitation; three new tests cover the
+  behaviour; the tutorial results are byte-identical.
+- **RM-185 (TODO/FIXME adjudication, no code change).** Exactly 17
+  `unimplemented!()` markers exist, all the transcendental boundary of the
+  opt-in fparser long-integer backend, matching the native `GmpInt` template
+  that cannot instantiate those opcodes. Nothing else is marked.
+- **RM-186 (stale records corrected).** The fparser "Complete API
+  compatibility remains open" sentence predated the E-001 closure and is
+  replaced above.
+- **RM-187 / E-016 (GPU host-sync characteristic, owner-accepted).** Fresh
+  measurements: bare 10k-cell cavity 2.67 s GPU vs 1.62 s CPU, tutorial 1
+  (PML) 1.41 s vs 0.49 s, tutorial 3 13.19 s vs 3.32 s, 451k-cell bare cavity
+  10.31 s vs 11.44 s (crossover). `--gpu` stays opt-in; recorded as E-016.
+- **Validation:** `cargo test --release --workspace --features
+  "openems-core/hdf5,openems-core/gpu,openems-cli/gpu"` passes every suite
+  (openems-core 310 + 2 analytic, openems-cli 7 incl. the new exit-code
+  contract, rust-matlab 25, rust-py 22, csxcad 172, fparser 18, GUI and tool
+  crates); tutorial 1 `probe_near` SHA-256 unchanged
+  (`620f048d3a7e4dc0c43dff969f4365e12e728e0eae723cc12208bc3ef8b750bd`).
+- **Next:** none from this thread; the full WSL acceptance rerun and the fresh
+  Windows package for the combined revision were completed on 2026-11-02
+  (session record below). Remaining migration work is tracked in
+  `REMEDIATION_TASKS.md` / `REMAINING_WORK.md`.
+
+## Session record 2026-11-02 (acceptance rerun and Windows package)
+
+- **Acceptance:** the full-stack WSL run was repeated after the last code
+  change and is **24/24 PASS at `b5b5d00`** (`ACCEPTANCE.md`): 859 crate tests,
+  the GPU host-sync check, HDF5 and Python suites, the unmodified Octave
+  testsuite 10/10, the 51-case differential harness, the CST and CTB checks and
+  the fresh performance gate inside the accepted 4.0x wall / 3.25x RSS limits.
+- **Package:** `dist/openEMS-rust_v0.37.0-130-g5b64b4a_win64.zip` (revision
+  `a7711c9`, openEMS `v0.37.0-130-g5b64b4a`), 14 715 410 bytes, SHA-256
+  `c35beb63ca8a899c44f10ca1c6ba2ff5f4811b143e5bcca592a185eb07a7e0e5`. Built and
+  smoke-tested with `pwsh scripts/ci/build_windows_package.ps1` (CLI help,
+  20-step solve, DLL closure without conda on `PATH`, wheel import) and then
+  verified independently from the extracted zip: hash match, CLI help with
+  `--gpu`, CPU and `--gpu` 20-step runs, a `DumpBox` HDF5 file
+  (`(3,3,3,3)` float32 + mesh), `appcsxcad.exe` alive, and both wheels
+  installed with `--no-deps` in a fresh venv producing a 682-byte CSXCAD XML.
+  Details in `WINDOWS_PACKAGE.md`.
+- **Note:** the first package attempt used Windows PowerShell 5.1 with an outer
+  `2>&1`; PS 5.1 converts the solver's stderr warning into a terminating
+  `NativeCommandError` and aborts the smoke step. The documented `pwsh`
+  invocation passes. The pitfall is recorded in `WINDOWS_PACKAGE.md`.
+
+## Session record 2026-11-02 (GPU analysis and batching)
+
+- **Analysis:** the complete GPU read is in `docs/migration/GPU_ANALYSIS.md`:
+  both engine paths, the per-step cost model, the measured tables, the
+  correctness evidence and the remaining bottleneck.
+- **Root cause:** the run loop stepped one timestep at a time, so every
+  extension-free GPU step paid a full device-to-host download, and every
+  host-extension step paid 8 array transfers (4 up, 4 down) plus four queue
+  waits. The kernel time was never the problem: the cost per step scaled with
+  the cell count while the kernels need ~0.01-0.2 ms.
+- **Changes (RM-188):** batched command submission (`dispatch_steps`),
+  run-loop batching bounded by the next probe/dump/end-criteria event
+  (`ProcessingArray::steps_until_due`), one pair download per batch with
+  persistent staging buffers (`download_pair` + `gpu_pending`), and per-field
+  dirty tracking so the host-extension path transfers only what changed.
+- **Results:** kernel differential 16.9x (13.3 ms vs 224 ms at 48^3);
+  extension-free CLI 7.2x at 451k cells (1.63 s vs 11.7 s) and 1.55x at 11k
+  cells; host-extension path 6.4x faster than before (2470 ms -> 384 ms at
+  48^3) though still slower than the CPU at tutorial scale, which is E-016 and
+  is closed only by device-side excitation/UPML kernels (roadmap in the
+  analysis).
+- **Correctness:** GPU vs CPU engine field diff `0.00e0`; tutorial probes agree
+  to 2.5e-7-4.8e-7 V/m over 700-12 000 steps; the CPU path is unchanged
+  (tutorial 1 `probe_near` SHA-256 matches the recorded hash, byte for byte).
+- **Next:** device-side excitation kernel first (it turns every source-driven
+  model into the batched path), then UPML; each port is testable against the
+  existing CPU extension with the same differential harness.
+
+
+## Session record 2026-11-02 (GPU device-side excitation)
+
+- **What:** the excitation source is now applied on the device. `GpuFields`
+  uploads the per-edge terms and waveform samples once, binds the per-step
+  timestamp with a dynamic uniform offset inside the batch, and an
+  `apply_source` kernel reproduces the host sample-index rule exactly. The
+  extension trait gained `excitation_terms`/`mark_gpu_handled`/`is_gpu_native`,
+  so a model whose every extension is device-native runs the batched path and a
+  mixed model keeps the host path.
+- **Correctness:** the new engine test reports `CPU diff 0.00e0` and batch vs
+  single-step `0.00e0`; tutorial 3 probes agree with the CPU run to
+  5.15e-7 / 5.11e-7 V/m over 12 000 steps; the CPU path is unchanged.
+- **Performance:** a 121x61x61 source cavity (2000 steps) went from 20.1-20.5 s
+  on the CPU to **2.15-2.19 s** on the GPU (**9.2x**); tutorial 3 improved
+  16.97 s -> 9.93 s and is now output-bound (its `OverSampling=16` makes the
+  probes sample every step, so every step needs a host download on any engine).
+- **Records:** `GPU_ANALYSIS.md` has the device-source section and the remaining
+  UPML port plan; E-016 carries the new numbers; RM-190 records the evidence.
+- **Next:** UPML device kernels (four phases, 12 coefficient + 6 flux arrays),
+  which removes the round trip for PML models.
+
+
+## Session record 2026-11-02 (GPU device-side UPML)
+
+- **What:** UPML now runs on the device. The six coefficient arrays and two
+  flux arrays of each PML slab are concatenated over components and uploaded
+  once; four kernels reproduce the host phases and are interleaved in the batch
+  (`pre_volt`, E, `post_volt`, source, `pre_curr`, H, `post_curr`, source).
+  `Engine::setup_gpu_extensions` accepts any model whose extensions are all
+  excitation/UPML, and the context now requests 16 storage buffers per stage
+  (the WebGPU default of 8 cannot hold the two fields, six coefficients and two
+  flux arrays).
+- **Correctness:** the new `gpu_device_upml_matches_the_cpu_engine` test
+  reports `CPU diff 0.00e0` and batch vs single-step `0.00e0`; tutorial 1
+  probes agree with the CPU run to 2.33e-7 / 4.25e-7 V/m; the CPU path and all
+  tutorial physics checks are unchanged.
+- **Performance:** a 201x51x51 model with PML and a source (700 steps) runs in
+  2.55-2.60 s on the GPU against 12.2-14.0 s on the CPU (**4.8-5.5x**). Small
+  PML models remain CPU-faster (tutorial 1 bare: 1.02 s vs 0.31 s) because 11
+  dispatches per step hit a ~0.1 ms per-dispatch floor; folding the PML terms
+  into the E/H kernels is the recorded next optimisation.
+- **Records:** `GPU_ANALYSIS.md` Â§6 has the design and measurements, Â§7 the
+  remaining extensions (Mur/TFSF/lumped/Debye/Lorentz/sheets), E-016 carries
+  the new numbers, RM-191 records the evidence.
+
+
+## Session record 2026-11-02 (GPU device-side Mur)
+
+- **What:** Mur ABC runs on the device. Each face's coefficients and history
+  arrays are uploaded once; `mur_pre`, `mur_post` and `mur_apply` run one pass
+  per face in registration order, because faces overlap on corner edges and
+  the host applies them sequentially. The kernels are interleaved with the
+  existing device UPML/source order and `Engine::setup_gpu_extensions` accepts
+  Mur as a device-native extension.
+- **Correctness:** `gpu_device_mur_matches_the_cpu_engine` (two overlapping
+  faces) reports `CPU diff 6.46e-26` and batch vs single-step `0.00e0`; a
+  201x51x51 Mur model with a source agrees with the CPU run to 3.78e-7 /
+  2.91e-7 V/m.
+- **Performance:** that model (700 steps) runs in 2.30-2.77 s on the GPU
+  against 10.2-11.4 s on the CPU (**3.9-4.4x**).
+- **Records:** `GPU_ANALYSIS.md` Â§7 documents the port and the remaining
+  extensions (TFSF, lumped, Debye/Lorentz, conducting sheets); E-016 carries
+  the new numbers; RM-192 records the evidence.
+
+
+## Session record 2026-11-02 (GPU device-side lumped RLC)
+
+- **What:** lumped RLC runs on the device. The nine coefficients per edge are
+  packed into one buffer, the voltage/current history and parallel inductor
+  current stay on the device, and two kernels (`lumped_pre`, `lumped_apply`)
+  run in the `pre_voltage`/`apply2_voltage` slots of the batch.
+  `Engine::setup_gpu_extensions` accepts lumped edges alongside excitation,
+  UPML and Mur.
+- **Correctness:** `gpu_device_lumped_rlc_matches_the_cpu_engine` (three edges,
+  12^3, 120 steps) reports `CPU diff 0.00e0` and batch vs single-step `0.00e0`;
+  the workspace suite passes.
+- **Records:** `GPU_ANALYSIS.md` Â§7 documents the port; the remaining host-path
+  extensions are TFSF, Debye/Lorentz and conducting sheets; E-016 and RM-193
+  carry the evidence.
+
+
+## Session record 2026-11-02 (GPU device-side conducting sheet)
+
+- **What:** conducting sheets run on the device. The coefficients and ADE
+  state are packed as global (order, component, position) matrices with one
+  base index per cell; `sheet_pre` advances the two ADE orders and
+  `sheet_apply` subtracts the summed corrections in the voltage phase slots.
+  `Engine::setup_gpu_extensions` accepts sheet cells alongside excitation,
+  UPML, Mur and lumped RLC.
+- **Correctness:** `gpu_device_conducting_sheet_matches_the_cpu_engine` (two
+  cells, 12^3, 120 steps) reports `CPU diff 3.94e-31` and batch vs single-step
+  `0.00e0`; the workspace suite passes.
+- **Records:** `GPU_ANALYSIS.md` Â§7 documents the port; the remaining
+  host-path extensions are TFSF, Debye and Lorentz; E-016 and RM-194 carry the
+  evidence.
+
+
+## Session record 2026-11-02 (GPU device-side TFSF)
+
+- **What:** TFSF runs on the device. The flattened delay/amplitude tables and
+  the waveform samples are uploaded once per direction and side; the per-step
+  timestamp arrives in a dynamic uniform and `tfsf_apply` reproduces the host
+  sample lookup exactly. Because corners are shared between directions, the
+  kernels run one pass per direction in the host's n-outer order; a single
+  dispatch raced and produced a 6.7e-4 field error in the first differential.
+- **Correctness:** `gpu_device_tfsf_matches_the_cpu_engine` (16^3, 120 steps,
+  six faces) reports `CPU diff 1.16e-10` and batch vs single-step `0.00e0`; a
+  101x61x61 TFSF+6 PML model agrees with the CPU run to 2.11e-9 V/m.
+- **Performance:** that model (400 steps) runs in 2.46-3.16 s on the GPU
+  against 10.8-10.9 s on the CPU (**3.4-4.4x**), and the debug summary confirms
+  the batched path with TFSF and six PML slabs.
+- **Records:** `GPU_ANALYSIS.md` Â§7 documents the port and the corner-order
+  constraint; the remaining host-path extensions are Debye and Lorentz; E-016
+  and RM-195 carry the evidence.
+
+
+## Session record 2026-11-02 (GPU device-side Debye and Lorentz)
+
+- **What:** Debye and Lorentz dispersive materials now run on the device, which
+  completes the extension coverage: excitation, UPML, Mur, lumped RLC,
+  conducting sheet, TFSF, Debye and Lorentz all have device kernels.
+  Debye packs the pole coefficients/state and runs three voltage phases;
+  Lorentz uploads the four coefficient/state matrices and the per-order active
+  flags and runs four phases, preserving the host's sequential per-order
+  subtraction.
+- **Correctness:** `gpu_device_debye_matches_the_cpu_engine` reports `CPU diff
+  1.14e-13` and `gpu_device_lorentz_matches_the_cpu_engine` `5.46e-12`; both
+  are `0.00e0` for batch vs single-step, and all ten GPU differentials pass.
+  The workspace suite and the tutorial physics checks are unchanged.
+- **Records:** `GPU_ANALYSIS.md` Â§7 documents both ports and the completed
+  coverage; E-016 now states that every extension is device-native and that the
+  host path is only a fallback; RM-196/RM-197 carry the evidence.
+
+
+## Session record 2026-11-02 (GPU optimisation plan, first pass)
+
+- **Plan:** `docs/migration/GPU_OPTIMISATION_PLAN.md` lists the remaining
+  improvements (P-1..P-12) with acceptance criteria, status and evidence, plus
+  an emergent-work section (P-E1..P-E3).
+- **Done and verified:** P-1 UPML slab merge (6 slabs now cost 6 passes instead
+  of 32, two-slab differential 0.00e0), P-2 Mur face colouring (6 faces cost 9
+  passes instead of 18, differential 1.95e-26), P-7 chunk tuning (64/128/256
+  within noise, default 256), P-8 storage-buffer fallback (per-extension
+  requirement table + host fallback), P-9 `--gpu-auto` (CPU at 12 221 cells,
+  GPU at 451k), P-10 dispatch-budget regression test.
+- **Closed without code:** P-3, because the operator builds exactly one Debye
+  and one Lorentz region (`operator.rs:3358/3569`), so there is nothing to
+  merge and the per-step cost is already 3/4 passes.
+- **Blocked:** P-5 device energy, because an f32 GPU reduction would perturb the
+  `endCriteria` stop step; it needs a compensated reduction and stop-step
+  validation.
+- **Remaining:** P-E2 (fold PML into E/H, the next big win for small/medium PML
+  models), P-4 (device-side probe sampling), P-6 (transfer/compute overlap),
+  P-11 (cylindrical multi-grid).
+- **Evidence:** `cargo test --release --workspace` with hdf5+gpu exits 0; all 11
+  GPU differentials pass; tutorial physics unchanged (delay +0.46 %, Fresnel
+  -0.3239/+0.6707, TE101 -0.14 %, mode-profile RMS 0.0004) and tutorial 1
+  `probe_near` SHA-256 is still 620f048d3a7e4dc0c43dff969f4365e12e728e0eae723cc12208bc3ef8b750bd.
+
+
+## Session record 2026-11-02 (GPU optimisation plan completed)
+
+- **Plan:** `docs/migration/GPU_OPTIMISATION_PLAN.md` now shows every item
+  Verified (P-1..P-12) plus five emergent items (P-E1..P-E5).
+- **Completed this session:** P-E2 fused PML post phases into E/H (a PML model
+  costs 4 passes/step, differential 0.00e0), P-5 device energy reduction
+  (relative diff 7.2e-9, no field download), P-4 device probe sampling for
+  point and box probes (6 points, batch 12 vs 1, probes match the CPU to
+  2.3e-7 / 4.3e-7), P-11 cylindrical multi-grid on the GPU (CPU/GPU diff
+  4.47e-8), and P-6 closed because the per-step downloads no longer exist.
+- **Critical finding (P-E4):** the engine differential tests compared zero
+  fields because `cavity_operator` never built the EC coefficients. Building
+  them exposed a real Mur colour-range bug (colours 1 and 2 wrote nothing,
+  0.274 field error) and an unstable Debye test; both are fixed, and every
+  differential now runs on non-zero fields.
+- **Verification:** 12/12 engine GPU differentials pass, the multi-grid GPU test
+  passes, `cargo test --release --workspace` with hdf5+gpu exits 0, the three
+  tutorials run and their physics checks are unchanged (delay +0.46 %, Fresnel
+  -0.3239/+0.6707, TE101 -0.14 %, mode-profile RMS 0.0004) with tutorial 1
+  `probe_near` SHA-256 still
+  620f048d3a7e4dc0c43dff969f4365e12e728e0eae723cc12208bc3ef8b750bd.
+- **Remaining (recorded, not a plan item):** models below ~50k cells are still
+  CPU-faster because ~0.2 ms per dispatch dominates; a single fused step kernel
+  would need a device-wide barrier, which WGSL does not provide.
+
+
+## Session record 2026-11-02 (fused PML pre phases)
+
+- **What:** the PML pre phases are now fused into the E/H kernels (P-E6).
+  Because the E update reads only `curr` and the H update only `volt`, the pre
+  phase touches the same cell as the update that follows it and needs no
+  global barrier. `update_e_pml`/`update_h_pml` run `pml_pre_phase` before and
+  `pml_post_phase` after the update, with the pre coefficients bound at 16/17.
+- **Result:** a PML model costs **2 passes/step** (E and H), independent of the
+  slab count; the 525k-cell PML+source model drops to 1.82-1.95 s (was 2.05 s
+  with post-only fusion).
+- **Verification:** the two-slab UPML differential is still 0.00e0, the
+  dispatch-budget test asserts 2, all 12 engine GPU differentials pass,
+  `cargo test --release --workspace` with hdf5+gpu exits 0, and the tutorial
+  physics checks and tutorial 1 probe hash are unchanged.
+- **Remaining (recorded):** the source excitation still needs two passes
+  because its writes race with the E/H threads; small models stay CPU-faster
+  at ~0.2 ms per dispatch.
+
+
+## Session record 2026-11-03 (fused excitation, adaptive auto threshold)
+
+- **What:** the excitation is now applied by the fused E/H kernels through a
+  per-cell CSR (P-E7). Each thread applies its own cell's terms after the
+  update, in term order, so a PML+source model costs **2 passes/step** and is
+  bit-identical to the CPU (`0.00e0`). `--gpu-auto` scales its crossover with
+  the estimated pass count (50k/75k/150k cells), and
+  `scripts/bench/gpu_bench.ps1` is the committed benchmark harness.
+- **Results:** the probe-only tutorial drops from 0.97 s to 0.74 s (CPU
+  0.27 s); the 525k PML+source model stays at 1.82-1.95 s.
+- **Verification:** 13/13 engine GPU differentials pass (the new fused
+  PML+source test is `0.00e0` and asserts 2 passes), the dispatch-budget test
+  passes, `cargo test --release --workspace` with hdf5+gpu exits 0, and the
+  tutorial physics checks and tutorial 1 probe hash are unchanged.
+- **Remaining (recorded in the plan as R-1..R-4):** the Debye chain is not
+  bit-identical (`5.8e-7` relative, FMA contraction), multi-grid keeps its
+  interface tables on the host, CI has no GPU runner, and small models stay
+  CPU-faster at the ~0.2 ms per-dispatch floor.
+
+## Session record 2026-11-03 (Windows-native re-verification; scope decisions)
+
+- **What:** the full workspace was rebuilt and re-tested Windows-native at
+  HEAD `92d3435` (after RM-205/RM-206) on the RTX 5070 Laptop host, using the
+  documented conda HDF5 setup (`HDF5_LIB_DIR` -> the `openems` conda env).
+  Two scope decisions were recorded: **MPI stays out of scope** — the native
+  C++ openEMS has no MPI (source grep: no `mpi.h`, no `MPI_*`), so distributed
+  execution is not migration parity and is not planned; and the **GPU scope is
+  confirmed complete as recorded** in `GPU_OPTIMISATION_PLAN.md` (R-1 accepted,
+  R-2/R-3 open, R-7 verified), with no new GPU parity gap identified.
+- **Results:** `cargo build --release` is green; `cargo test --release
+  --workspace --features "openems-core/hdf5,openems-core/gpu,openems-cli/gpu"`
+  reports **933 passed / 0 failed** across 39 suites, including the 18-test GPU
+  engine differential set (UPML, Mur, TFSF, Debye, Lorentz, lumped RLC,
+  conducting sheet, source, multi-grid, energy, dispatch budget, host
+  extension fallback) running on the actual wgpu adapter.
+- **CLI evidence:** `openems-cli gpu_engine.xml` completes 10 timesteps on the
+  CPU engine, on `--gpu`, and on `--gpu-auto`, which correctly defers to the
+  CPU at 1000 cells (< the 75000-cell crossover, 4 passes/step, message
+  printed). `appcsxcad gpu_engine.xml` opens the geometry window on the
+  desktop (egui/wgpu, title "AppCSXCAD - ...gpu_engine.xml").
+- **Remaining:** R-2 (device-resident multi-grid interface tables), R-3 (CI
+  GPU runner), RM-121 (native performance baseline), RM-106 (interactive GUI
+  QA sign-off items).
+- **Correction + regression fixed:** the record above initially reported the
+  plain `cargo build --release` as green from a tail-only read without
+  checking the exit code; the build had actually failed. The default
+  (no-gpu) workspace build was broken since the RM-204 multi-grid wiring:
+  `iterate_multi_grid` calls `upload_all_gpu`/`download_all_gpu`
+  unconditionally while the methods exist only under the `gpu` feature
+  (E0599, 8 errors at `engine.rs:1056-1082`). Fixed in `openEMS@272f1a6`
+  with `cfg(not(feature = "gpu"))` no-op stubs (the established fallback
+  pattern in `openems.rs`). Evidence, all exit-code-checked: plain build
+  exit 0; plain workspace tests **915/915**; gpu-feature build + tests
+  **933/933**; `openems-cli --gpu` solves the 10-step GPU smoke model on the
+  RTX 5070. Lesson recorded: every build/test verification must check the
+  exit status, not the trailing output.
+

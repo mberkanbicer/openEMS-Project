@@ -1043,7 +1043,7 @@ Two native parity fixes were applied to `parameter_update_errors()`:
   errors collected, matching native CSXCAD where every setter uses `Eval=true`
   and discards the returned code.
 - **MultiBox:** Changed coordinate evaluation order from flat per-box
-  insertion order to native per-axis order — for each axis (x, y, z),
+  insertion order to native per-axis order â for each axis (x, y, z),
   evaluate `start` then `stop` across all boxes before moving to the next
   axis. All coordinates are evaluated and all errors collected; no
   short-circuit.
@@ -1101,7 +1101,7 @@ cargo fmt --workspace -- --check
 
 ---
 
-## Session evidence � 2026-10-24 (HDF5, UPML, CFL, averaging, FD dumps)
+## Session evidence - 2026-10-24 (HDF5, UPML, CFL, averaging, FD dumps)
 
 Environment: Windows 11, Rust stable (MSVC), HDF5 1.14 from the FreeCAD 1.1
 installation. The import library was generated once from the shipped DLL:
@@ -1233,7 +1233,7 @@ cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs
 
 ---
 
-## Wave A evidence � build, install and packaging (2026-10-25)
+## Wave A evidence  build, install and packaging (2026-10-25)
 
 ### One workspace build through CMake (RM-009)
 
@@ -1399,7 +1399,7 @@ The engine ADE is driven with a sinusoidal edge voltage and the complex
 `J/V` ratio is compared with the analytic series admittance
 `1/(R + j(wL - 1/(wC)))` at 1, 2, 3 and 4 GHz. Worst relative error < 2e-3.
 The parallel branch, the stability capacitance floor, the PEC fallbacks and
-the metallic caps have separate unit tests. A `1e5` S/m, `35 �m` conducting
+the metallic caps have separate unit tests. A `1e5` S/m, `35 µm` conducting
 sheet is validated separately (previous section).
 
 ### Debye and Lorentz materials (`RM-056`)
@@ -1463,3 +1463,1342 @@ the installed `openEMS` entry point:
 
 The Python and MATLAB/Octave layers are not part of this evidence; they remain
 open under Wave C (`RM-013`, `RM-080`, `RM-085`..`RM-096`).
+
+## Rust Python extension build under WSL (2026-10-25)
+
+`scripts/ci/build_rust_python_wsl.sh` creates a venv with the system
+numpy/h5py visible, installs maturin, and builds both PyO3 extension crates:
+
+```
+building CSXCAD/rust-py   -> csxcad_python-0.1.0-cp314-cp314-linux_x86_64.whl
+building openEMS/rust-py  -> openems_py-0.1.0-cp314-cp314-linux_x86_64.whl
+csxcad_py: /home/.../rustpy-venv/lib/python3.14/site-packages/csxcad_py/__init__.py
+openems_py: /home/.../rustpy-venv/lib/python3.14/site-packages/openems_py/__init__.py
+```
+
+Both modules import successfully under CPython 3.14 with numpy 2.3.5 and h5py
+3.15.1. This unblocks the native Python suite runs (`RM-095`); the class
+surface itself is still the open part of `RM-085`..`RM-090`.
+
+## Octave/MATLAB interface (RM-091, RM-092, RM-093, RM-096)
+
+Command: `scripts/ci/run_octave_testsuite_wsl.sh` (native testsuite, unchanged;
+Rust `openEMS`, `nf2ff` and `sar_calc` binaries linked under their native names).
+
+| Case | Result | Reference evidence |
+| --- | --- | --- |
+| `unittests/port_setup` | PASS (11 checks) | port geometry/weights/mode profiles |
+| `unittests/transforms` | PASS (7 checks) | DFT/FFT round trips vs analytic pulses |
+| `probes/fieldprobes` | PASS (8 checks) | E/H probe vs dump amplitude 5.9e-8 / 5.7e-8, time base 1e-16 s |
+| `combinedtests/Coax` | PASS | Z = 50.09..51.12 Ohm (native 50.49..51.10, analytic 49.94) |
+| `combinedtests/cavity` | PASS | TE/TM resonance spectrum and spurious-response limits |
+| `combinedtests/msl_port` | PASS | beta = k0 (0.32%), ZL 72.7..73.4 Ohm, S11 -54 dB |
+| `combinedtests/nf2ff_dipole` | PASS | Dmax 1.5 (1.35%), sin(theta) pattern (2.97%), cross-pol 0.93% |
+| `combinedtests/rect_waveguide` | PASS | S11 -33.6 dB, S21 -0.03..0.01 dB, dispersion 0.07% |
+| `enginetests/engine_compare` | PASS | sse/sse-compressed/multithreaded dumps bit-identical to basic |
+| `combinedtests/coax_cylindrical` | ERROR | cylindrical engine deferred (D-02, RM-134) |
+
+Smoke tests: `.github/smoketests/octave/MSL_NotchFilter.m` and
+`.github/smoketests/python/MSL_NotchFilter.py` complete unchanged.
+
+M-file surface: 58/58 CSXCAD public M-files resolve (12 private helpers
+present), 70/70 openEMS public M-files resolve
+(`scripts/ci/check_octave_mfiles_wsl.sh`).
+
+Python interface regression: `scripts/ci/run_rust_python_tests_wsl.sh` reports
+openEMS 298 tests OK and CSXCAD 150 tests OK on CPython 3.14.
+
+## SAR raw dump and `sar_calc` (RM-073 integration)
+
+Command: `scripts/ci/run_sar_dump_check_wsl.sh` (Octave writes a `DumpType` 29
+raw dump of a lossy box, `sar_calc` processes it).
+
+| Check | Result |
+| --- | --- |
+| raw layout | `/Mesh`, `/CellWidth`, `/CellData/{Conductivity,Density,Volume}`, `/FieldData/FD/f0` (complex, `NXYZ`) and the frequency attribute |
+| material data | 512 of 1331 cells with density 1000 kg/m^3 and kappa 0.5 S/m (the material box) |
+| local SAR | peak 6.509386e-22 W/kg, relative deviation 7.8e-8 from sigma|E|^2/(2 rho) |
+| result file | `maxSAR` attribute and the dataset agree to float precision |
+
+Direct SAR result dumps (`DumpType` 20..22) are tracked separately as RM-136.
+
+## SAR averaging-cube parity (RM-145)
+
+The kernel in `openEMS/rust/src/sar.rs` was rewritten against
+`openEMS/tools/sar_calculation.cpp`:
+
+| Native rule | Rust before | Rust now |
+| --- | --- | --- |
+| `FindFittingCubicalMass` receives the full edge `(m/rho)^(1/3)/2` and walks the half edge | the same number was used as the half edge (8x cube mass) | full edge, `GetCubicalMass(pos, edge/2)` |
+| power density zeroed in air (`*= 0.5*(dens>0)`) | kept everywhere | zero in air (both E/conductivity and E/J paths) |
+| the centre value is overwritten by its own cube | `max(existing, own)` | overwrite, `max` only for the peak |
+| step 2 stores the face/frequency that raised the value | smallest-volume face | native value-based selection |
+| partial cells marked used only when the method allows | always marked | `mark_partial_as_used` (false for IEEE 62704) |
+| `used_cubes = count(used) - valid`, air counted in step 1 | `valid + unused` | separate `used_cells`/`air_cells`, counters partition the grid |
+| constructor defaults = SIMPLE | `maxBGRatio 0.5`, `ignoreFaceValid false` | SIMPLE |
+
+Evidence, `scripts/ci/run_cylindrical_sar_check_wsl.sh` with `EndCriteria=-1`
+on both sides (the criterion is isolated in RM-146):
+
+| Check | Before | Now |
+| --- | --- | --- |
+| probe `et` vs native | shapes differed (251 vs 1001) | 1001/1001 rows, max relative difference **0.0** |
+| raw E-field DFT | 1.195e-3 | **8.241e-7** |
+| 1 g per-cell, relative to the peak | 6.557e-1, 1534/1936 cells > 1 % | **2.565e-3, 0/1936 cells > 1 %** |
+| 1 g peak | +0.32 % | **-2.06e-7** |
+| `valid_cubes` / `used_cubes` | 1600 / 1600 vs 1600 / 0 | **1600 / 0 vs 1600 / 0** |
+
+Bound: per-cell 1e-2 relative to the peak (margin 3.9x). Justification: native
+stores the volumes, densities, power densities and SAR in `float` and
+accumulates in `double`; the residual worst cell differs by ~1 % of its own
+value, consistent with f32 rounding accumulated over a cube of ~1000 cells.
+`run_sar_dump_check_wsl.sh` still passes (raw+sar_calc peak 9.0e-8, 1 g maxSAR
+finite). Unit tests pin the 1 g five-cell cube (2 mm cells, partials 1.0), air
+power zeroing, the counter partition and the full-edge convention.
+
+## End-criteria parity (RM-146)
+
+`CalcFastEnergy` is now exactly native: per cell `eps0*(E0^2+E1^2+E2^2) +
+mue0*(H0^2+H1^2+H2^2)` in native order, over `GetNumberOfLines(n, false)-1`
+cells; a closed cylindrical azimuth hides its two seam planes, and the
+steady-state extension uses the same helper. The loop follows `openems.cpp`:
+the default evaluates only after four seconds of wall clock,
+`--exact-endcriteria` evaluates every excitation Nyquist period (with the
+native startup line), `maxE` is seeded at the maximum-excitation timestep
+(without updating `change` in default mode), and a negative `EndCriteria`
+disables the criterion.
+
+| Check | Result |
+| --- | --- |
+| energy formula (unit) | `eps0/mue0` weighted sum over the interior cells |
+| cadence (unit) | exact mode hits multiples of the Nyquist (Dirac/Step = 1); default fires at 4 s and then every 4 s |
+| fast default run (integration) | a 30-step Gaussian run reaches NrTS instead of stopping on the old 100-step cadence |
+| negative criterion | `EndCriteria=-1` is kept (disables) |
+| `openems-core` | 238 tests pass |
+| Python suites | 298 + 150 pass |
+| Octave suite | 10/10 pass, every simulation case with `--exact-endcriteria` |
+| reference harness | 4/4 pass |
+| cylindrical SAR check | exact criteria on both sides: **both stop at 1488**, 249/249 probe rows, probe `et` 3.247e-6, E-field DFT 6.801e-7, SAR 2.562e-3, counters equal |
+| native build cross-check | a rebuilt native from the fork source stops at 1e-6/1e-4/1e-3 on 1656/1224/1056, identical to the pinned binary (SAR_raw/et/ht md5 equal; SAR_1g differs only in `proc_time`) |
+
+Native argument order is `openEMS input.xml --exact-endcriteria` (the XML must
+be argv[1]); the earlier "flag unsupported" observation was this ordering
+mistake. The committed check now runs exact mode on both sides and gates the
+probe shape, a non-zero probe scale and the stop step (a 24-step multiple). The
+probe moved from the PEC outer radius (where it was identically zero) to
+rho = 16 mm inside the lossy material.
+
+## CTB parity (RM-112..RM-115)
+
+`CTB/rust` was split into `ref_impedance`, `transforms`, `abcd`, `touchstone`
+and `network` modules. Octave 11.1.0 generated 84 fixtures (75 numeric/meta
+texts, 9 native `.sNp` files) from the unmodified `CTB/*.m`.
+
+| Check | Result |
+| --- | --- |
+| Rust tests | 65 lib + 8 differential + 1 doc test pass |
+| per-port references | 3-port `[50;75;60]` S->Z 5.25e-16; `[50;50;50]` vs scalar exactly 0.0; renormalisation 3.3e-16 |
+| 2/3-port transforms | S/Y/Z/A round trips <=5.25e-16; `a_series`/`a_shunt` exactly 0.0; `a_mul`/`a_t` <=1.7e-16 |
+| Touchstone | six native cases write byte-identically (316/1028/211/1136/940/313 B) and read back exactly; 1..5 ports, RI/MA/DB, unit prefixes, wrapped records; v2 keywords parsed; 24 malformed inputs rejected |
+| network operations | element chains, current/power application and termination <=4.2e-16 |
+
+Bounds: 1e-12 absolute-ish (`|delta| <= tol*max(1,|expected|)`) for the
+transforms and 1e-11 for the network chains; the worst measured deviation is
+5.25e-16, i.e. 2000x margin. The residual is Gauss-Jordan versus LAPACK LU
+elimination rounding, not a model difference.
+
+Native quirks are preserved and recorded in `audits/ctb.md`: the v1 >=3-port
+Touchstone writer is row-major (native reads it back transposed), `a_T` uses
+`Z1/Z2` for `A(1,1)` but `Z3` for the shunt arm (`det != 1`), `a_PI` cannot run
+at all (`Y1.Y2`), `SetPortTermination` leaves `net.y` stale, and `AddElement2Port`
+accepts `Y_sh` while its help says `Y_se`. The port adds v2 reading, explicit
+errors for malformed files and per-port references in `s2a`/`a2s` (native
+aborts or returns garbage); those are documented deviations.
+
+## CSXCAD interface depth (RM-031..RM-033)
+
+| Check | Result |
+| --- | --- |
+| Python surface inventory | 7 native `.pyx` files, 33 classes, 360 declarations, 293 public, 256 distinct names, per-file SHA-256 |
+| Python surface test | 33/33 classes, 288/288 public methods, 5/5 module functions present, 0 absent |
+| MATLAB surface inventory | 70 M-files (58 public, 12 private), 114 declarations, per-file SHA-256 |
+| MATLAB surface test | every declaration re-parsed and compared, all 58 public entry points resolve, 0 absent, 2 declared external requirements |
+| Octave wrapper suite | 130 assertions plus an XML round trip re-read by the Rust core |
+| Ownership contracts | 6 Rust core tests + 25 Python binding tests + 7 C-ABI tests, each citing the native source line |
+| Bugs fixed | delete of a foreign property could remove a colliding id; delete of a detached property raised instead of a no-op |
+| Regressions | native Python suites 298 + 150 pass; CSXCAD 200, rust-py 2, rust-matlab 7, Python 36 |
+
+Deliberate deviations (asserted, not reproduced): native double-add of a
+property causes double ownership and a double free; parameter-set transforms
+(`CSTransform(pset)`) are not modelled by the numeric 4x4 Rust transform; and
+`Utilities.GetMultiDirs` with an invalid name silently returns `None` where the
+Rust binding raises `ValueError`.
+
+## Install path with `--with-rust` (RM-010, RM-021)
+
+`./update_openEMS.sh $HOME/openems-prefix --with-rust` on 2026-10-28 reports
+`build successful` and installs the advertised layout on a clean prefix:
+
+```
+bin/   AppCSXCAD  ctb  hyp2mat  nf2ff  openEMS  openEMS.sh  sar_calc
+lib/   libcsxcad_matlab.so  libopenems_matlab.so  (+ the C++ libraries)
+share/ CSXCAD/matlab  openEMS/matlab
+```
+
+`bin/openEMS --help` prints `openEMS - Electromagnetic Field Solver (Rust)`, so
+the native names point at the port. Two integration bugs had to be fixed first:
+
+1. The script built and installed each subproject separately, so the root CMake
+   project -- the only place with the Rust install rules -- never ran. The
+   prefix kept the C++ `openEMS`, `AppCSXCAD`, `nf2ff` and `sar_calc`, had no
+   `hyp2mat`/`ctb` and no MATLAB C-ABI libraries, and the old post-install check
+   only looked for `bin/openEMS*` plus the M-file trees, which the C++ install
+   satisfies. The Rust section now configures the root project, builds its
+   `rust-workspace` target and installs from it, then verifies all six binaries,
+   both libraries, both trees and the Rust banner. It reads `--help`, because
+   `--version` is not a supported flag and its non-zero exit trips `pipefail`.
+2. `Cargo.toml` `default-members` did not include `openEMS/nf2ff-cli` and
+   `openEMS/sar-cli`, which the install rules ship as `nf2ff` and `sar_calc`, so
+   a plain `cargo build` left them unbuilt and the install failed on the missing
+   files.
+
+The resulting `bin/` layout is the same one `scripts/ci/check_cmake_install.sh`
+checks for the root CMake install, which is what RM-021's "single documented
+command produces identical layout" asks for.
+
+## Operator dump comparison (RM-042, RM-078)
+
+`--debug-operator` writes `vv`, `vi`, `ii` and `iv` as three-component point
+data in native order. Two writer bugs were fixed on the way: the port emitted a
+single scalar `vv`, and it wrote the points with i slowest while VTK (and
+native `VTK_File_Writer`) expects i fastest.
+
+`scripts/ci/compare_operator_dump.py` parses the native `.vtr` (concatenated
+base64 chunks, per-block zlib, Float32) and the Rust `.vtk`. On a 20-cell PML box
+with eps=4, sigma=0.01:
+
+| Field | Nodes | Peak | Max relative difference |
+| --- | --- | --- | --- |
+| `vv` | 9261 | 1 | 0 |
+| `vi` | 9261 | 108.75 | 1.29e-13 |
+| `ii` | 9261 | 1 | 5.96e-8 |
+| `iv` | 9261 | 3.07e-3 | 4.81e-15 |
+
+Native zeroes the normal edge on the high line and both tangential components
+of every face in the operator itself (`ApplyElectricBC` with every face that is
+not "none", `FDTD/operator.cpp:1042-1048`). The port keeps the bulk coefficient
+there because the solver never integrates those edges and every validated run
+was produced in that state; the dump reports the native value so the arrays can
+be compared. `ii`/`iv` are not masked, matching native's PMC-only magnetic BC.
+
+## Timestep method parity (RM-049, RM-151)
+
+Native `Operator::Operator()` sets `m_TimeStepVar = 3` (`FDTD/operator.cpp:57`),
+i.e. `Rennings_2`, and the engine defaults to method 3 as well
+(`openems.rs:140`), so an XML without `TimeStepMethod` takes the same method as
+native.
+
+The Var3 walk was wrong at the domain edge: it reflected an already mirrored
+absolute coordinate, while native keeps the shift relative and reflects it
+against the base cell (`AdrOp::GetPos` with `SetReflection2Cell`,
+`tools/AdrOp.cpp:119-160`, `:423-433`). `shift_rel`/`reflected_pos` now do the
+latter, and three meshes match the native binary:
+
+| Mesh | Native `Timestep (s)` | Port (Var3) | Difference |
+| --- | --- | --- | --- |
+| uniform 1 mm, 4 cells | 1.92583e-12 | 1.92583e-12 | < 1e-5 |
+| graded x 1/2/3, y 2, z 5 mm | 3.03659e-12 | 3.03659e-12 | < 1e-5 |
+| uniform 0.5 mm, 4 cells | 9.62917e-13 | 9.62917e-13 | < 1e-5 |
+
+`setup_fdtd` now follows the native order -- EC coefficients first, timestep
+second (`FDTD/operator.cpp:986-1012`) -- and applies the periodic-signal
+adjustment (`:1014-1020`) after the time-step factor.
+
+The bare `Operator::new()` default stays Var1: flipping it makes the Debye
+analytic test miss its 1e-6 bound by 1.07e-6 because the ADE relaxation and
+drive coefficients are `FDTD_FLOAT` (f32), exactly as in native, so the bound
+itself is at the representation limit; moving it needs owner approval. Only
+direct library users see that difference.
+
+## Excitation arrays (RM-037..RM-039)
+
+`scripts/ci/run_excitation_dump_check_wsl.sh` runs the pinned native binary and
+the Rust CLI on byte-identical input and compares the `et` (voltage at `n*dT`)
+and `ht` (current at `(n+0.5)*dT`) dumps element by element. The native dump is
+written with six significant digits, so the bound is 1e-5 of the peak.
+
+| Type | Samples (native/Rust) | `et` | `ht` |
+| --- | --- | --- | --- |
+| Gaussian | 10 / 10 | 8.3e-7 | 8.0e-7 |
+| sinusoidal 1 GHz | 1040 / 1040 | 5.0e-7 | 5.0e-7 |
+| Dirac | 2 / 2 | 0 | 0 |
+| step | 2 / 2 | 0 | 0 |
+| custom `sin(2*pi*1e9*t)` | 10 / 10 | 4.5e-7 | 2.6e-6 |
+| custom `exp(-pow((t-5e-9)/1e-9,2))*sin(2*pi*1e9*t)` | 10 / 10 | 2.7e-6 | 1.6e-6 |
+
+Two fixes made this match: the period adjustment (`FDTD/operator.cpp:1014-1020`)
+gives the 1 GHz sinus 1040 samples instead of 1039, and `build_custom` registers
+the `pi`/`e` constants that native adds before parsing
+(`FDTD/excitation.cpp:227-235`).
+
+## Boundary conditions, mesh geometry and required input (RM-044..RM-048, RM-064)
+
+| Check | Evidence |
+| --- | --- |
+| Mur per-face delta | `mur_uses_the_local_face_delta_on_a_graded_mesh`: 1/2/3 mm x, 2 mm y, 5 mm z; every coefficient matches `(c*dt - delta)/(c*dt + delta)` with its face delta, and the 1 mm and 3 mm x faces differ by >0.2 |
+| PEC tangential-only | `pec_boundary_zeroes_only_tangential_components`: tangential `VV` exactly 0, normal component > 0 on every low face |
+| PMC matching native | `pmc_boundary_matches_the_native_magnetic_bc`: low face clears all three, high face tangential only, normal preserved |
+| `discLines` mesh | `nonuniform_mesh_edge_lengths_and_ec_coefficients`: `num_lines = [4,3,3]`, edge lengths 1/2/3 mm with the last node repeating the previous delta, analytic areas, `vi_y/vi_x = 4.0` |
+| Required CSX | `setup_requires_a_csx_geometry`: no geometry means `setup_fdtd()` false and no engine, exactly like native `SetupFDTD` |
+
+## Probes and engine interface (RM-066..RM-068)
+
+| Check | Result |
+| --- | --- |
+| Engine interface | `run_fdtd` passes a live `EngineInterface` (mesh metadata, `volt`, `curr`) to every processing step; `probes/fieldprobes` reads a running engine and asserts the field is excited (E 0.006 vs a 0.005 limit, H 1.61e-7 vs 1e-7) |
+| Time-domain sampling | the same case compares the probe against the field dump at the same point: E 5.91e-8, H 5.67e-8 max relative deviation (limit 1e-7), sample counts equal, time base within 1.05e-16 s |
+| Running DFT | `field_probe_accumulates_dft`: a 10 GHz sinus at dt = 1 ps over 1000 steps gives an on-bin magnitude more than 100x the off-bin and within 1e-3 of the native N/2 amplitude; duplicates are ignored and `reset` keeps the frequency list |
+| Dump side | `frequency_domain_accumulates_a_known_tone` covers the frequency-domain dump with the same tone |
+
+## Full-stack acceptance run (RM-125)
+
+`scripts/ci/run_full_acceptance_wsl.sh` at revision `e71b743`, one session, one
+host (WSL2, i9-13900H). The report is `ACCEPTANCE.md`; the script writes it from
+the same logs it checks, and a check only counts as PASS when its command exits
+0 *and* its log carries no failure marker (the harness's own classification is
+covered by a three-case self-check: pass, silent failure, failure marker).
+
+| Check | Result |
+| --- | --- |
+| workspace build (release) | PASS |
+| crate unit + integration tests | 759 tests |
+| HDF5 feature tests | 469 tests |
+| Python packages build + native imports | 2 packages |
+| native Python suites | 448 cases |
+| native Octave testsuite | 10 passed, 0 failed, 0 errors |
+| differential reference harness | 51 cases |
+| cylindrical SAR differential | per-cell 2.6e-3 (bound 1e-2), counters equal |
+| curve-excitation differential | 4.8e-5 / 9.2e-6 / 2.9e-5 on the peaks |
+| CTB Octave delivery | PASS |
+| CMake install layout | `AppCSXCAD ctb hyp2mat nf2ff openEMS sar_calc` + MATLAB libs/trees |
+| migration records | PASS |
+| placeholder policy self-test | PASS |
+
+The Octave suite took 331 s in this session (the earlier 2305 s run was on a
+cold cache); the assertions and values are identical. This run covers the Linux
+CI job and adds the Python, Octave and differential suites that CI does not run;
+it does not cover the Windows, macOS or FreeBSD jobs.
+
+## Final audit (RM-127)
+
+`docs/migration/FINAL_AUDIT.md` records the 13 `AGENTS.md` Section 21 criteria:
+4 met, 5 partly met, 3 not met. The mechanical part of the audit confirmed that
+all 96 `Verified` rows name a command, a result and an artefact. The verdict is
+that the migration is **not complete**: 53 rows are still `Implemented`, RM-144
+is blocked, and the platform/GUI evidence cannot be produced on this host while
+GitHub Actions is disabled and no GUI session can present a frame.
+
+## Performance and memory baseline (RM-121, RM-122)
+
+`scripts/ci/run_performance_baseline_wsl.sh`, final code, both binaries pinned by
+SHA-256 in the generated table. Machine: i9-13900H, 20 threads, 48 GiB, WSL2.
+
+| Engine | Case | Native wall / RSS | Rust wall / RSS | Ratio |
+| --- | --- | --- | --- | --- |
+| default | cavity (9 152 cells, 20 000 steps) | 1.34 s / 46.5 MiB | 5.07 s / 14.7 MiB | 3.78x / 0.32x |
+| default | Coax (2.1M cells, 1 178 steps) | 24.99 s / 249.4 MiB | 53.53 s / 738.6 MiB | 2.14x / 2.96x |
+| default | msl_port (14 098 cells, 1 716 steps) | 0.51 s / 46.8 MiB | 1.49 s / 17.8 MiB | 2.92x / 0.38x |
+| basic | cavity | 2.81 s / 45.9 MiB | 5.10 s / 14.7 MiB | 1.81x / 0.32x |
+| basic | Coax | 42.38 s / 239.5 MiB | 111.29 s / 738.3 MiB | 2.63x / 3.08x |
+| basic | msl_port | 0.69 s / 46.3 MiB | 1.40 s / 18.0 MiB | 2.03x / 0.39x |
+
+All twelve runs stop on the same timestep and produce the same output row
+counts (`default` and `basic`, every case). Throughput is 36-46 MCells/s on the
+Rust side against 47-137 MCells/s natively.
+
+Reading:
+
+- The serial kernel is within 1.8-2.6x of native's serial engine; the residual
+  is the deferred SSE vectorisation (ADR 0002), not the update equations.
+- The default engine is 2.1-3.8x slower: the threaded kernel starts and joins
+  its workers per time step, which the 16384-cells-per-worker threshold keeps
+  off the small cases but cannot amortise as well as the native OpenMP pool.
+- Peak memory is 0.32-0.39x native on the small cases but **2.96-3.08x on the
+  2.1M-cell Coax case** (738.6 vs 249.4 MiB): the Rust operator keeps the full
+  material and coefficient arrays, while the native compressed-SSE engine stores
+  the compressed form. Recorded as a known difference; no compressed engine
+  exists in the port (ADR 0002).
+- The numbers are roughly 2x the earlier measurement on the previous worktree
+  because the restored tree lives on a slower volume; the ratios, stop steps and
+  output counts are the comparable quantities, and the table records the
+  binaries' hashes and machine.
+
+## Octave testsuite after the curve-excitation port (2026-10-27)
+
+`scripts/ci/run_octave_testsuite_wsl.sh` on the restored tree:
+
+| Case | Result | Time |
+| --- | --- | --- |
+| unittests/port_setup | PASS | 1.4 s |
+| unittests/transforms | PASS | 1.7 s |
+| probes/fieldprobes | PASS | 189.6 s |
+| combinedtests/Coax | PASS | 63.5 s |
+| combinedtests/cavity | PASS | 303.8 s |
+| combinedtests/coax_cylindrical | PASS | 12.6 s |
+| combinedtests/msl_port | PASS | 14.4 s |
+| combinedtests/nf2ff_dipole | PASS | 483.3 s |
+| combinedtests/rect_waveguide | PASS | 34.3 s |
+| enginetests/engine_compare | PASS | 1200.8 s |
+
+**10 passed, 0 failed, 0 errors in 2305.7 s.** The cavity case now passes with
+non-zero probes (the excitation fix); `nf2ff_dipole` needed the Rust `nf2ff` CLI
+at `<repo>/openEMS/nf2ff/nf2ff`, which `scripts/ci/link_rust_openems.sh`
+provides (native `searchBinary` concatenates PATH entries without a separator,
+so a PATH lookup cannot match).
+
+The absolute times are ~1.9x the earlier run on the previous worktree. The
+restored tree lives on a slower volume and the dump-heavy cases are I/O bound;
+the assertions, sample counts and values are unchanged, so this is a disk
+effect, not a solver change.
+
+## CI and record gates (RM-007, RM-008)
+
+| Check | Command | Result |
+| --- | --- | --- |
+| Placeholder gate self-test | `python scripts/ci/check_placeholders.py --self-test` | `placeholder checker self-test passed` -- a seeded `todo!()` is reported, a file whose only marker is the allowed `unreachable!()` is not, and an allowlisted file is excused |
+| Placeholder gate in CI | `.github/workflows/rust.yml` lines 58-60 (`--changed --base`, then `--changed` for a push) | green on every run since run 40580893146 |
+| Register consistency | `python scripts/ci/check_migration_docs.py` | `migration record check passed`: closed vocabulary, snapshot counts, backlog header, coverage statuses |
+| Session log | `REMEDIATION_PLAN.md` Section 12 and the `REMEDIATION_TASKS.md` progress-evidence table | one entry per session; every status change carries date, evidence path and command |
+
+## Cylindrical path walk (RM-148)
+
+| Check | Result |
+| --- | --- |
+| Ported | `fit_to_alpha_range` (`operator_cylinder.cpp:226-250`), the `SnapToMeshLine` azimuth fold (`:277-282`), the two `SnapLine2Mesh` seam remaps (`:307-317`), `find_path_cylindrical` (`:320-475`), and `line_plane_intersection`/`determinant3`/`invert3` (`tools/useful.cpp:272-328`) |
+| Dispatch | `find_path` chooses the cylindrical walk from the mesh type, so the excitation curve branch and `calc_pec_curves` take it with no call-site change (native virtual call) |
+| Decreasing azimuth | 90 deg -> 0 deg returns exactly the increasing path `(0,[3,0,3]), (1,[3,0,3]), (1,[3,1,3]), (1,[3,2,3]), (0,[3,3,3])`, because native swaps the endpoints (`:339-348`) |
+| Span above pi | 90 deg -> 300 deg folds to -60 deg -> 90 deg (`:331-337`); the base walk then clamps -60 deg to alpha line 0 and yields `(1,[4,0,2])` |
+| Seam crossing | closed 6-sector mesh, `(rho 2, 300 deg) -> (rho 5, 10 deg)`: `(1,[2,5,2]), (0,[2,6,2]), (0,[3,6,2]), (0,[4,6,2])`, including the closed-alpha remap `0 -> numLines[1]-2` (`:467-472`) |
+| Native internals | both native binaries (`~/openems-exact` and the pinned v0.37.0) print `A path was leaving the alpha-direction mesh...`, `Intersection top: 3.6138,6.28319,2`, `Intersection bottom: 3.6138,0,2`, `Voltage excitations: 4 (3, 1, 0)` on the same input XML -- the port reproduces the split, the reused upper intersection on a closed azimuth and the 3 radial + 1 alpha distribution |
+| Probe agreement | cylindrical seam probes differ from native by 4.7e-7 / 2.1e-7 / 2.2e-7 (Ex/Ey/Ez); further probes at (rho 2, 60 deg) and (rho 5, 60 deg) agree to 1e-6, a constant-rho seam curve to 1e-6, a Cartesian curve control to 1e-6 and a `Box` excitation of the same cell to 1e-7 |
+| Regression | `openems-core` 250 + 2 tests; the Cartesian cavity curve gate reproduces 4.8e-5 / 9.2e-6 / 2.9e-5 on the peaks; `run_cylindrical_r0_check_wsl.sh` passes (4.2e-5) |
+
+Not reproduced: the native verbose `FindPath` diagnostics beyond the
+intersection error (semantics unaffected), and the unused `dist` out-parameter
+of `LinePlaneIntersection`. `Operator_Cylinder::SnapBox2Mesh` (`:284-305`) is
+still unported and belongs to RM-144.
+
+## Metal curves are PEC (RM-150)
+
+| Check | Result |
+| --- | --- |
+| Implementation | `calc_ec_operator` calls `calc_pec_curves`: METAL property curves are walked with `FindPath` (points evaluated in the operator mesh system with the primitive transform) and `VV`/`VI` are zeroed on every path edge, with the primitive marked used |
+| Native parity | mirrors `Operator::CalcPEC_Curves` (`FDTD/operator.cpp:2064-2097`); only a `Curve` is walked (`ToCurve()` matches `Type == CURVE`), and the native `m_Nr_PEC` statistics counter has no Rust consumer |
+| Test | `metal_curve_marks_the_path_as_pec`: the two path edges are exactly zero, the neighbouring edge keeps `VV = 1` and `VI > 0`, and the primitive is used |
+| Regression | `openems-core` 245 + 2 tests; cavity curve gate unchanged (peaks 4.8e-5 / 9.2e-6 / 2.9e-5) |
+
+## Curve and wire excitations (RM-149)
+
+| Check | Result |
+| --- | --- |
+| `FindPath` port | native neighbour order and tie-breaking, `SnapLine2Mesh` (dual=false, full=true), `Point_Line_Distance` with the cylindrical chord metric, out-of-domain failure, closure loop |
+| Curve branch | point evaluated in the operator mesh system with the primitive transform, path walked, `amp = GetWeightedExcitation * GetEdgeLength`, types 0 and 1 only, VV/VI zeroed for hard excite |
+| Unit tests | 5: tie-breaking staircase (hand-derived), axis-aligned segment, out-of-domain, cylindrical metric (the inward first step pins the chord metric), end-to-end curve excitation |
+| `openems-core` | 245 + 2 tests pass |
+| Cavity differential | peaks 5.807516e-06 / 2.316531e-05 / 7.766571e-06 vs native 5.807240e-06 / 2.316510e-05 / 7.766348e-06 (4.8e-5 / 9.2e-6 / 2.9e-5); maximum sample difference 1.6e-4 / 4.5e-5 / 1.2e-4; **bit-identical** for all 6667 samples when the native timestep is pinned, which isolates the residual to the pre-existing `calc_timestep` summation-order difference |
+| Regression | `Coax` `ut1`/`et`/`ht` and all `msl_port` probes are byte-identical before and after the change; `scripts/ci/run_curve_excitation_check_wsl.sh` gates the behaviour |
+| Wire primitive | not walked: native `ToCurve()` matches `Type == CURVE` only, and the earlier wire fallback produced a 4.27e-5 probe where native is exactly zero; `wire_excitation_is_not_walked_as_a_curve` pins it |
+| Not ported | the `Operator_Cylinder` overrides (azimuth fold, start/stop swap, alpha-seam split), tracked as RM-148; metal curves are not PEC yet (RM-150) |
+
+## MATLAB C-ABI contracts (RM-094)
+
+| Check | Result |
+| --- | --- |
+| Exported symbols | 34 `extern "C"` entry points (26 pre-existing + 8 added), identical to `nm -D`, pinned by `src/abi_inventory.rs` |
+| Crate tests | 25 passed (3 inventory + 22 contract), `cargo fmt --check` and `clippy --all-targets` clean |
+| Octave consumer | 54 checks through an `.oct` shim linked against both delivery libraries (Octave 11.1.0 has no `loadlibrary`) |
+| Native citations | every expectation quotes the native file:line (face accessors `openems.cpp:810-846`, `SetCSX` ownership `:1163-1175`, setup codes `:1177-1234`, `SetBoundaryCond.m:51-71`, Python controller `openEMS.pyx:169-179/320-331`, deleted-object message `CSXCAD.pyx:118`) |
+
+Deviations fixed: `Get_BC_Type`/`Get_PML_Size` now return the native `-1`
+sentinels, `Set_BC_PML` forces the face type, the Reset default PML size is 8,
+`SetupFDTD` reports the native codes 3 and 2 with messages, `SetCSX(NULL)` is a
+clear instead of a null dereference, and `openems_free` drops the geometry.
+Array orientation is asserted in both 1x6 and 6x1 column-major shapes.
+
+Recorded deviations: a missing excitation aborts native `SetupFDTD` with code 3
+while the core applies a default pulse (tracked as a follow-up on
+`openEMS/rust/src/openems.rs`), and `set_over_sampling(0)` is clamped because
+native zero divides by zero in processing.
+
+## CI platform matrix and HDF5 feature (RM-026, RM-030, RM-120, RM-124)
+
+`.github/workflows/rust.yml` run `40580893146`:
+
+| Job | Result |
+| --- | --- |
+| Linux (workspace check, five numerical crates, policy gates) | green, 2m9s |
+| macOS (workspace check + the same tests) | green, 2m59s |
+| Windows (workspace check + tests, HDF5 from vcpkg) | green, 8m7s |
+| FreeBSD (workspace check without `hyp2mat-rs`, fparser differential) | green, 2m49s |
+| Linux HDF5 feature (`csxcad-core` + `openems-core`, six HDF5 reader tests) | green, 1m52s |
+| fparser differential (macOS) | green, 54s |
+| Reference (differential harness over `reference-data/`) | green, dispatched run `40580897904`, 4m8s |
+
+The `hdf5` feature is unified across the workspace, so every job installs the
+development files (apt, vcpkg, Homebrew, FreeBSD pkg); the HDF5 job also runs
+`reads_native_discrete_material_hdf5_layout_and_properties`. FreeBSD excludes
+`hyp2mat-rs` only because its `clipper2c-sys` backend has no FreeBSD target
+(exception `E-004`); the solver, CSXCAD, CTB, GUI crates and the fparser
+differential suite all run there. `RM-124` adds a nightly `cron` schedule to the
+Reference workflow; the dispatch path is proven, the first scheduled artifact is
+still pending.
+
+## fparser optimizer coverage and decisions (RM-023..RM-025)
+
+### Measured optimizer coverage (RM-023)
+
+`fparser/rust/tests/run_differential.py` builds the pinned C++ parser
+(`tests/original_reference.cpp`, CMake) and the Rust parser, runs both over the
+same corpus and compares values (tolerance 1e-12, explicit non-finite and
+float-boundary values), plus the callback-call counts that make the optimizer
+observable.
+
+| Corpus part | Rows | Optimizer-enabled |
+| --- | --- | --- |
+| checked-in cases (`differential_cases.tsv`) | 485 | 328 |
+| generated operator matrix (14 operators x 31 values x 2) | 15,180 | 7,590 |
+| generated builtin matrix | 2,920 | 1,460 |
+| generated nested builtins | 26,245 | 13,123 |
+| nested optimizer regressions | 126 | 126 |
+| zero/error rewrites | 81 | 81 |
+| signed `exp`/`log` rewrites | 48 | 48 |
+| negative `sqrt`/`log` rewrites | 54 | 54 |
+| signed nested composition | 84 | 84 |
+| **total** | **45,223** | **22,894** |
+
+Result: **45,221 expressions and 45,196 callback-count checks compared with zero
+mismatches** under the recorded tolerances.
+
+Residual risk (bounded): the Rust optimizer is a targeted port (constant
+folding, legacy math lowering, function sharing and the observable nested
+rewrites such as `csc(asin(x))`, `log(csc(acos(x)))`, `cbrt(sqrt(x))`), not a
+rule-for-rule port of the 262 generated optimizer rules. A rule whose effect is
+not observable in a value or in a callback count is not individually asserted;
+the 22,894 optimizer-enabled cases are the mitigation, and every observed
+difference is a defect, not tolerance noise.
+
+### Decisions (RM-024, RM-025)
+
+| Task | Decision |
+| --- | --- |
+| RM-024 optional numeric backends | `ADR 0006` keeps `f64` only; the omitted variants (`float`, `long double`, long integer, MPFR/GMP) are recorded as exception `E-001` with the impact and the compatibility path |
+| RM-025 C++ API/FFI surface | `ADR 0008`: the Rust crates are canonical, there is no C++ source/binary-compatible wrapper, external surfaces are the CLI binaries, the Python packages, the MATLAB/Octave CLI plus a narrow reviewed C ABI, and the CSXCAD XML format; a C ABI is allowed only as documented foreign-runtime glue, and system HDF5 remains the only library FFI (`E-002`) |
+
+## Python packages under the native names (RM-013)
+
+| Check | Result |
+| --- | --- |
+| `CSXCAD/rust-py` packaging | new `pyproject.toml`: `python-source = "python"`, `module-name = "csxcad_py"`, `python-packages = ["CSXCAD"]`; the wheel ships the compiled `csxcad_py` extension **and** the pure-Python `CSXCAD` package (native layout `CSXCAD.CSXCAD`, `CSXCAD.CSProperties`, `CSXCAD.CSPrimitives`, `CSXCAD.CSRectGrid`, `CSXCAD.CSTransform`, `CSXCAD.Utilities`) |
+| `openEMS/rust-py` packaging | distribution name changed from `openems-py` to the native `openEMS`, so `importlib.metadata.version("openEMS")` resolves and `openEMS.__version__` is `0.1.0` instead of the fallback `0.0.0` |
+| Installed import | `cd /tmp && env -u PYTHONPATH python -c "from CSXCAD import ContinuousStructure; from openEMS import openEMS"` -> `CSXCAD 0.1.0`, `openEMS 0.1.0`, `ContinuousStructure().GetGrid()` -> `CSRectGrid`, solver class `openEMS.openEMS.openEMS` |
+| CI gate | `scripts/ci/build_rust_python_wsl.sh` now performs that import from `/tmp` with `PYTHONPATH` unset after `maturin develop`, so a wheel that loses the package fails the build |
+| Regression | native Python suites still pass against the installed packages: 298 openEMS + 150 CSXCAD |
+
+A stale `site-packages/csxcad_py` copy left by an earlier non-package build had
+to be removed once; the editable install now points at the repository source.
+The repository root is not safe as a working directory for the import check
+because the `CSXCAD/` source directory shadows the installed package (the native
+tree has the same property); the check runs from `/tmp`.
+
+## CSXCAD depth: native XML corpus and differential harness (RM-027..RM-036)
+
+### Corpus
+
+`CSXCAD/rust/tests/native_gen/run_native_generator.sh` copies the pinned native
+`CSXCAD/` and `openEMS/` (never the repository copies), builds them, and writes
+fixtures back into the repository:
+
+| Artefact | Content |
+| --- | --- |
+| `tests/fixtures/xml/` | 11 documents written by native `ContinuousStructure::Write2XML` + `manifest.txt` (property types, primitive types, transforms, parameters, cylindrical coordinates, background/grid, openEMS wrapper, DiscMaterial) |
+| `tests/fixtures/native/` | 11 model reports produced by a **native re-read** (`ReadFromXML`, `read_back = 1`) |
+| `tests/fixtures/mesh/` | 22 STL/PLY files (native test meshes, VTK-written ASCII/binary STL, quad PLY, multi-solid, malformed) + VTK-derived expectations |
+
+Two complete regenerations produced the identical fixture hash
+`58726f26e30b24465c30e7082c8edd687370446e5d3e938a682c3a732235e17d`, so the corpus is
+reproducible rather than hand-written.
+
+### Results
+
+| Area | Evidence |
+| --- | --- |
+| XML dispatch and round trip (RM-028) | manifest/disk agreement, strict and compatibility parse, native -> Rust -> Rust -> Rust model equality, byte-stable second write, openEMS wrapper extraction, native transform element names |
+| Differential model harness (RM-029) | counts and types, grid, background, parameters (native `IncreaseStep` walks), property fields, primitive priority/coordinate system/bounds/dimension, transform matrices, containment/priority queries, object area, native `isGeometryValid` |
+| Expression integration (RM-027) | parameter/coordinate/weight/transform expressions through bounding boxes and containment; native error codes 1, 2, 3, 4, `100 + fparser code`, `-1`; strict error vs native warn+skip for a malformed transform |
+| Transform/parameter parity (RM-034) | native `tscenario` matrices (pre/post multiply, `Rotate_Origin`, degree mode, `Matrix`+`Scale3`, invert), extra-argument truncation, zero axis, singular inverse, sweep/`set_linear_range`/zero-step termination |
+| Mesh corpus (RM-035) | exact point/face order and winding, quad arity, multi-solid merging, XML round trip, malformed rejection; empty meshes rejected like native |
+| Performance baseline (RM-036) | 158,337-byte document: release serialize 3.03 ms (49.8 MB/s), parse 4.04 ms (37.3 MB/s), bounds 1.50 microseconds/primitive, 100 containment queries 183 ms; debug 10.20/16.03 ms |
+| Tests | `cargo test`: **194 passed** (157 lib + 37 integration); `cargo test --features hdf5`: **200 passed** (163 lib) |
+
+Porting defects fixed by this wave: native transform element names on write,
+native extra-argument truncation, and the `Box` update-error path (evaluate all
+`P1` components, short-circuit `P2` only when `P1` fails).
+
+The native `DispersiveMaterial` tag cannot be dispatched because native never
+writes it; `11_disc_material` reports `read_back = 0` because native cannot
+reload a `DiscMaterial` without its HDF5 file. Both are recorded in the reports
+and asserted in the tests.
+
+## hyp2mat parity (RM-107..RM-111)
+
+| Check | Result |
+| --- | --- |
+| Fixtures (RM-107) | 9 `.hyp` files: 3 native EAGLE examples, 6 grammar-derived synthetic files (planes/clearances, pours/voids, arcs, vias, rotated/oval/oblong pads, cutout, multi-layer, flood, metric/english/weight); SHA-256 manifest + provenance README |
+| Polygon operations (RM-108) | stateful native `Polygon` with a Rust port of Clipper 1's offset builder; expectations from a native oracle built against `lib/polygon.cc`, compared as exact grid-unit vertex sets |
+| CSXCAD output (RM-109) | `-f csxcad` reproduces the native MATLAB writer (non-polygon lines byte-identical; geometry exact for 7/9, <= one 10 um step on the two arc fixtures; copper area <= 1.7e-3 relative). `tests/native/run_native_read_check.sh`: pinned native `libCSXCAD` reads all 9 Rust XML documents and its model dump is **identical** to the Rust dump (255 lines: counts, types, names, material values, grid, delta unit, background, priorities, owners) |
+| QucsStudio and PDF (RM-110) | properties exact, items within the same one-grid-step bound, identical stderr multiset; PDF renders under Ghostscript 10.06 with 3/3/3/3/4/3/3/5/3 pages (composite + one page per metal layer) |
+| CLI (RM-111) | full native option set, stdin/stdout, `--help`/`--version`, exit codes and messages, binary installed as `hyp2mat`; `-v` board/layer summary byte-identical to native `std::cerr` for 9/9 fixtures; five output variants per fixture are deterministic (45/45 identical SHA-256); 23 CLI integration tests |
+| Tests | `cargo test`: **114 passed** (77 lib + 23 CLI + 14 fixture); `cargo fmt --check` and `cargo clippy --all-targets` clean |
+
+Preserved native quirks: `{UNITS=METRIC}` means centimetres, imperial copper
+weight thickness is 1000x (native defect), device `VAL=` is always a string, a
+deprecated `PAD` yields a zero-size pad, the plane-mask filter uses the target
+net name, a syntax error exits 0, and `-f pdf` without `-o` prints
+`pdf output file missing` and writes nothing. The additive `--csxcad-xml`
+extension is the only new output path; `-f csxcad` keeps the native MATLAB
+script so `matlab/ImportHyperLynx.m` still works.
+
+Accepted deviation: the two arc fixtures resolve one shallow polygon
+intersection one 10 um grid step apart (Clipper2 versus Clipper 1 integer
+rounding). The bound is 1.5 grid steps and is asserted explicitly; it is
+recorded in `REFERENCE_TOLERANCES.md` and awaits owner re-approval.
+
+## Regression CI (RM-123)
+
+`.github/workflows/reference.yml` runs on every push/PR that touches Rust,
+Python, `scripts/ci` or the reference captures:
+
+| Step | Command | Result |
+| --- | --- | --- |
+| Numerical core | `cargo test -p fparser-rs -p csxcad-core -p openems-core -p ctb-rs -p hyp2mat-rs` and `cargo test -p openems-core --features hdf5` | PASS |
+| Python suites | `bash scripts/ci/run_rust_python_tests_wsl.sh` | PASS |
+| Differential harness | `bash scripts/ci/run_reference_harness_wsl.sh` (4/4 cases) | PASS |
+
+GitHub Actions evidence on `mberkanbicer-rust-migration-audit`: runs
+40394042360, 40398852196, 40409688197, 40422519177, 40482929043 and
+40495994980 all finished `success` (3m34s..5m45s); the last one ran commit
+`33802a4`. The runner installs `libhdf5-dev`, `pkg-config`, `python3-venv`,
+`numpy`, `scipy`, `h5py` and `matplotlib`, then builds the maturin extensions.
+
+## GUI PNG capture and visual QA (RM-105, RM-106)
+
+| Check | Measured | Verdict |
+| --- | --- | --- |
+| PNG writer | a 2x1 RGBA buffer decodes back byte-identical; a wrong buffer length is rejected | PASS |
+| Offscreen capture | 64x48 render of an orange box: 3072 RGBA pixels, >100 non-background pixels, `export_image` writes a 64x48 PNG that decodes to the same content | PASS |
+| Full UI frame | 1280x800 frame through the real wgpu pipelines and egui widgets: `audits/gui-screenshot.png` (251592 bytes, 1280x800, >50 distinct colours). The layout shows the tree with `Material::substrate`, `Box - ID: 1` and the selected `Sphere - ID: 2`, the property editor (name, visibility, coordinates, colors, isotropic, Epsilon/Mue/Kappa/Sigma), the primitive editor (priority, center, radius, delete), the mesh/parameter editor and the 3D viewport with the sphere and box | PASS |
+| Defects found by the artifact | duplicate `ScrollArea` ID (egui warning), missing arrow/bulb glyphs (empty boxes) and a selected primitive hidden by the tree's expansion state; all fixed | PASS |
+
+The frame is rendered offscreen because WSLg cannot present a frame in this
+environment (`Io error: Broken pipe`). Seven interactive items (real-display
+presentation, keyboard-focus edge case, dialogs, mouse interaction, camera
+controls, native side-by-side parity, platform matrix) remain open in
+`audits/gui-qa.md`; RM-106 therefore stays `Implemented`.
+
+## GUI project I/O, undo/redo and exports (RM-102..RM-104)
+
+Verified headlessly; the interactive checklist is RM-106.
+
+| Check | Measured | Verdict |
+| --- | --- | --- |
+| Undo/redo | add property -> rename -> undo -> undo restores `""` and then removes the property; redo replays both; a new edit clears the redo stack; primitive, grid-line and parameter edits undo in reverse order; the history stops at 100 steps | PASS |
+| Bare CSXCAD round trip | read -> edit -> render -> re-read equals the edited structure; a single XML declaration | PASS |
+| openEMS wrapper round trip | `<FDTD NumberOfTimesteps="1000" EndCriteria="1e-5"/>`, `<BoundaryCond .../>` and `<Excitation Type="0" f0="1e9"/>` survive a save; exactly one `<ContinuousStructure>` element | PASS |
+| Save / Save As | Save writes the loaded path and clears the modified flag; Save As adopts the new path and a following Save writes it | PASS |
+| CLI | `appcsxcad --disableEdit --export-polydata-vtk=/tmp/appexp <project.xml>` loads the project, prints the native export lines and writes `ground.vtp` (2252 bytes, `NumberOfPolys="12"`, `NumberOfLines="12"`); a missing project reports an error | PASS |
+| Exports | per-property `.vtp` (`NumberOfPolys="12"`, scaled by the 1 mm delta unit), binary `.stl` (12 triangles, 84 + 50*12 bytes, scaled), ASCII `.ply` (36 vertices, 12 faces), POV-Ray `mesh2` with two `vertex_vectors` blocks and the fill colors, X3D with two `IndexedFaceSet` elements | PASS |
+| Settings | the persisted window size round-trips and clamps to 320x240 .. 16384 | PASS |
+
+### Migration decisions
+
+- Save preserves the openEMS wrapper. Native `QCSXCAD::Write2XML` writes only
+  the `ContinuousStructure` element, so a save after opening a solver project
+  drops every openEMS setting. The port substitutes the regenerated structure
+  into the original document instead; the decision is recorded in
+  `audits/gui.md`.
+- Save As adopts the new path. Native's export dialog leaves `m_filename`
+  unchanged, so a following Save writes the previous file; the port updates it.
+- New properties start without a fill color (native assigns a random color at
+  construction) so documents and exports are reproducible.
+- Property file names fall back to `property_<index>` and replace path
+  separators, so an export can never leave its directory.
+- File dialogs are in-app path windows instead of `QFileDialog`; the file
+  operations themselves are the same.
+- `--disableEdit` is implemented; `--RenderDiscMaterial` records the render
+  flag but no longer toggles the edit flag (confirmed native defect). Discrete
+  material rendering itself is tracked as RM-147.
+
+## GUI editing model (RM-098..RM-101)
+
+The editing wave is verified headlessly; the interactive checklist is RM-106.
+
+| Check | Measured | Verdict |
+| --- | --- | --- |
+| Tree labels and grouping | `tree_rows` emits `Material::substrate` and `Box - ID: 1` in model order, hides primitives of collapsed properties and carries the property visibility/color | PASS |
+| Property edits | Name, visibility, fill/edge color, coordinate system, material (isotropic + 3 components of Epsilon/Mue/Kappa/Sigma), excitation (type, number, enabled, frequency, delay, per-component excitation and propagation terms), probe (number, type, normal, weight, start/stop, oversampling, FD samples), dump (type, mode, file type, multi-grid level, sub-sampling, oversampling, FD samples, SAR method) and resolution factor survive `to_xml_string` -> `from_xml_str`; mismatched edits return an error | PASS |
+| Primitive edits | Add/edit/delete of a box (bounds `[-1,1] x [-2,2] x [-3,3]`, priority 4) survives a reload; all six native creatable types build; a frame with twelve primitive shapes renders without panic | PASS |
+| Grid and parameter edits | Lines, delta unit and resolution increase survive a reload and every axis compares line by line; constant and linear parameters round-trip name, value, `(min, max, step)` and the sweep flag; removing a parameter shifts the indices | PASS |
+| Editor frames | `egui::Context::run_ui` renders the tree, property, primitive and mesh editors over a document with all six property types and every renderable shape | PASS |
+
+### Defect found: duplicated dump-box oversampling
+
+Native `CSPropProbeBox` owns the single `m_OverSampling` field and
+`CSPropDumpBox` inherits it. The Rust model had a second `oversampling` field
+on `DumpBoxProperties`; both writers set the same `OverSampling` attribute, so
+the dump value silently replaced the probe value in every written file, and
+the FD dump path read the dump copy while the Python setter wrote the probe
+copy. The dump copy is removed; dump boxes now read the probe field, matching
+native.
+
+## GUI renderer and application launch (RM-015, RM-097)
+
+The GUI wave has no numerical reference yet; the evidence is unit-test and
+launch based:
+
+| Check | Measured | Verdict |
+| --- | --- | --- |
+| `qcsxcad-core::tessellate` geometry | 11 tests: box bounds and 12 triangles, degenerate plane, cylinder axis/radius, sphere radius, spherical shell radii, extruded polygon elevation/length, rotational polygon revolution, cylindrical wedge bounds, polyhedron triangulation, wire tube surfaces, transform + property colors | PASS |
+| `qcsxcad-egui` camera | center projects to the NDC origin; fitted bounds stay inside the clip volume for the perspective and orthographic cameras | PASS |
+| `appcsxcad --version` / `--help` | `AppCSXCAD 0.1.0` / usage text, exit 0 | PASS |
+| headless graphical launch | window creation, egui buffer updates and the 3D pipelines run without wgpu validation errors; the WSLg compositor cannot present a frame (`Io error: Broken pipe`), so the interactive launch awaits the RM-106 checklist | LIMITED |
+
+The tessellation mirrors the native `VTKPrimitives` sources listed in
+`audits/gui.md`; visual parity against native screenshots is still pending
+(RM-106). Four launch blockers found here were fixed: argv[0] was opened as
+the input file, egui had no bundled fonts, `update_buffers` was never called
+and the egui pipeline declared no depth format while the pass carried a depth
+attachment.
+
+## Cylindrical SAR (RM-143)
+
+`scripts/ci/run_cylindrical_sar_check_wsl.sh` runs a lossy muscle-like shell
+(eps_r = 80, kappa = 1 S/m, density 1000 kg/m^3, 16 sectors, rho = 0 axis) with
+a raw SAR dump (`DumpType` 29) and a 1 g result dump (`DumpType` 21), driven by
+the same `input.xml` through the Rust and native solvers:
+
+| Check | Measured | Bound | Verdict |
+| --- | --- | --- | --- |
+| `/Mesh` layout (`rho`,`alpha`,`z`, `mesh_type=1`, `mesh_scaling=1e-3`) | identical | - | PASS |
+| `/CellData/Volume` vs native and vs `dA/2 (r2^2 - r1^2) dz` | 0.0 difference, 3.5e-8 vs analytic | 1e-6 | PASS |
+| `/CellData/Density`, `/CellData/Conductivity` | 0.0 difference | 1e-6 | PASS |
+| raw E-field DFT (`f0`) vs native | 1.195e-3 | 1e-2 | PASS |
+| 1 g SAR peak vs native | +0.32 % | 1 % | PASS |
+| 1 g SAR per cell vs native | 6.4e-1 of the peak (1534 of 1936 cells above 1 %) | not gated | FAIL (RM-145) |
+| probe cadence / stop time | 251 vs 1001 samples | not gated | FAIL (RM-146) |
+
+Two engine bugs were found by this case and fixed with unit coverage:
+
+* `AverageMatQuarterCell` weights the quarter cells by `GetNodeArea`, not by the
+  rho-face `GetEdgeArea`; the latter applies the primary rho factor and
+  vanishes on the `rho = 0` axis, so every axis E_rho cell fell back to the
+  background material. Dielectric cylindrical meshes therefore took a vacuum
+  timestep (9.089e-13 s instead of the native 8.12933e-12 s, a factor
+  `sqrt(eps_r)`) and used wrong EC values on the rho = 0 sheet. The new test
+  `cylindrical_r0_timestep_includes_the_dielectric` pins the native value.
+* Closed-azimuth seam/padding samples must wrap into `[alpha0, alpha0 + 2*pi)`
+  like native `GetYeeCoords`, otherwise those cells resolve the background.
+
+The remaining per-cell 1 g differences come from the mass-averaging cube search
+(RM-145) and the stop-time difference from the end-criteria evaluation (RM-146);
+both are reported by the check and tracked as their own tasks.
+
+## Cylindrical field dumps (RM-138)
+
+`scripts/ci/run_cylindrical_dump_check_wsl.sh` mirrors the plain half of the
+native `python/Tests/Cylindrical_Cavity.py` (closed PEC pillbox with the
+`rho = 0` axis, E-field FD dump of `f_010` over the full ring at mid-height)
+and runs the native solver on the same `input.xml`:
+
+| Check | Measured | Bound | Verdict |
+| --- | --- | --- | --- |
+| `/Mesh` layout (`rho`,`alpha`,`z`, `mesh_type=1`, `mesh_scaling=1e-3`) | identical dataset shapes (21, 24, 1) | - | PASS |
+| `/Mesh` values | 0.000e+00 relative | 1e-9 | PASS |
+| `/FieldData/FD/f0` E-field DFT vs native | 5.221e-6 relative | 1e-2 | PASS |
+| TM010 radial Ez profile vs `J0(x_01 r / R)` | 0.0003 | 0.03 (native test bound) | PASS |
+
+The azimuth is written in radians (unscaled), rho/z in metres, exactly like
+the native `HDF5_File_Writer::WriteRectMesh`. Two collateral unit bugs were
+found by the case and fixed: the processing metadata used to scale azimuth
+coordinates by the grid delta (which snapped probes and dump boxes to wrong
+azimuth lines) and the dump files recorded `mesh_scaling = 1` instead of the
+grid delta. The cylindrical snapping now ports `FitToAlphaRange`, the
+cylindrical `SnapBox2Mesh` recentring and the `fullMesh = false` semantics of
+`Processing::DefineStartStopCoord`.
+
+## Cylindrical rho = 0 axis (RM-137)
+
+`scripts/ci/run_cylindrical_r0_check_wsl.sh` runs a closed PEC pillbox
+(R = 50 mm, h = 30 mm, dr = dz = 2.5 mm, 24 azimuthal sectors) on a mesh that
+includes the `rho = 0` axis, mirroring the plain part of the native
+`python/Tests/Cylindrical_Cavity.py`, and additionally runs the native solver
+on the very same `input.xml`:
+
+| Check | Measured | Bound | Verdict |
+| --- | --- | --- | --- |
+| TM010 resonance vs `x_01 c / (2 pi R)` | 2.2940 GHz vs 2.2949 GHz (-0.04 %) | 1 % | PASS |
+| TM110 resonance vs `x_11 c / (2 pi R)` | 3.6500 GHz vs 3.6565 GHz (-0.18 %) | 1 % | PASS |
+| probe `et` (Ez, r = 25 mm, alpha = pi/4) vs native | 4.162e-5 relative | 1e-2 | PASS |
+| native and Rust mode frequencies | identical (2.2940 / 3.6500 GHz) | - | PASS |
+
+The case is stable for the full 40000 steps only with native's conservative
+`Rennings_1` step: native `Operator_Cylinder::CalcTimestep` forces it whenever
+`discLines[0][0] == 0`, while `Rennings_2` produces a 3.2x larger step that
+diverges within a few dozen timesteps. Two collateral compatibility gaps were
+fixed on the way: `et`/`ht` must be written before `SetupProcessing` (a probe
+reusing those names truncates the file, as native does) and a non-positive
+`EndCriteria` must keep the native 1e-6 default.
+
+## Cylindrical operator (RM-134)
+
+Command: `scripts/ci/run_octave_testsuite_wsl.sh` (native testsuite, unchanged).
+
+| Case | Result | Reference evidence |
+| --- | --- | --- |
+| `combinedtests/coax_cylindrical` | PASS | beta = k0 within 0.20 % (limit 1 %), radial voltage profile within 0.013 % of `log(r_p/r_i)/log(r_o/r_i)` (limit 1 %), rotational symmetry 7.6e-17 (limit 1e-9) |
+| full suite | 10 passed / 0 failed / 0 errors in 333.8 s | all ten native cases, including the previously deferred cylindrical case |
+
+Rust unit coverage: `cylindrical_full_turn_is_accepted_and_padded`,
+`cylindrical_metric_uses_rho_and_annulus_areas`,
+`cylindrical_open_alpha_is_not_padded`,
+`cylindrical_negative_rho_and_open_axis_are_rejected`, plus the seam-copy
+assertions in `extensions::tests_cylinder`.
+
+Not yet covered and therefore open: a mesh that includes the `rho = 0` axis
+(rejected explicitly, RM-137) and cylindrical field dumps with the native
+`/Mesh/{rho,alpha,z}` layout (RM-138).
+
+## Direct SAR result dumps (RM-136)
+
+Command: `scripts/ci/run_sar_dump_check_wsl.sh` (one Octave run with a
+`DumpType` 29 raw dump, a `DumpType` 20 local result and a `DumpType` 21 1 g
+result on the same lossy box).
+
+| Check | Result |
+| --- | --- |
+| raw + `sar_calc` vs `sigma|E|^2/(2 rho)` | peak 6.509386e-22 W/kg, 7.8e-8 relative |
+| direct type 20 vs raw + `sar_calc` peak | 6.5e-9 relative |
+| homogeneous interior (uniform conductivity) | 0.0 (bit-identical) |
+| whole block including the material boundary | 6.2e-3 relative, the native J-field vs cell-conductivity distinction (edge kappa is averaged over quarter cells that lie partly outside the box) |
+| 1 g averaged direct dump | finite maxSAR 1.531e-22 W/kg with a positive mass attribute |
+
+Rust unit coverage: `sar_hdf5::tests::direct_result_dump_matches_the_local_sar_formula`
+(0.5*|E|*|J|/rho = 1 W/kg) and the existing `sar` averaging tests.
+
+## Differential reference harness (RM-117)
+
+Command: `scripts/ci/run_reference_harness_wsl.sh [--case <name>]`. The harness
+runs the unmodified pinned Python sources against the Rust core, keeps the
+solver output (including `input.xml`) and compares the derived quantities with
+the native captures in `docs/migration/reference-data/`. Bounds and their
+justification are in `REFERENCE_TOLERANCES.md`.
+
+| Case | Check | Measured | Verdict |
+| --- | --- | --- | --- |
+| coax 3-D (715 k cells) | `Z_ref` real | 7.5e-5 relative | PASS |
+| coax 3-D | `S21` | 1.9e-4 dB | PASS |
+| coax 3-D | `S11` worst in band | -50.83 dB vs -50.88 dB | PASS |
+| conducting sheet (resistive film) | `|T|` | 0.036 dB vs native | PASS |
+| conducting sheet (thin copper) | `|T|` | 0.036 dB vs native | PASS |
+| conducting sheet (thick copper) | `|T|` | 0.073 dB vs native | PASS |
+| conducting sheet | phase | 0.178-0.199 deg vs native | PASS |
+| fieldprobes | all probe/dump checks | probes 1.5e-5, Ef/Hf 1.2e-5, H TD 3e-5 | PASS |
+| msl-notchfilter | `et`/`ht`, `port_ut_*`, `port_it_2*` | 1.4e-8 .. 6.0e-6 | PASS |
+| msl-notchfilter | `port_it_1A/1B` (excited port) | 1.5e-6 .. 1.9e-6 | PASS |
+
+The harness found and localised three real defects. The D/B one is fixed:
+
+* native `m_epsR`/`m_mueR` store the **absolute** permittivity/permeability
+  (`Operator::DumpMaterial2File` divides them by `EPS0`/`MUE0`), so the D and B
+  dumps are `eps0*eps_r*E` and `mue0*mue_r*H`. The Rust conversion multiplied by
+  the relative values only, which the FieldProbes source test caught as a
+  `1/eps0` relative error. Fixed in `processing.rs`, with the unit test updated
+  to the absolute values.
+
+The same run showed that the `et`/`ht` excitation waveforms were missing from
+the solver output; they are now written before the time loop and match the
+native MSL reference to 2.1e-6. The MSL reference then exposes one more gap:
+the Python `AddMSLPort` current probes of the *excited* port are all zero
+(RM-141), while the voltage probes and port-2 currents match.
+
+The FD-dump gap is fixed: the DFT interval follows native
+`min(global Nyquist, freq)`, probes default to FD oversampling 1, FD VTK dumps
+write `.vtr` rectilinear grids with the real mesh, and cropped dumps apply
+`SnapMethod = 1`. `fieldprobes` now passes every harness check.
+
+The conducting-sheet gap is closed. The root cause was the magnetic boundary
+condition: Rust `apply_magnetic_bc` cleared only the two tangential current
+components, while native `Operator::ApplyMagneticBC` also clears the normal one
+on a low PMC face, the tangential ones one line inside a high PMC face
+(`numLines - 2`), and the outermost line of every axis (outside the iterated
+domain). In the 1 mm PEC/PMC parallel-plate channel the surviving normal H
+destroyed the single-row TEM mode: the pulse propagated at 0.69 c with a 1.42x
+amplitude. With the native clearing rules the incident probe matches the
+reference exactly (amplitude ratio 1.00000, 0.0 ps delay at z = 20..120 mm,
+v = c) and all three sheet cases pass the differential bounds.
+
+The excited-port gap is closed as well. Native `ProcessCurrent` treats a
+current probe as a closed surface: every tangential axis requested with zero
+extent is grown by one dual line. Rust snapped the box but kept the line flat,
+so the two opposite faces of the probe were evaluated on the same line and the
++y/-y terms cancelled exactly (a hard zero where native reads 9.6e-8). With the
+expansion `port_it_1A/1B` match to 1.5e-6/1.9e-6. All four reference cases pass,
+which closes RM-118; the remaining step (RM-119) is owner approval of the
+recorded bounds.
+
+## nf2ff native round-trip and the DFT weight (RM-076, 2026-10-29)
+
+Command: `scripts/ci` build of `nf2ff-cli` plus the native `nf2ff` from the
+pinned v0.37.0 build, both run on the time-domain dumps that the Rust solver
+wrote for `combinedtests/nf2ff_dipole`.
+
+The native reader rejected the dump before the `uint8` flag fix
+(`dual_mesh`, `legacy_fmt` are `H5T_NATIVE_UCHAR` in
+`HDF5_File_Writer`). After the fix both runs produce a result file with the
+same layout:
+
+| Dataset | native peak | Rust peak | max relative difference |
+| --- | --- | --- | --- |
+| `nf2ff/E_phi/FD/f0_real` | 1.2890e-17 | 1.2890e-17 | 4.97e-6 |
+| `nf2ff/E_phi/FD/f0_imag` | 7.7707e-18 | 7.7707e-18 | 1.57e-5 |
+| `nf2ff/E_theta/FD/f0_real` | 4.3114e-16 | 4.3114e-16 | 4.62e-6 |
+| `nf2ff/E_theta/FD/f0_imag` | 1.5597e-15 | 1.5597e-15 | 1.67e-7 |
+| `nf2ff/P_rad/FD/f0` | 3.4747e-33 | 3.4747e-33 | 8.73e-7 |
+
+Datasets are `f8`, the `Frequency` attribute is `f4` and the mesh datasets are
+`f4`, matching native. The factor that had made the Rust field `1.08e10` too
+small was the DFT weight: native `HDF5_File_Reader::CalcFDVectorData`
+multiplies the sum by `2 * time_diff` (`tools/hdf5_file_reader.cpp:938-945`),
+with `time_diff` the last recorded sample interval. The dump interval is
+`4.6188022e-11 s` and `1 / (2 * 4.6188022e-11) = 1.0825e10`.
+`time_domain_dft_applies_the_native_trapezoidal_weight` pins the factor with the
+exact three-sample sequence `1, 0, -1`.
+
+## Lossy medium (RM-054, 2026-10-29)
+
+The operator dump fixture (`scripts/ci/run_operator_dump_check_wsl.sh`) now
+uses `BackgroundMaterial Epsilon="4" Kappa="0.05" Sigma="0.01"`, so `EC_G`
+(electric loss) and `EC_R` (magnetic loss) are both compared node by node
+against the native `--debug-operator` dump:
+
+| Coefficient | peak | max relative difference |
+| --- | --- | --- |
+| `vv` | 0.994577 | 9.8e-15 |
+| `vi` | 108.458 | 4.3e-13 |
+| `ii` | 1 | 5.96e-8 |
+| `iv` | 0.00306506 | 4.8e-15 |
+
+A parallel-plate TEM fixture (PEC plates, PMC walls, `Kappa=0.05`, 8 GHz,
+probes 40 mm apart) attenuates, but the measured `alpha` is 8.7-9.5 Np/m against
+the exact 6.65 Np/m; the lossless control still shows a 4% amplitude residue
+from the finite PML, so the fixture is not yet tight enough to carry the 3%
+analytic bound. The earlier attempt in the register used `Sigma`, the magnetic
+conductivity, whose low-loss attenuation is ~6.6e-5 Np/m over the same path,
+which is why it showed no loss. `RM-054` therefore stays `Implemented` with the
+coefficient half verified.
+
+## Var3 default and the Debye identity (RM-151, 2026-10-29)
+
+Native `Operator::Operator()` sets `m_TimeStepVar = 3` (`operator.cpp:57`); the
+port now does the same in `OperatorBaseImpl::new()`.
+`var1_and_var3_match_the_uniform_mesh_analytic_values` asserts the default. The
+Debye test now asserts the stored `v_relax_ADE`/`v_drive_ADE` values are the
+correctly rounded f32 analytic coefficients (bit-exact equality) instead of
+checking the exact identity `2 d / (1 - a) = delta_eps`, which the native
+`FDTD_FLOAT` storage limits to a few 1e-7 at Var3. `openems-core --features
+hdf5`: 266 + 2 tests pass.
+
+## Native differential: lossy guide and UPML (RM-043, RM-054, 2026-10-29)
+
+Two dedicated gates now run the same XML through the pinned native binary and
+the Rust CLI and compare the E-field probe traces. Both use the approved 1 %
+probe bound.
+
+`scripts/ci/run_lossy_medium_check_wsl.sh` - parallel-plate TEM guide (PEC
+plates in z, PMC walls in y, PML in x), 1 mm cells, `Kappa = 0.05 S/m`
+everywhere, 8 GHz Gaussian, probes at x = 60 mm and 100 mm, 200 steps:
+
+| Probe | max relative difference | native peak |
+| --- | --- | --- |
+| x = 60 mm | 7.5e-6 | 0.6240 |
+| x = 100 mm | 1.1e-5 | 0.4244 |
+
+Native probe ratio `p2/p1 = 0.6802`, i.e. the loss attenuates, and the port
+reproduces it. The analytic `exp(-alpha d)` from the exact lossy-medium formula
+is 0.7665, so the 11 % gap is a property of the native discretisation, not a
+port difference; the native comparison is therefore the acceptance and no
+analytic bound is used.
+
+`scripts/ci/run_upml_reflection_check_wsl.sh` - 41x21x21 at 1 mm, eight-cell
+UPML on all six faces, hard E_z 6 GHz Gaussian at the centre, probes at the
+centre and 6 mm off-centre, 900 steps:
+
+| Probe | max relative difference | absorbed tail |
+| --- | --- | --- |
+| centre | 6.0e-8 | 8.9e-8 native, 7.6e-8 Rust (-141 / -142 dB) |
+| 6 mm | 1.0e-8 | - |
+
+The library test `upml_absorbs_a_gaussian_pulse` reports -117 dB for the same
+setup, consistent with the differential tail.
+
+## Mesh and time-step convergence
+
+Refinement studies are recorded in `audit/numerics/CONVERGENCE.md` and the raw
+JSON under `reference-data/convergence/`:
+
+| Study | Observable | Result |
+|---|---|---|
+| PEC cavity h/h2/h4 | TE101 vs analytic 3.9024232466 GHz | errors 1.770e-3 / 4.270e-4 / 1.047e-4, order **2.05 / 2.03** |
+| PEC cavity dt x1/x0.5/x0.25 | TE101 vs the fixed-mesh dt->0 limit | temporal error 2.062 MHz -> 0.412 MHz, ratio 5.0, order **2.32** (one pair); 3.73 MHz offset is spatial |
+| Dielectric line h/h2/h4 (eps_r=4) | speed vs c/2 | errors 2.143e-3 / 1.149e-3 / 9.253e-4, monotone, order 0.90/0.31 (estimator-limited) |
+| MSL shunt-open-stub notch | \|S11\| peak (\|S21\| dip) | 3.6700 / 3.6712 / 3.6703 GHz at 373/448/560 um; spread 3.0e-4, quarter-wave estimate 3.6871 GHz (0.46 %) |
+
+These are studies, not CI gates. The MSL result says the smoke model is not a
+converged notch design; it is not evidence of a solver defect.
+
+## Miri memory-safety pass (RM-180)
+
+`scripts/ci/run_miri_checks_wsl.sh` (nightly + Miri) runs:
+
+- `fparser-rs`: **21 passed, 0 failed**, 32 filtered;
+- `openems-core`: three operator timestep/coordinate tests, **3 passed**;
+- result: **no undefined behaviour** reported.
+
+The 32 filtered parser tests are the optimizer's exact last-bit
+floating-point parity tests (`optimization*`, `optimized*`). Miri's float
+emulation differs from the host in the final bit (for example
+`-0.5463024898437903` vs `-0.5463024898437905`, or `0.9999999999999998` vs
+`1.0`), so those tests cannot be used as a Miri gate. The full suite still
+passes natively (53/53).
+
+## Fuzzing (RM-182)
+
+`fuzz/fparser-parse` is a cargo-fuzz crate (its own workspace, not part of
+the product build) with the target `parse_expression`: arbitrary UTF-8 is
+parsed, optimized, evaluated with `[1, 2, 3]` and `[0, -0, 1e300]`, and also
+fed to `parse_and_deduce_variables`. Inputs are capped at 4 KiB; seven seed
+expressions include a conditional, nested parentheses, `atan2`, an overflow
+and a domain error.
+
+Run on 2026-10-31 (nightly 1.101, cargo-fuzz 0.13.2):
+
+```
+cargo +nightly fuzz run --fuzz-dir . parse_expression -- \
+    -max_total_time=120 -rss_limit_mb=2048 -print_final_stats=1
+Done 126963 runs in 121 second(s)
+stat::number_of_executed_units: 126963
+stat::average_exec_per_sec:     1049
+stat::new_units_added:          1988
+stat::peak_rss_mb:              474
+```
+
+No crash, timeout or OOM artifact was produced (`artifacts/parse_expression`
+is empty). A re-verification run on 2026-10-31 (same command, retained corpus)
+executed **324 073 runs** with 3 208 new units and 498 MB peak, again with no
+crash.
+
+## AddressSanitizer (RM-183)
+
+`scripts/ci/run_asan_checks_wsl.sh`:
+
+```
+RUST_MIN_STACK=67108864 RUSTFLAGS=-Zsanitizer=address \
+  cargo +nightly test -Zbuild-std --target x86_64-unknown-linux-gnu -p fparser-rs
+RUST_MIN_STACK=67108864 RUSTFLAGS=-Zsanitizer=address \
+  cargo +nightly test -Zbuild-std --target x86_64-unknown-linux-gnu \
+    -p openems-core --lib operator::
+```
+
+- fparser: **53 passed, 0 failed**, no ASan report.
+- openems-core `operator::`: **58 passed, 0 failed**, no ASan report.
+- `RUST_MIN_STACK=64 MiB` is required: ASan's larger frames exhaust the default
+  8 MiB test-thread stack on the deliberate 4000-level nesting test before the
+  parser's 512-level guard fires. With the larger stack the guard is reached
+  and the suite passes; this is instrumentation stack pressure, not a memory
+  error. TSan is not enabled for this single-threaded selection and is not
+  claimed.
+
+## Analytic SAR (VAL-002, RM-178)
+
+`scripts/ci/run_analytic_sar_check_wsl.sh` drives a homogeneous lossy TEM line
+(`eps_r=4`, `sigma=0.1 S/m`, `rho=1000 kg/m3`, 2 GHz) and compares the complex
+field and the SAR output with the exact lossy-medium solution over 50-200 mm:
+
+| Quantity | Analytic | Measured | Relative error |
+|---|---:|---:|---:|
+| attenuation `alpha` | 9.360098 Np/m | 9.351325 Np/m | 9.37e-4 |
+| phase constant `beta` | 84.354713 rad/m | 84.365061 rad/m | 1.23e-4 |
+| SAR slope | 18.720195 1/m | 18.702651 1/m | 9.37e-4 |
+
+The SAR output also matches `0.5 sigma |E|^2 / rho` pointwise to 1.65e-7 of
+the peak. Record: `reference-data/convergence/analytic_sar.json`. Tolerance is
+2 % for each fitted quantity; the measured values are 0.01-0.1 %. The absolute
+SAR scale is the engine's DFT convention (validated pointwise), so the analytic
+claim is the spatial decay and phase, not an independent W/kg calibration.
+
+## fparser long-integer backend (E-001, 2026-11-01)
+
+`long-integer` selects `rug::Integer` and native `FunctionParser_gmpint`
+semantics: decimal/octal/hex integer literals, truncating division and
+remainder, exact comparisons, `abs/min/max/if`, and integer-only syntax (no
+`^`, `&&`/`||`, `==`, floats or transcendental builtins). Division or remainder
+by zero evaluates to 0, matching the native integer parser.
+
+Evidence: 2/2 integer unit tests and `run_fparser_long_integer_check_wsl.sh`:
+**52 expressions, exact integer equality and parse-error agreement** against the
+native `FunctionParser_gmpint` oracle at x=5.
+
+## GPU host-sync extension path (ADR 0012, 2026-11-01)
+
+`Engine::enable_gpu` no longer rejects models with extensions. The E/H kernels
+stay on the device; the extension phases run on the host copy with a
+download/upload around the phase (native `Engine_GPU` host-sync behaviour).
+`--gpu` is wired through the CLI (`openems-cli --features gpu --gpu`).
+
+Evidence:
+
+| case | result |
+| --- | --- |
+| 48^3, 120 steps, `BumpExtension` (post-voltage host write) | E field diff **0.0**; CPU 4.23 s vs GPU host-sync 23.07 s (quiet run; transfers dominate on the WSL device) |
+| extension-free 48^3, 120 steps | CPU 5.00 s vs GPU 97 ms, fields identical |
+| high-level coax excitation + probes, 220 steps, `--gpu` | `u1` **0.0**, `u2` **3.55e-8** relative vs the CPU run |
+| high-level setup with a Mur extension | GPU buffers active, host-sync run completes |
+
+The host-sync path is correctness-first: it removes the CPU fallback for
+extension models but is not faster than the CPU on the current WSL adapter.
+GPU-safe extension kernels (excitation/PML) are the performance follow-up.
+
+## fparser extended-precision backends (E-001, 2026-11-01)
+
+The parser scalar seam now has three opt-in backends beside the default `f64`:
+`float` (f32), `long-double` (IEEE binary128 via `f128`/libquadmath) and `mpfr`
+(`rug::Float`, 256-bit, with the non-`Copy` scalar refactor). The default
+workspace build does not compile the new dependencies.
+
+Per-backend evidence:
+
+| backend | unit tests | native differential |
+| --- | --- | --- |
+| f64 (default) | 53/53 | existing 36k-expression corpus |
+| f32 (`float`) | 3/3 | existing float differential |
+| `long-double` | 3/3 | `run_fparser_long_double_check_wsl.sh`: 30 expressions, worst relative **0.000e+00** vs native `FunctionParser_ld` |
+| `mpfr` | 3/3 | `run_fparser_mpfr_check_wsl.sh`: 30 expressions, worst relative **1.806e-29** vs native `FunctionParser_mpfr` |
+
+The extended-precision tests check binary128/256-bit literals directly:
+`0.1 + 0.2` versus the parsed `0.3` is below `1e-30` (binary128) and `1e-70`
+(MPFR), and builtins agree with the `f64` reference inside `1e-15`. The native
+differentials compile the reference `FunctionParser_ld`/`FunctionParser_mpfr`
+against the same corpus and compare the parsed/evaluated values.
+
+Limitation: the long-integer variant (`FunctionParser_gmpint`) is not ported
+yet because it needs the integer-only builtin and optimizer rule set.
+
+## Cylindrical multi-grid setup + coax probe gate (E-007 stage 5, 2026-11-01)
+
+`setup_fdtd` now builds the child operator, forces its outer rho face to PEC,
+builds child-safe extensions through `IsCylindricalMultiGridSave`, attaches the
+inner engine to `Engine`, and the probes/dumps sample the full base mesh. The
+`MultiGrid` setup rejection is removed.
+
+High-level coaxial gate (closed alpha, 14 rho lines 100..230 mm, 17 alpha lines,
+101 z lines, PEC walls, `1/rho` weighted voltage excitation at z=0, voltage
+probes at z=100 mm and z=600 mm, 220 steps):
+
+| check | result |
+| --- | ---: |
+| `u1` multigrid vs single grid | 1.042e-7 relative |
+| `u2` multigrid vs single grid | 9.313e-8 relative |
+| phase(u2/u1) | single 1.0761 rad, multigrid 1.0761 rad |
+| beta vs k0 (wrapped) | 6.204e-3 (0.62 %) |
+| partial/full voltage profile vs log(r) | 0.5642 vs analytic 0.5643 (1.3e-4) |
+
+This is the `coax_cylindrical.m` phase/profile oracle applied to the multigrid
+run. The physical initial-condition test above still shows the first-order
+interface drift (~30 % after 40 source-free steps); the driven probe gate is
+unaffected.
+
+Child-limitation note: UPML is not cloned to the child (native marks it
+child-unsafe), so a PML model absorbs on the base but reflects in the inner
+grid, exactly like native. TFSF and Mur on the alpha/rho-min faces are
+rejected at setup.
+
+## Cylindrical multi-grid engine (E-007 stage 4, 2026-11-01)
+
+`MultiGridEngine` (`openEMS/rust/src/multigrid.rs`) runs the native
+`Engine_CylinderMultiGrid` barrier order sequentially:
+
+1. base voltage half-step, then child voltage half-step,
+2. `SyncVoltages` (base row `split_pos - 1` -> child: `E_rho = 0`,
+   `E_z`, `E_alpha = E_alpha(a) + E_alpha(a+1)`),
+3. base current half-step, then child current half-step,
+4. `SyncCurrents` (child row `split_pos - 2` -> base),
+5. child-to-base interpolation of the overlap rows.
+
+The pair now uses the native layout: base = full mesh, child = rho up to the
+split and every second alpha line. The base EC coefficients below
+`split_pos - 1` are zero and the child runs on the base timestep.
+
+Evidence (openEMS-core lib tests, closed alpha, manufactured coaxial TEM pulse,
+10/10 multigrid tests):
+
+| check | result |
+| --- | ---: |
+| voltage parity vs single-grid, 5 steps | 6.7e-3 |
+| current parity vs single-grid, 5 steps | 3.3e-2 |
+| TEM peak position | multigrid z=7, reference z=7 |
+| normalized radial voltage profile | 2.8e-4 |
+
+Long-run limitation: after 40 source-free steps the same case drifts to
+~30% (a small `E_z` is generated at the split by the native first-order
+coupling). Stage 5 adds the driven coax probe/phase gate and the setup
+integration; see the section above.
+
+## Child-to-base field interpolation (E-007 stage 3b, 2026-11-01)
+
+\interpolate_child_to_base\ applies the alpha tables for one rho row and z
+index: the alpha component uses the alpha table, rho/z use the companion table.
+Unit test: 0.25/0.75 weights on a constant child field reproduce the constant in
+all components. The multi-grid engine and the physical coax probe oracle remain
+open; the tables are not yet driven by a simulation.
+
+## Cylindrical multi-grid interpolation tables (E-007 stage 3, 2026-11-01)
+
+`AlphaInterpolation::new` ports the native `SetupInterpolation` positions and
+weights for the alpha direction (voltage and current tables, closed/open seam
+cases). Unit test: base 5 / child 10 closed lines -> voltage table index 0 wraps
+to `child_len-3 = 7`, current index 1 maps to positions 0/1, all weights finite
+and in range.
+
+The tables are not yet applied to fields; the engine and the physical
+`coax_cylindrical` probe oracle remain open.
+
+## Cylindrical multi-grid operator pair (E-007 stage 2, 2026-11-01)
+
+`MultiGridOperatorPair::from_xml` splits the model at the validated split line
+and builds two `Operator` instances: the base keeps rho up to the split and
+every second alpha line, the child keeps the split rho lines and all alpha
+lines. Unit test: 13 rho / 10 closed-alpha lines -> base `6x5`, child `7x11`
+(CSXCAD pads the closed alpha mesh); `setup_fdtd` now builds the pair and
+reports its cell counts before the explicit "engine not wired" rejection.
+
+Native differential attempt (`scripts/ci/run_multigrid_operator_check_wsl.sh`,
+base fixture, PEC and MUR boundaries, 6 rho x 5 alpha x 5 z):
+
+| coefficient | max relative difference |
+| --- | ---: |
+| `vv` | 0.0 |
+| `vi` | 2.03 |
+| `ii` | 0.0 |
+| `iv` | 2.68 |
+
+An experiment that switched the EC geometry to an unscaled (no-rho) metric made
+`vi`/`iv` rho-independent like the dump, but broke the coaxial cylindrical
+propagation gate (`TEM propagation, beta = k0`, max relative deviation 1.37
+against 0.01) in the Octave testsuite. The change was reverted in `4f97545`:
+the operator dump is not yet a trustworthy oracle for the cylindrical rho
+convention, and the coaxial gate is authoritative.
+
+The split operators therefore still differ from native `Operator_Cylinder` on
+this mesh. This stage-2 layout was later found inverted and replaced in stage 4
+(base = full mesh); the physical gates in stages 4-5 are the validation that
+matters, and the dump difference is tracked as E-015.
+
+## Cylindrical multi-grid plan (E-007 stage 1, 2026-11-01)
+
+`openEMS/rust/src/multigrid.rs` ports the native placement and compatibility
+rules without wiring the engine:
+
+- radii validation (1..20 levels, finite, positive, strictly increasing);
+- `find_grid_split`: first rho line above the split, at least four lines from
+  both ends, odd alpha count (minus a closed alpha plane);
+- `split_lines`: base keeps rho lines up to the split and every second alpha
+  line, the child keeps the full mesh (native `SetGeometryCSX`);
+- `IsCylindricalMultiGridSave` matrix per extension family, including the
+  Mur z/rho and UPML base-only cases.
+
+`cargo test -p openems-core --lib multigrid`: **4 tests pass**; `setup_fdtd`
+still rejects a valid plan with an explicit "engine not wired" error (E-007
+remains open). The full lib suite is green.
+
+## GPU stage 1 (ADR 0012, 2026-11-01)
+
+The optional `gpu` feature acquires a `wgpu` adapter and runs a compute shader
+over an f32 storage buffer, then reads it back. Test evidence on this host:
+
+```
+GPU round-trip on NVIDIA GeForce RTX 5070 Laptop GPU (Vulkan)
+gpu::tests::gpu_context_and_scale_round_trip ... ok
+```
+
+Stage 2 adds the Yee E/H update kernels (`update_e`, `update_h`) over the same
+component-major layout, with `vv`/`vi`/`ii`/`iv` coefficients. On a 5x4x3 grid
+the GPU result matches the CPU formula: **E 5.96e-8, H 5.96e-8** max absolute
+difference.
+
+Stage 3 wires the buffers into `Engine`: `enable_gpu()` uploads the fields and
+coefficients, every step dispatches E then H, and the fields sync once per
+`iterate_ts` batch. Models with any registered extension are refused with an
+explicit "CPU fallback" error. Measured on the local RTX 5070 (Vulkan), 48^3
+cells, 120 steps, single-thread CPU:
+
+| engine | wall time | field difference |
+| --- | ---: | ---: |
+| CPU | 5.00 s | reference |
+| GPU | 97 ms | 0.00e0 (identical) |
+
+All four GPU tests skip with an explicit message when no adapter is available.
+The CPU threaded engine is not part of this comparison; extension-aware GPU
+kernels (PML, excitation, probes) remain open.
+
+## Cell-constant material averaging (E-008, 2026-11-01)
+
+`CellConstantMaterial="1"` now selects native `AverageMatCellCenter`
+(`MaterialAveraging::CellCenter`): the four transverse cells are sampled at
+their dual-node (cell) centres instead of quarter points, and the edge
+mue/sigma width uses the dual mesh. `scripts/ci/run_operator_dump_check_wsl.sh`
+runs two differential cases: the original quarter-cell model and a
+`CellConstantMaterial="1"` model with a material box straddling cell centres
+(20^3 mesh). Native vs Rust:
+
+| coefficient | quarter-cell | cell-centre |
+| --- | ---: | ---: |
+| `vv` | 9.8e-15 | exact |
+| `vi` | 4.3e-13 | 9.9e-8 |
+| `ii` | 6.0e-8 | exact |
+| `iv` | 4.8e-15 | 1.1e-13 |
+
+Both cases pass the 1e-6 relative bound. Unit tests cover the quarter-vs-centre
+difference on a thin slab and the setup switch; `openems-core` has 278 passing
+lib tests.
+
+## CST cross-validation (E-009, 2026-10-31)
+
+CST Studio Suite 2026 ran the MSL notch fixture through
+`docs/migration/cst/run_msl_notch_cst.py` (waveguide ports at the line ends,
+160 steps/wavelength, fixed mesh, 1-7 GHz). The harness reports **PASS**:
+
+| observable | openEMS | CST 2026 | difference |
+| --- | ---: | ---: | ---: |
+| notch frequency | 3.6700 GHz | 3.6425 GHz | 0.749 % (gate 1 %) |
+| \|S11\| at notch | 0.9921 | 0.9981 | gate >= 0.8 |
+| \|S21\| at notch | -50.07 dB | -29.76 dB | gate <= -20 dB |
+| \|S11\| RMS, 1-7 GHz | - | 1.42 dB | gate 3 dB |
+
+Mesh convergence (same ports and geometry, fixed mesh): 80 steps/wavelength
+gives 3.6327 GHz (1.018 %), 160 gives 3.6425 GHz (0.749 %), moving toward the
+openEMS/quarter-wave value. The 69 MB CST project is reproducible and ignored;
+the Touchstone export, metadata, CST messages and report are committed under
+`docs/migration/cst/run_wg160/`. The low-frequency power balance (0.68 at
+1 GHz, 0.95 at 7 GHz) is a band-edge port limitation and is recorded, not
+gated. Earlier failed attempts (port plane below the strip, ignored mesh
+property) are documented in `docs/migration/cst/PREPARATION.md`.
+
