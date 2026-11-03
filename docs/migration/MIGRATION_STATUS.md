@@ -1229,3 +1229,28 @@ now register rows, all closed:
   interface tables on the host, CI has no GPU runner, and small models stay
   CPU-faster at the ~0.2 ms per-dispatch floor.
 
+## Session record 2026-11-03 (Windows-native re-verification; scope decisions)
+
+- **What:** the full workspace was rebuilt and re-tested Windows-native at
+  HEAD `92d3435` (after RM-205/RM-206) on the RTX 5070 Laptop host, using the
+  documented conda HDF5 setup (`HDF5_LIB_DIR` -> the `openems` conda env).
+  Two scope decisions were recorded: **MPI stays out of scope** — the native
+  C++ openEMS has no MPI (source grep: no `mpi.h`, no `MPI_*`), so distributed
+  execution is not migration parity and is not planned; and the **GPU scope is
+  confirmed complete as recorded** in `GPU_OPTIMISATION_PLAN.md` (R-1 accepted,
+  R-2/R-3 open, R-7 verified), with no new GPU parity gap identified.
+- **Results:** `cargo build --release` is green; `cargo test --release
+  --workspace --features "openems-core/hdf5,openems-core/gpu,openems-cli/gpu"`
+  reports **933 passed / 0 failed** across 39 suites, including the 18-test GPU
+  engine differential set (UPML, Mur, TFSF, Debye, Lorentz, lumped RLC,
+  conducting sheet, source, multi-grid, energy, dispatch budget, host
+  extension fallback) running on the actual wgpu adapter.
+- **CLI evidence:** `openems-cli gpu_engine.xml` completes 10 timesteps on the
+  CPU engine, on `--gpu`, and on `--gpu-auto`, which correctly defers to the
+  CPU at 1000 cells (< the 75000-cell crossover, 4 passes/step, message
+  printed). `appcsxcad gpu_engine.xml` opens the geometry window on the
+  desktop (egui/wgpu, title "AppCSXCAD - ...gpu_engine.xml").
+- **Remaining:** R-2 (device-resident multi-grid interface tables), R-3 (CI
+  GPU runner), RM-121 (native performance baseline), RM-106 (interactive GUI
+  QA sign-off items).
+
