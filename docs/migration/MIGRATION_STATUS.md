@@ -1253,4 +1253,17 @@ now register rows, all closed:
 - **Remaining:** R-2 (device-resident multi-grid interface tables), R-3 (CI
   GPU runner), RM-121 (native performance baseline), RM-106 (interactive GUI
   QA sign-off items).
+- **Correction + regression fixed:** the record above initially reported the
+  plain `cargo build --release` as green from a tail-only read without
+  checking the exit code; the build had actually failed. The default
+  (no-gpu) workspace build was broken since the RM-204 multi-grid wiring:
+  `iterate_multi_grid` calls `upload_all_gpu`/`download_all_gpu`
+  unconditionally while the methods exist only under the `gpu` feature
+  (E0599, 8 errors at `engine.rs:1056-1082`). Fixed in `openEMS@272f1a6`
+  with `cfg(not(feature = "gpu"))` no-op stubs (the established fallback
+  pattern in `openems.rs`). Evidence, all exit-code-checked: plain build
+  exit 0; plain workspace tests **915/915**; gpu-feature build + tests
+  **933/933**; `openems-cli --gpu` solves the 10-step GPU smoke model on the
+  RTX 5070. Lesson recorded: every build/test verification must check the
+  exit status, not the trailing output.
 
